@@ -1,76 +1,20 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Decision Tree Visualizer</title>
+  <title>EagleEye</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <header>
-    <h1>Decision-Support Chatbot Visualizer</h1>
-    <p>For internal use only.</p>
-  </header>
+  <body>
+    <div data-include="parts/header.html"></div>
+    <div data-include="parts/upload-panel.html"></div>
+    <!-- <div data-include="parts/select-tree-panel.html"></div> -->
+    <div data-include="parts/editor-panel.html"></div>
+    <div data-include="parts/preview-panel.html"></div>
 
-  <main>
-    <section class="panel">
-      <h2>1. Upload XLSX files</h2>
-      <div class="upload-grid">
-        <label>1_topics.xlsx <input type="file" id="topicsFile" accept=".xlsx,.xls"></label>
-        <label>2_issues.xlsx <input type="file" id="issuesFile" accept=".xlsx,.xls"></label>
-        <label>3_parameters.xlsx <input type="file" id="parametersFile" accept=".xlsx,.xls"></label>
-        <label>4_decision_rules.xlsx <input type="file" id="rulesFile" accept=".xlsx,.xls"></label>
-        <label>5_recommendations.xlsx <input type="file" id="recommendationsFile" accept=".xlsx,.xls"></label>
-      </div>
-      <button id="loadBtn">Load files</button>
-      <p id="loadStatus" class="status"></p>
-    </section>
-
-    <section class="panel controls">
-      <h2>2. Select decision tree</h2>
-      <label>
-        Topic
-        <select id="topicSelect" disabled="">
-          <option value="">Load files first</option>
-        </select>
-      </label>
-      <label>
-        Issue
-        <select id="issueSelect" disabled="">
-          <option value="">Select a topic first</option>
-        </select>
-      </label>
-    </section>
-
-    <section class="summary-grid">
-      <div class="card">
-        <h3>Required parameters</h3>
-        <div id="parametersList" class="empty">No issue selected.</div>
-      </div>
-      <div class="card">
-        <h3>Matching rules</h3>
-        <div id="rulesList" class="empty">No issue selected.</div>
-      </div>
-      <div class="card">
-        <h3>Recommendations</h3>
-        <div id="recommendationsList" class="empty">No issue selected.</div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="flowchart-header">
-        <h2>3. Decision tree flowchart</h2>
-        <button id="copyMermaidBtn" disabled="">Copy Mermaid</button>
-      </div>
-      <div id="flowchart" class="flowchart empty">Load files and select an issue.</div>
-    </section>
-
-
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-  <script src="script.js"></script>
-  
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+  </body>
 </html>

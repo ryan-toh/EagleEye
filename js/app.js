@@ -1,11 +1,39 @@
 import { buildIssueFlowchart, renderMermaid } from './flowchart.js';
-import { getFileInputs, loadWorkbookData, validateLibraries, validateWorkbookData } from './fileService.js';
-import { loadState, setSelectedIssue, setSelectedTopic } from './state.js';
-import { clearIssueView, copyMermaid, disableLoading, dom, renderIssueOptions, renderIssueSummary, renderTopicOptions, setStatus } from './dom.js';
+import { getFileInputs, loadWorkbookData, validateLibraries, validateWorkbookData, saveWorkbookData } from './fileService.js';
+import { loadState, setSelectedIssue, setSelectedTopic, appState } from './state.js';
+import { dom, initDomElements, clearIssueView, copyMermaid, disableLoading, renderIssueOptions, renderIssueSummary, renderTopicOptions, setStatus, saveSheet } from './dom.js';
 
-const fileInputs = getFileInputs();
+document.addEventListener("DOMContentLoaded", main);
 
-initApp();
+async function main() {
+  try {
+    await loadParts();
+
+    initDomElements();
+    initApp();
+
+  } catch (error) {
+    console.error("Failed to initialise app:", error);
+  }
+}
+
+
+// Load HTML parts
+async function loadParts() {
+  const includeElements = document.querySelectorAll("[data-include]");
+
+  for (const element of includeElements) {
+    const filePath = element.getAttribute("data-include");
+    const response = await fetch(filePath);
+
+    if (!response.ok) {
+      throw new Error(`Failed to load partial: ${filePath}`);
+    }
+    
+    element.innerHTML = await response.text();
+
+  }
+}
 
 /**
  * Start the application.
@@ -20,18 +48,20 @@ function initApp() {
     return;
   }
 
+
   // attach event listeners to buttons
   dom.loadBtn.addEventListener('click', onLoadFiles);
   dom.topicSelect.addEventListener('change', onTopicChange);
   dom.issueSelect.addEventListener('change', onIssueChange);
   dom.copyMermaidBtn.addEventListener('click', copyMermaid);
+  dom.saveSheetBtn.addEventListener('click', saveSheet);
 }
 
 async function onLoadFiles() {
   setStatus('Loading files...');
 
   try {
-    const workbookData = await loadWorkbookData(fileInputs);
+    const workbookData = await loadWorkbookData(getFileInputs());
     validateWorkbookData(workbookData);
     loadState(workbookData);
     renderTopicOptions();

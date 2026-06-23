@@ -1,0 +1,87 @@
+<section class="panel controls">
+    <h2>2a. Select decision tree</h2>
+    <label>
+    Topic
+    <select id="topicSelect" disabled="">
+        <option value="">Load files first</option>
+    </select>
+    </label>
+    <label>
+    Issue
+    <select id="issueSelect" disabled="">
+        <option value="">Select a topic first</option>
+    </select>
+    </label>
+</section>
+
+<section class="panel editor-panel">
+    <h2>2b. Create or edit decision trees</h2>
+    <p class="helper-text">Create or edit a topic, issue, parameters, then generate recommendation rule/rows from parameter value combinations.</p>
+
+    <div class="editor-grid">
+        <div class="editor-card">
+          <h3>Topic</h3>
+          <label>
+            Existing topic
+            <select id="editorTopicPicker"></select>
+          </label>
+          <label>Topic ID <input id="editorTopicId" type="text" /></label>
+          <label>Topic name <input id="editorTopicName" type="text" /></label>
+          <label>Description <textarea id="editorTopicDescription" rows="3"></textarea></label>
+          <label>Example phrases <textarea id="editorTopicExamples" rows="3"></textarea></label>
+          <button id="saveTopicBtn" type="button">Save topic</button>
+        </div>
+
+        <div class="editor-card">
+          <h3>Issue</h3>
+          <label>
+            Existing issue
+            <select id="editorIssuePicker"></select>
+          </label>
+          <label>Issue ID <input id="editorIssueId" type="text" /></label>
+          <label>Issue name <input id="editorIssueName" type="text" /></label>
+          <label>Issue description <textarea id="editorIssueDescription" rows="3"></textarea></label>
+          <label>Example phrases <textarea id="editorIssueExamples" rows="3"></textarea></label>
+          <button id="saveIssueBtn" type="button">Save issue</button>
+        </div>
+
+        <div class="editor-card">
+          <h3>Parameter</h3>
+          <label>
+            Existing parameter
+            <select id="editorParameterPicker"></select>
+          </label>
+          <label>Parameter ID <input id="editorParameterId" type="text" /></label>
+          <label>Question to ask <textarea id="editorParameterQuestion" rows="3"></textarea></label>
+          <label>
+            Required
+            <select id="editorParameterRequired">
+              <option value="yes">yes</option>
+              <option value="no">no</option>
+            </select>
+          </label>
+          <label>Allowed values <textarea id="editorParameterAllowedValues" rows="3" placeholder="yes, no, unclear"></textarea></label>
+          <label>Example values <textarea id="editorParameterExampleValues" rows="2"></textarea></label>
+          <label>Order <input id="editorParameterOrder" type="number" min="1" /></label>
+          <button id="saveParameterBtn" type="button">Save parameter</button>
+        </div>
+      </div>
+
+      <div class="editor-card wide">
+        <div class="flowchart-header">
+          <h3>Recommendation matrix</h3>
+          <div class="button-row">
+            <button id="buildCombinationsBtn" type="button">Build combinations</button>
+            <button id="saveCombinationRulesBtn" type="button" disabled>Save recommendation rules</button>
+          </div>
+        </div>
+        <br>
+        <p class="helper-text">The matrix uses parameters with allowed_values. Each saved row creates or updates one decision rule and one linked recommendation.</p>
+        <div id="recommendationMatrix" class="empty">Select an issue, add parameters with allowed_values, then build combinations.</div>
+      </div>
+
+      <p id="editorStatus" class="status"></p>
+    </section>
+
+  </main>
+</section>

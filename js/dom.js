@@ -1,17 +1,35 @@
+import { saveWorkbookData } from './fileService.js';
 import { appState, getIssuesForTopic, getIssueParameters, getIssueRules, getRecommendationsForRules } from './state.js';
 import { escapeHtml, isRequired, str, toList } from './utils.js';
 
-export const dom = {
-  loadBtn: document.getElementById('loadBtn'),
-  loadStatus: document.getElementById('loadStatus'),
-  topicSelect: document.getElementById('topicSelect'),
-  issueSelect: document.getElementById('issueSelect'),
-  parametersList: document.getElementById('parametersList'),
-  rulesList: document.getElementById('rulesList'),
-  recommendationsList: document.getElementById('recommendationsList'),
-  flowchart: document.getElementById('flowchart'),
-  copyMermaidBtn: document.getElementById('copyMermaidBtn')
-};
+export const dom = {};
+
+export function initDomElements() {
+  Object.assign(dom, {
+    loadBtn:             getRequiredElement('loadBtn'),
+    loadStatus:          getRequiredElement('loadStatus'),
+    topicSelect:         getRequiredElement('topicSelect'),
+    issueSelect:         getRequiredElement('issueSelect'),
+    parametersList:      getRequiredElement('parametersList'),
+    rulesList:           getRequiredElement('rulesList'),
+    recommendationsList: getRequiredElement('recommendationsList'),
+    flowchart:           getRequiredElement('flowchart'),
+    copyMermaidBtn:      getRequiredElement('copyMermaidBtn'),
+    saveSheetBtn:        getRequiredElement('saveSheetBtn')
+  });
+
+  return dom;
+}
+
+function getRequiredElement(id) {
+  const element = document.getElementById(id);
+
+  if (!element) {
+    throw new Error(`Missing DOM Element: #${id}`);
+  }
+
+  return element;
+}
 
 export function setStatus(message, type = '') {
   dom.loadStatus.textContent = message;
@@ -110,4 +128,8 @@ export async function copyMermaid() {
   await navigator.clipboard.writeText(appState.lastMermaid);
   dom.copyMermaidBtn.textContent = 'Copied';
   setTimeout(() => (dom.copyMermaidBtn.textContent = 'Copy Mermaid'), 1200);
+}
+
+export async function saveSheet() {
+  await saveWorkbookData(appState);
 }

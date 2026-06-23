@@ -1,4 +1,84 @@
-import { FILE_CONFIG } from './schema.js';
+import { FILE_CONFIG } from "./schema.js";
+
+/* Save and Export */
+export function saveWorkbookData(workbookData) {
+  validateExportData(workbookData);
+
+  console.log("Attempting to save.");
+
+  saveSingleWorkbook(
+    FILE_CONFIG.topics.label,
+    workbookData.topics,
+    getExportColumns("topics")
+  );
+
+  saveSingleWorkbook(
+    FILE_CONFIG.issues.label,
+    workbookData.issues,
+    getExportColumns("issues")
+  );
+
+  saveSingleWorkbook(
+    FILE_CONFIG.parameters.label,
+    workbookData.parameters,
+    getExportColumns("parameters")
+  );
+
+  saveSingleWorkbook(
+    FILE_CONFIG.rules.label,
+    workbookData.rules,
+    getExportColumns("rules")
+  );
+
+  saveSingleWorkbook(
+    FILE_CONFIG.recommendations.label,
+    workbookData.recommendations,
+    getExportColumns("recommendations")
+  );
+}
+
+function saveSingleWorkbook(filename, rows, columns) {
+  if (!window.XLSX) {
+    throw new Error("XLSX library not loaded.");
+  }
+
+  const workbook = window.XLSX.utils.book_new();
+
+  const normalizedRows = rows.map((row) =>
+    normalizeRowForExport(row, columns)
+  );
+
+  const worksheet = window.XLSX.utils.json_to_sheet(normalizedRows, {
+    header: columns
+  });
+
+  window.XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  window.XLSX.writeFile(workbook, filename);
+}
+
+function normalizeRowForExport(row, columns) {
+  const normalized = {};
+
+  for (const column of columns) {
+    normalized[column] = row[column] ?? "";
+  }
+
+  return normalized;
+}
+
+function getExportColumns(key) {
+  return FILE_CONFIG[key].exportColumns ?? FILE_CONFIG[key].requiredColumns;
+}
+
+function validateExportData(workbookData) {
+  for (const key of Object.keys(FILE_CONFIG)) {
+    if (!Array.isArray(workbookData[key])) {
+      throw new Error(`Cannot export: workbookData.${key} must be an array.`);
+    }
+  }
+}
+
+/* Extract and Import */
 
 export function validateLibraries() {
   if (!window.XLSX) {
