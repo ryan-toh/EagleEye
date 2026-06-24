@@ -3,79 +3,97 @@ import { FILE_CONFIG } from "./schema.js";
 /* Save and Export */
 
 // multi sheet export
-// export function saveWorkbookData(workbookData, filename="bot-input") {
-//   if (!window.XLSX) {
-//     throw new Error('XLSX Library not loaded.');
-//   }
-
-//   const workbook = window.XLSX.utils.book_new();
-
-//   Object.entries(FILE_CONFIG).forEach(([key, config]) => {
-//     const rows = Array.isArray(data[key]) ? data[key] : [];
-//     const exportRows = rows.map(row => normalizeRowForExport(row, config.exportColumns || config.requiredColumns));
-//     const worksheet = window.XLSX.utils.json_to_sheet(exportRows, {
-//       header: config.exportColumns || config.requiredColumns
-//     });
-
-//     window.XLSX.writeFile(workbook, filename);
-//   })
-// }
-
-// single sheet export
-export function saveWorkbookData(workbookData) {
+export function saveWorkbookData(workbookData, filename = "bot-input.xlsx") {
   validateExportData(workbookData);
 
   console.log("Attempting to save.");
 
-  saveSingleWorkbook(
-    FILE_CONFIG.topics.label,
-    workbookData.topics,
-    getExportColumns("topics")
-  );
-
-  saveSingleWorkbook(
-    FILE_CONFIG.issues.label,
-    workbookData.issues,
-    getExportColumns("issues")
-  );
-
-  saveSingleWorkbook(
-    FILE_CONFIG.parameters.label,
-    workbookData.parameters,
-    getExportColumns("parameters")
-  );
-
-  saveSingleWorkbook(
-    FILE_CONFIG.rules.label,
-    workbookData.rules,
-    getExportColumns("rules")
-  );
-
-  saveSingleWorkbook(
-    FILE_CONFIG.recommendations.label,
-    workbookData.recommendations,
-    getExportColumns("recommendations")
-  );
-}
-
-function saveSingleWorkbook(filename, rows, columns) {
   if (!window.XLSX) {
     throw new Error("XLSX library not loaded.");
   }
 
   const workbook = window.XLSX.utils.book_new();
+  const sheet_config = FILE_CONFIG.sheet
 
-  const normalizedRows = rows.map((row) =>
-    normalizeRowForExport(row, columns)
-  );
+  const sheets = [
+    { key: "topics", config: sheet_config.topics },
+    { key: "issues", config: sheet_config.issues },
+    { key: "parameters", config: sheet_config.parameters },
+    { key: "rules", config: sheet_config.rules },
+    { key: "recommendations", config: sheet_config.recommendations },
+  ];
 
-  const worksheet = window.XLSX.utils.json_to_sheet(normalizedRows, {
-    header: columns
-  });
+  for (const { key, config } of sheets) {
+    const columns = getExportColumns(key);
+    const normalizedRows = workbookData[key].map((row) =>
+      normalizeRowForExport(row, columns)
+    );
 
-  window.XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    const worksheet = window.XLSX.utils.json_to_sheet(normalizedRows, {
+      header: columns,
+    });
+
+    window.XLSX.utils.book_append_sheet(workbook, worksheet, config.label);
+  }
+
   window.XLSX.writeFile(workbook, filename);
 }
+
+// single sheet export
+// export function saveWorkbookData(workbookData) {
+//   validateExportData(workbookData);
+
+//   console.log("Attempting to save.");
+
+//   saveSingleWorkbook(
+//     FILE_CONFIG.topics.label,
+//     workbookData.topics,
+//     getExportColumns("topics")
+//   );
+
+//   saveSingleWorkbook(
+//     FILE_CONFIG.issues.label,
+//     workbookData.issues,
+//     getExportColumns("issues")
+//   );
+
+//   saveSingleWorkbook(
+//     FILE_CONFIG.parameters.label,
+//     workbookData.parameters,
+//     getExportColumns("parameters")
+//   );
+
+//   saveSingleWorkbook(
+//     FILE_CONFIG.rules.label,
+//     workbookData.rules,
+//     getExportColumns("rules")
+//   );
+
+//   saveSingleWorkbook(
+//     FILE_CONFIG.recommendations.label,
+//     workbookData.recommendations,
+//     getExportColumns("recommendations")
+//   );
+// }
+
+// function saveSingleWorkbook(filename, rows, columns) {
+//   if (!window.XLSX) {
+//     throw new Error("XLSX library not loaded.");
+//   }
+
+//   const workbook = window.XLSX.utils.book_new();
+
+//   const normalizedRows = rows.map((row) =>
+//     normalizeRowForExport(row, columns)
+//   );
+
+//   const worksheet = window.XLSX.utils.json_to_sheet(normalizedRows, {
+//     header: columns
+//   });
+
+//   window.XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+//   window.XLSX.writeFile(workbook, filename);
+// }
 
 function normalizeRowForExport(row, columns) {
   const normalized = {};
@@ -88,11 +106,11 @@ function normalizeRowForExport(row, columns) {
 }
 
 function getExportColumns(key) {
-  return FILE_CONFIG[key].exportColumns ?? FILE_CONFIG[key].requiredColumns;
+  return FILE_CONFIG['sheet'][key].exportColumns ?? FILE_CONFIG['sheet'][key].requiredColumns;
 }
 
 function validateExportData(workbookData) {
-  for (const key of Object.keys(FILE_CONFIG)) {
+  for (const key of Object.keys(FILE_CONFIG['sheet'])) {
     if (!Array.isArray(workbookData[key])) {
       throw new Error(`Cannot export: workbookData.${key} must be an array.`);
     }
@@ -111,45 +129,31 @@ export function validateLibraries() {
   }
 }
 
-export function getFileInputs() {
-  return Object.fromEntries(
-    Object.entries(FILE_CONFIG).map(([key, config]) => [
-      key,
-      document.getElementById(config.inputId)
-    ])
-  );
+export function getFileInput() {
+  return document.getElementById(FILE_CONFIG.inputId);
 }
 
-export function validateFilesPresent(fileInputs) {
-  const missing = Object.entries(fileInputs)
-    .filter(([, input]) => !input?.files || input.files.length === 0)
-    .map(([key]) => FILE_CONFIG[key].label);
-
-  if (missing.length > 0) {
-    throw new Error(`Missing file(s): ${missing.join(', ')}`);
+export function validateFilePresent(fileInput) {
+  if (!fileInput?.files || fileInput.files.length === 0) {
+    throw new Error(`No file selected. Please upload "${FILE_CONFIG.filename}".`);
   }
 }
 
-export async function loadWorkbookData(fileInputs) {
-  validateFilesPresent(fileInputs);
-
-  const entries = await Promise.all(
-    Object.entries(fileInputs).map(async ([key, input]) => {
-      const rows = await readXlsx(input.files[0]);
-      return [key, rows];
-    })
-  );
-
-  return Object.fromEntries(entries);
+// read single workbook and return { topics: [...], issues: [...], ... }
+export async function loadWorkbookData(fileInput) {
+  validateFilePresent(fileInput);
+  return await readMultiSheetXlsx(fileInput.files[0]);
 }
 
+// validate that each sheet has the required columns
 export function validateWorkbookData(workbookData) {
-  Object.entries(FILE_CONFIG).forEach(([key, config]) => {
-    validateRequiredColumns(config.label, workbookData[key], config.requiredColumns);
+  Object.entries(FILE_CONFIG.sheet).forEach(([key, config]) => {
+    validateRequiredColumns(config.sheetName, workbookData[key], config.requiredColumns);
   });
 }
 
-function readXlsx(file) {
+// read a multi-sheet workbook and map each sheet to its key via sheetName
+function readMultiSheetXlsx(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -157,15 +161,36 @@ function readXlsx(file) {
       try {
         const data = new Uint8Array(event.target.result);
         const workbook = window.XLSX.read(data, { type: 'array' });
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = window.XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
-        resolve(rows.map(normalizeRowKeys));
+
+        // Build a reverse lookup: sheetName → key
+        // e.g. { "1_topics": "topics", "2_issues": "issues", ... }
+        const sheetNameToKey = Object.fromEntries(
+          Object.entries(FILE_CONFIG.sheet).map(([key, config]) => [config.sheetName, key])
+        );
+
+        const result = {};
+
+        for (const [key, config] of Object.entries(FILE_CONFIG.sheet)) {
+          const sheet = workbook.Sheets[config.sheetName];
+
+          if (!sheet) {
+            throw new Error(
+              `Sheet "${config.sheetName}" not found in "${file.name}". ` +
+              `Expected sheets: ${Object.values(FILE_CONFIG.sheet).map(s => s.sheetName).join(', ')}.`
+            );
+          }
+
+          const rows = window.XLSX.utils.sheet_to_json(sheet, { defval: '' });
+          result[key] = rows.map(normalizeRowKeys);
+        }
+
+        resolve(result);
       } catch (error) {
         reject(error);
       }
     };
 
-    reader.onerror = () => reject(new Error(`Could not read ${file.name}`));
+    reader.onerror = () => reject(new Error(`Could not read "${file.name}".`));
     reader.readAsArrayBuffer(file);
   });
 }
@@ -180,15 +205,15 @@ function normalizeRowKeys(row) {
   return normalized;
 }
 
-function validateRequiredColumns(fileName, rows, columns) {
+function validateRequiredColumns(sheetName, rows, columns) {
   if (!rows?.length) {
-    throw new Error(`${fileName} has no data rows.`);
+    throw new Error(`Sheet "${sheetName}" has no data rows.`);
   }
 
   const rowColumns = Object.keys(rows[0]);
   const missing = columns.filter(col => !rowColumns.includes(col));
 
   if (missing.length) {
-    throw new Error(`${fileName} is missing column(s): ${missing.join(', ')}`);
+    throw new Error(`Sheet "${sheetName}" is missing column(s): ${missing.join(', ')}`);
   }
 }

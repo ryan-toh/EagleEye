@@ -1,7 +1,7 @@
 import { buildIssueFlowchart, renderMermaid } from './flowchart.js';
-import { getFileInputs, loadWorkbookData, validateLibraries, validateWorkbookData, saveWorkbookData } from './fileService.js';
+import { getFileInput, loadWorkbookData, validateLibraries, validateWorkbookData, saveWorkbookData } from './fileService.js';
 import { loadState, setSelectedIssue, setSelectedTopic, appState } from './state.js';
-import { dom, initDomElements, clearIssueView, copyMermaid, disableLoading, renderIssueOptions, renderIssueSummary, renderTopicOptions, setStatus, saveSheet } from './dom.js';
+import { dom, initDomElements, clearIssueView, copyMermaid, disableLoading, renderIssueOptions, renderIssueSummary, renderTopicOptions, setStatus, saveSheet, setActiveStep } from './dom.js';
 import { initEditor, refreshEditor } from './editor/controller.js';
 
 document.addEventListener("DOMContentLoaded", main);
@@ -63,7 +63,7 @@ async function onLoadFiles() {
   setStatus('Loading files...');
 
   try {
-    const workbookData = await loadWorkbookData(getFileInputs());
+    const workbookData = await loadWorkbookData(getFileInput());
     validateWorkbookData(workbookData);
     loadState(workbookData);
     renderTopicOptions();
@@ -72,6 +72,11 @@ async function onLoadFiles() {
     console.error(error);
     setStatus(error.message || 'Failed to load files.', 'error');
   }
+}
+
+// to increment the stepper in the header (not implemented)
+function onStepChange() {
+  setActiveStep(-1);
 }
 
 function onTopicChange() {
