@@ -2,6 +2,7 @@ import { buildIssueFlowchart, renderMermaid } from './flowchart.js';
 import { getFileInputs, loadWorkbookData, validateLibraries, validateWorkbookData, saveWorkbookData } from './fileService.js';
 import { loadState, setSelectedIssue, setSelectedTopic, appState } from './state.js';
 import { dom, initDomElements, clearIssueView, copyMermaid, disableLoading, renderIssueOptions, renderIssueSummary, renderTopicOptions, setStatus, saveSheet } from './dom.js';
+import { initEditor, refreshEditor } from './editor/controller.js';
 
 document.addEventListener("DOMContentLoaded", main);
 
@@ -11,6 +12,7 @@ async function main() {
 
     initDomElements();
     initApp();
+    initEditor();
 
   } catch (error) {
     console.error("Failed to initialise app:", error);

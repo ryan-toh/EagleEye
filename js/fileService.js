@@ -1,6 +1,27 @@
 import { FILE_CONFIG } from "./schema.js";
 
 /* Save and Export */
+
+// multi sheet export
+// export function saveWorkbookData(workbookData, filename="bot-input") {
+//   if (!window.XLSX) {
+//     throw new Error('XLSX Library not loaded.');
+//   }
+
+//   const workbook = window.XLSX.utils.book_new();
+
+//   Object.entries(FILE_CONFIG).forEach(([key, config]) => {
+//     const rows = Array.isArray(data[key]) ? data[key] : [];
+//     const exportRows = rows.map(row => normalizeRowForExport(row, config.exportColumns || config.requiredColumns));
+//     const worksheet = window.XLSX.utils.json_to_sheet(exportRows, {
+//       header: config.exportColumns || config.requiredColumns
+//     });
+
+//     window.XLSX.writeFile(workbook, filename);
+//   })
+// }
+
+// single sheet export
 export function saveWorkbookData(workbookData) {
   validateExportData(workbookData);
 
