@@ -1,6 +1,7 @@
 import { saveWorkbookData } from './fileService.js';
 import { appState, getIssuesForTopic, getIssueParameters, getIssueRules, getRecommendationsForRules } from './state.js';
 import { escapeHtml, isRequired, str, toList } from './utils.js';
+import { renderTopicPicker } from './editor/dom.js';
 
 export const dom = {};
 
@@ -56,13 +57,14 @@ export function renderTopicOptions() {
 
   appState.topics.forEach(topic => {
     const option = document.createElement('option');
-    option.value = str(topic.topic_id);
+    option.value = String(topic.topic_id);
     option.textContent = `${topic.topic_name} (${topic.topic_id})`;
     dom.topicSelect.appendChild(option);
   });
 
   dom.topicSelect.disabled = false;
   renderIssueOptions('');
+  renderTopicPicker();
   clearIssueView();
 }
 

@@ -33,7 +33,7 @@ export function saveWorkbookData(workbookData, filename = "bot-input.xlsx") {
       header: columns,
     });
 
-    window.XLSX.utils.book_append_sheet(workbook, worksheet, config.label);
+    window.XLSX.utils.book_append_sheet(workbook, worksheet, config.sheetName);
   }
 
   window.XLSX.writeFile(workbook, filename);

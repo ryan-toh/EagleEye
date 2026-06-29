@@ -65,7 +65,7 @@ export function getIssueRules(issueId) {
 }
 
 export function getRecommendation(recommendationId) {
-  return appState.recommendations.find(rec => str(recommendation_id) === str(recommendationId));
+  return appState.recommendations.find(rec => str(rec.recommendation_id) === str(recommendationId));
 }
 
 export function getRecommendationsForRules(rules) {
@@ -143,6 +143,7 @@ export function upsertParameter(parameter) {
 }
 
 export function upsertRecommendation(recommendation) {
+  
   const normalized = {
     recommendation_id: str(recommendation.recommendation_id),
     final_decision: str(recommendation.final_decision),
@@ -151,8 +152,10 @@ export function upsertRecommendation(recommendation) {
     escalation_note: str(recommendation.escalation_note)
   };
 
+
   requireFields(normalized, ['recommendation_id', 'final_decision', 'recommendation_text'], 'recommendation');
   upsertById(appState.recommendations, 'recommendation_id', normalized);
+  
   return normalized;
 }
 
@@ -164,18 +167,22 @@ export function upsertRule(rule) {
     recommendation_id: str(rule.recommendation_id),
     priority: str(rule.priority)
   };
-
+  console.log(normalized);
   requireFields(normalized, ['rule_id', 'issue_id', 'conditions', 'recommendation_id', 'priority'], 'rule');
 
+  console.log("1");
   if (!getIssue(normalized.issue_id)) {
     throw new Error(`Cannot save rule: issue_id ${normalized.issue_id} does not exist.`);
   }
+  console.log("2");
 
   if (!getRecommendation(normalized.recommendation_id)) {
     throw new Error(`Cannot save rule: recommendation_id ${normalized.recommendation_id} does not exist.`);
   }
+  console.log("3");
 
   upsertById(appState.rules, 'rule_id', normalized);
+  console.log("4");
   return normalized;
 }
 

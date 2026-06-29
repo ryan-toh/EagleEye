@@ -151,6 +151,8 @@ function onSaveCombinationRules() {
     }
 
     const rows = collectCombinationRows();
+
+    
     const savedCount = saveCombinationRecommendations(appState.selectedIssueId, rows);
     renderSelectedIssuePreview();
     setEditorStatus(`${savedCount} recommendation/rule row(s) saved.`, 'success');

@@ -73,7 +73,8 @@ export function saveCombinationRecommendations(issueId, rows) {
       next_steps: row.next_steps,
       escalation_note: row.escalation_note
     });
-
+    
+    console.log("sending to upsertRule()");
     upsertRule({
       rule_id: ruleId,
       issue_id: issueId,
@@ -81,6 +82,7 @@ export function saveCombinationRecommendations(issueId, rows) {
       recommendation_id: recommendationId,
       priority: row.priority || index + 1
     });
+    console.log("success");
 
     savedCount += 1;
   });
