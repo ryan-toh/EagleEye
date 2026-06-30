@@ -1,5 +1,5 @@
 import { saveWorkbookData } from './components/upload/fileService.js';
-import { appState, getIssuesForTopic, getIssueParameters, getIssueRules, getRecommendationsForRules } from './state.js';
+import { appState, getIssueParameters, getIssueRules, getRecommendationsForRules } from './state.js';
 import { escapeHtml, isRequired, str, toList } from './utils.js';
 import { renderTopicPicker } from './components/editor/dom.js';
 import { initUploadDomElements } from './components/upload/dom.js';
@@ -13,8 +13,9 @@ export function initDomElements() {
     // loadStatus:          getRequiredElement('loadStatus'),
     // saveSheetBtn:        getRequiredElement('saveSheetBtn'),
 
-    topicSelect:         getRequiredElement('topicSelect'),
-    issueSelect:         getRequiredElement('issueSelect'),
+    // topicSelect:         getRequiredElement('topicSelect'),
+    // issueSelect:         getRequiredElement('issueSelect'),
+
     parametersList:      getRequiredElement('parametersList'),
     rulesList:           getRequiredElement('rulesList'),
     recommendationsList: getRequiredElement('recommendationsList'),
@@ -36,48 +37,38 @@ function getRequiredElement(id) {
   return element;
 }
 
-// export function setStatus(message, type = '') {
-//   dom.loadStatus.textContent = message;
-//   dom.loadStatus.className = `status ${type}`.trim();
+// export function renderTopicOptions() {
+//   dom.topicSelect.innerHTML = '<option value="">Select a topic</option>';
+
+//   appState.topics.forEach(topic => {
+//     const option = document.createElement('option');
+//     option.value = String(topic.topic_id);
+//     option.textContent = `${topic.topic_name} (${topic.topic_id})`;
+//     dom.topicSelect.appendChild(option);
+//   });
+
+//   dom.topicSelect.disabled = false;
+//   renderIssueOptions('');
+//   renderTopicPicker();
+//   clearIssueView();
 // }
 
-// export function disableLoading(message) {
-//   setStatus(message, 'error');
-//   dom.loadBtn.disabled = true;
+// export function renderIssueOptions(topicId) {
+//   const issues = topicId ? getIssuesForTopic(topicId) : [];
+
+//   dom.issueSelect.innerHTML = topicId
+//     ? '<option value="">Select an issue</option>'
+//     : '<option value="">Select a topic first</option>';
+
+//   issues.forEach(issue => {
+//     const option = document.createElement('option');
+//     option.value = str(issue.issue_id);
+//     option.textContent = `${issue.issue_name} (${issue.issue_id})`;
+//     dom.issueSelect.appendChild(option);
+//   });
+
+//   dom.issueSelect.disabled = !topicId;
 // }
-
-export function renderTopicOptions() {
-  dom.topicSelect.innerHTML = '<option value="">Select a topic</option>';
-
-  appState.topics.forEach(topic => {
-    const option = document.createElement('option');
-    option.value = String(topic.topic_id);
-    option.textContent = `${topic.topic_name} (${topic.topic_id})`;
-    dom.topicSelect.appendChild(option);
-  });
-
-  dom.topicSelect.disabled = false;
-  renderIssueOptions('');
-  renderTopicPicker();
-  clearIssueView();
-}
-
-export function renderIssueOptions(topicId) {
-  const issues = topicId ? getIssuesForTopic(topicId) : [];
-
-  dom.issueSelect.innerHTML = topicId
-    ? '<option value="">Select an issue</option>'
-    : '<option value="">Select a topic first</option>';
-
-  issues.forEach(issue => {
-    const option = document.createElement('option');
-    option.value = str(issue.issue_id);
-    option.textContent = `${issue.issue_name} (${issue.issue_id})`;
-    dom.issueSelect.appendChild(option);
-  });
-
-  dom.issueSelect.disabled = !topicId;
-}
 
 export function renderIssueSummary(issueId) {
   const issueParameters = getIssueParameters(issueId);

@@ -1,11 +1,11 @@
 import { buildIssueFlowchart, renderMermaid } from './flowchart.js';
 import { validateLibraries } from './utils.js';
 import { loadState, setSelectedIssue, setSelectedTopic, appState } from './state.js';
-import { dom, initDomElements, clearIssueView, copyMermaid, renderIssueOptions, renderIssueSummary, renderTopicOptions } from './dom.js';
+import { dom, initDomElements, clearIssueView, copyMermaid, renderIssueSummary } from './dom.js';
 import { disableLoading, setStatus } from './components/upload/dom.js';
-// import { setActiveStep } from './components/header/dom.js';
-import { initEditor, refreshEditor } from './components/editor/controller.js';
+import { initEditor } from './components/editor/controller.js';
 import { initUpload } from './components/upload/controller.js';
+import { initViewer } from './components/viewer/controller.js';
 
 document.addEventListener("DOMContentLoaded", main);
 
@@ -48,6 +48,7 @@ function initApp() {
     initDomElements();
     initUpload();
     initEditor();
+    initViewer();
   } catch (error) {
     disableLoading(error.message);
     return;
@@ -56,8 +57,8 @@ function initApp() {
 
   // attach event listeners to buttons
   // dom.loadBtn.addEventListener('click', onLoadFiles);
-  dom.topicSelect.addEventListener('change', onTopicChange);
-  dom.issueSelect.addEventListener('change', onIssueChange);
+  // dom.topicSelect.addEventListener('change', onTopicChange);
+  // dom.issueSelect.addEventListener('change', onIssueChange);
   dom.copyMermaidBtn.addEventListener('click', copyMermaid);
   // dom.saveSheetBtn.addEventListener('click', saveSheet);
 }
@@ -82,29 +83,29 @@ function initApp() {
 //   setActiveStep(-1);
 // }
 
-function onTopicChange() {
-  const topicId = dom.topicSelect.value;
-  setSelectedTopic(topicId);
-  renderIssueOptions(topicId);
-  clearIssueView();
-}
+// function onTopicChange() {
+//   const topicId = dom.topicSelect.value;
+//   setSelectedTopic(topicId);
+//   renderIssueOptions(topicId);
+//   clearIssueView();
+// }
 
-async function onIssueChange() {
-  const issueId = dom.issueSelect.value;
-  setSelectedIssue(issueId);
+// async function onIssueChange() {
+//   const issueId = dom.issueSelect.value;
+//   setSelectedIssue(issueId);
 
-  if (!issueId) {
-    clearIssueView();
-    return;
-  }
+//   if (!issueId) {
+//     clearIssueView();
+//     return;
+//   }
 
-  renderIssueSummary(issueId);
+//   renderIssueSummary(issueId);
 
-  const graphDefinition = buildIssueFlowchart(issueId);
-  const result = await renderMermaid(dom.flowchart, graphDefinition);
-  dom.copyMermaidBtn.disabled = false;
+//   const graphDefinition = buildIssueFlowchart(issueId);
+//   const result = await renderMermaid(dom.flowchart, graphDefinition);
+//   dom.copyMermaidBtn.disabled = false;
 
-  if (!result.ok) {
-    setStatus('Files are loaded, but Mermaid could not render the selected issue.', 'error');
-  }
-}
+//   if (!result.ok) {
+//     setStatus('Files are loaded, but Mermaid could not render the selected issue.', 'error');
+//   }
+// }

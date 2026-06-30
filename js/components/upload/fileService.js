@@ -119,17 +119,6 @@ function validateExportData(workbookData) {
 }
 
 /* Extract and Import */
-
-export function validateLibraries() {
-  if (!window.XLSX) {
-    throw new Error('XLSX library not loaded. Check the script tag in index.html.');
-  }
-
-  if (!window.mermaid) {
-    throw new Error('Mermaid library not loaded. Check the script tag in index.html.');
-  }
-}
-
 export function validateFilePresent(fileInput) {
   if (!fileInput?.files || fileInput.files.length === 0) {
     throw new Error(`No file selected. Please upload "${FILE_CONFIG.filename}".`);

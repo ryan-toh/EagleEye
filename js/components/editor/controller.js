@@ -1,5 +1,7 @@
 import { buildIssueFlowchart, renderMermaid } from '../../flowchart.js';
-import { renderIssueOptions, renderIssueSummary, renderTopicOptions, dom } from '../../dom.js';
+import { renderIssueSummary, dom } from '../../dom.js';
+import { viewerDom } from '../viewer/dom.js';
+import { renderIssueOptions, renderTopicOptions } from '../viewer/dom.js';
 import { setStatus } from '../upload/dom.js';
 import { appState, setSelectedIssue, setSelectedTopic, upsertIssue, upsertParameter, upsertTopic } from '../../state.js';
 import { saveCombinationRecommendations } from './service.js';
@@ -44,7 +46,7 @@ function onEditorTopicPicked() {
 
   if (topicId !== '__new__') {
     setSelectedTopic(topicId);
-    dom.topicSelect.value = topicId;
+    viewerDom.topicSelect.value = topicId;
     renderIssueOptions(topicId);
   }
 
@@ -57,7 +59,7 @@ function onEditorIssuePicked() {
 
   if (issueId !== '__new__') {
     setSelectedIssue(issueId);
-    dom.issueSelect.value = issueId;
+    viewerDom.issueSelect.value = issueId;
     renderParameterPicker(issueId);
     renderSelectedIssuePreview();
   }
@@ -73,7 +75,7 @@ function onSaveTopic() {
     });
 
     renderTopicOptions();
-    dom.topicSelect.value = topic.topic_id;
+    viewerDom.topicSelect.value = topic.topic_id;
     setSelectedTopic(topic.topic_id);
     renderIssueOptions(topic.topic_id);
     renderTopicPicker();
