@@ -85,7 +85,6 @@
 
 export const FILE_CONFIG = {
   filename: "bot-input.xlsx",
-  inputId: "botInputFile",
   sheet: {
     topics: {
       sheetName: "1_topics",

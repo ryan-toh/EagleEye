@@ -1,4 +1,5 @@
-import { FILE_CONFIG } from "./schema.js";
+import { FILE_CONFIG } from "../../schema.js";
+import { uploadDom } from "./dom.js";
 
 /* Save and Export */
 
@@ -127,10 +128,6 @@ export function validateLibraries() {
   if (!window.mermaid) {
     throw new Error('Mermaid library not loaded. Check the script tag in index.html.');
   }
-}
-
-export function getFileInput() {
-  return document.getElementById(FILE_CONFIG.inputId);
 }
 
 export function validateFilePresent(fileInput) {

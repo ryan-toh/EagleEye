@@ -1,14 +1,18 @@
-import { saveWorkbookData } from './fileService.js';
+import { saveWorkbookData } from './components/upload/fileService.js';
 import { appState, getIssuesForTopic, getIssueParameters, getIssueRules, getRecommendationsForRules } from './state.js';
 import { escapeHtml, isRequired, str, toList } from './utils.js';
-import { renderTopicPicker } from './editor/dom.js';
+import { renderTopicPicker } from './components/editor/dom.js';
+import { initUploadDomElements } from './components/upload/dom.js';
 
 export const dom = {};
 
 export function initDomElements() {
   Object.assign(dom, {
-    loadBtn:             getRequiredElement('loadBtn'),
-    loadStatus:          getRequiredElement('loadStatus'),
+    // v0.1
+    // loadBtn:             getRequiredElement('loadBtn'),
+    // loadStatus:          getRequiredElement('loadStatus'),
+    // saveSheetBtn:        getRequiredElement('saveSheetBtn'),
+
     topicSelect:         getRequiredElement('topicSelect'),
     issueSelect:         getRequiredElement('issueSelect'),
     parametersList:      getRequiredElement('parametersList'),
@@ -16,7 +20,7 @@ export function initDomElements() {
     recommendationsList: getRequiredElement('recommendationsList'),
     flowchart:           getRequiredElement('flowchart'),
     copyMermaidBtn:      getRequiredElement('copyMermaidBtn'),
-    saveSheetBtn:        getRequiredElement('saveSheetBtn')
+    
   });
 
   return dom;
@@ -32,25 +36,15 @@ function getRequiredElement(id) {
   return element;
 }
 
-// to increment the stepper in the header
-export function setActiveStep(stepNumber) {
-  document.querySelectorAll('.stepper__item').forEach((item, index) => {
-    const n = index + 1;
-    item.classList.remove('active', 'completed');
-    if (n < stepNumber) item.classList.add('completed');
-    if (n === stepNumber) item.classList.add('active');
-  });
-}
+// export function setStatus(message, type = '') {
+//   dom.loadStatus.textContent = message;
+//   dom.loadStatus.className = `status ${type}`.trim();
+// }
 
-export function setStatus(message, type = '') {
-  dom.loadStatus.textContent = message;
-  dom.loadStatus.className = `status ${type}`.trim();
-}
-
-export function disableLoading(message) {
-  setStatus(message, 'error');
-  dom.loadBtn.disabled = true;
-}
+// export function disableLoading(message) {
+//   setStatus(message, 'error');
+//   dom.loadBtn.disabled = true;
+// }
 
 export function renderTopicOptions() {
   dom.topicSelect.innerHTML = '<option value="">Select a topic</option>';
@@ -142,6 +136,6 @@ export async function copyMermaid() {
   setTimeout(() => (dom.copyMermaidBtn.textContent = 'Copy Mermaid'), 1200);
 }
 
-export async function saveSheet() {
-  await saveWorkbookData(appState);
-}
+// export async function saveSheet() {
+//   await saveWorkbookData(appState);
+// }

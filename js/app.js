@@ -1,18 +1,18 @@
 import { buildIssueFlowchart, renderMermaid } from './flowchart.js';
-import { getFileInput, loadWorkbookData, validateLibraries, validateWorkbookData, saveWorkbookData } from './fileService.js';
+import { validateLibraries } from './utils.js';
 import { loadState, setSelectedIssue, setSelectedTopic, appState } from './state.js';
-import { dom, initDomElements, clearIssueView, copyMermaid, disableLoading, renderIssueOptions, renderIssueSummary, renderTopicOptions, setStatus, saveSheet, setActiveStep } from './dom.js';
-import { initEditor, refreshEditor } from './editor/controller.js';
+import { dom, initDomElements, clearIssueView, copyMermaid, renderIssueOptions, renderIssueSummary, renderTopicOptions } from './dom.js';
+import { disableLoading, setStatus } from './components/upload/dom.js';
+// import { setActiveStep } from './components/header/dom.js';
+import { initEditor, refreshEditor } from './components/editor/controller.js';
+import { initUpload } from './components/upload/controller.js';
 
 document.addEventListener("DOMContentLoaded", main);
 
 async function main() {
   try {
     await loadParts();
-
-    initDomElements();
     initApp();
-    initEditor();
 
   } catch (error) {
     console.error("Failed to initialise app:", error);
@@ -45,6 +45,9 @@ function initApp() {
   try {
     validateLibraries();
     window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+    initDomElements();
+    initUpload();
+    initEditor();
   } catch (error) {
     disableLoading(error.message);
     return;
@@ -52,32 +55,32 @@ function initApp() {
 
 
   // attach event listeners to buttons
-  dom.loadBtn.addEventListener('click', onLoadFiles);
+  // dom.loadBtn.addEventListener('click', onLoadFiles);
   dom.topicSelect.addEventListener('change', onTopicChange);
   dom.issueSelect.addEventListener('change', onIssueChange);
   dom.copyMermaidBtn.addEventListener('click', copyMermaid);
-  dom.saveSheetBtn.addEventListener('click', saveSheet);
+  // dom.saveSheetBtn.addEventListener('click', saveSheet);
 }
 
-async function onLoadFiles() {
-  setStatus('Loading files...');
+// async function onLoadFiles() {
+//   setStatus('Loading files...');
 
-  try {
-    const workbookData = await loadWorkbookData(getFileInput());
-    validateWorkbookData(workbookData);
-    loadState(workbookData);
-    renderTopicOptions();
-    setStatus('Files loaded successfully.', 'success');
-  } catch (error) {
-    console.error(error);
-    setStatus(error.message || 'Failed to load files.', 'error');
-  }
-}
+//   try {
+//     const workbookData = await loadWorkbookData(getFileInput());
+//     validateWorkbookData(workbookData);
+//     loadState(workbookData);
+//     renderTopicOptions();
+//     setStatus('Files loaded successfully.', 'success');
+//   } catch (error) {
+//     console.error(error);
+//     setStatus(error.message || 'Failed to load files.', 'error');
+//   }
+// }
 
 // to increment the stepper in the header (not implemented)
-function onStepChange() {
-  setActiveStep(-1);
-}
+// function onStepChange() {
+//   setActiveStep(-1);
+// }
 
 function onTopicChange() {
   const topicId = dom.topicSelect.value;

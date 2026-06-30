@@ -1,6 +1,7 @@
-import { buildIssueFlowchart, renderMermaid } from '../flowchart.js';
-import { renderIssueOptions, renderIssueSummary, renderTopicOptions, dom, setStatus } from '../dom.js';
-import { appState, setSelectedIssue, setSelectedTopic, upsertIssue, upsertParameter, upsertTopic } from '../state.js';
+import { buildIssueFlowchart, renderMermaid } from '../../flowchart.js';
+import { renderIssueOptions, renderIssueSummary, renderTopicOptions, dom } from '../../dom.js';
+import { setStatus } from '../upload/dom.js';
+import { appState, setSelectedIssue, setSelectedTopic, upsertIssue, upsertParameter, upsertTopic } from '../../state.js';
 import { saveCombinationRecommendations } from './service.js';
 import {
   collectCombinationRows,

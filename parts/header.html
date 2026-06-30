@@ -1,14 +1,8 @@
-<!-- <header>
-  <h1>EagleEye</h1>
-  <p>For internal use only.</p>
-</header> -->
-
 <header id="main-header">
 
-  <!-- Top bar: branding -->
+  <!-- Top bar: logo and name -->
   <div class="header__brand">
     <div class="header__logo-area">
-      <!-- Replace src with your actual logo if you have one -->
       <div class="header__logo-placeholder" aria-hidden="true">🦅</div>
       <div class="header__title-group">
         <h1 class="header__app-name">EagleEye</h1>
@@ -16,4 +10,27 @@
       </div>
     </div>
   </div>
+
+  <!-- Bottom bar: step progress indicator -->
+  <nav class="header__stepper" aria-label="Progress steps">
+    <ol class="stepper">
+      <li class="stepper__item active" data-step="1">
+        <span class="stepper__number">1</span>
+        <span class="stepper__label">Load File</span>
+      </li>
+      <li class="stepper__item" data-step="2">
+        <span class="stepper__number">2</span>
+        <span class="stepper__label">Choose Topic</span>
+      </li>
+      <li class="stepper__item" data-step="3">
+        <span class="stepper__number">3</span>
+        <span class="stepper__label">Edit Rules</span>
+      </li>
+      <li class="stepper__item" data-step="4">
+        <span class="stepper__number">4</span>
+        <span class="stepper__label">Preview & Export</span>
+      </li>
+    </ol>
+  </nav>
+
 </header>

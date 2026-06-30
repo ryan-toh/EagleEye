@@ -1,5 +1,5 @@
-import { appState, getIssue, getIssueParameters, getIssuesForTopic, getTopic, makeUniqueId } from '../state.js';
-import { escapeHtml, str } from '../utils.js';
+import { appState, getIssue, getIssueParameters, getIssuesForTopic, getTopic, makeUniqueId } from '../../state.js';
+import { escapeHtml, str } from '../../utils.js';
 import {
   buildParameterCombinations,
   getParametersWithAllowedValues,
