@@ -1,5 +1,5 @@
 import { initViewerDomElements, viewerDom, renderIssueOptions } from "./dom.js";
-import { setSelectedIssue, setSelectedTopic } from "../../state.js";
+import { appState, setSelectedIssue, setSelectedTopic, renderStep } from "../../state.js";
 import { buildIssueFlowchart, renderMermaid } from "../../flowchart.js";
 import { clearIssueView, previewDom, renderIssueSummary } from "../preview/dom.js";
 
@@ -36,6 +36,9 @@ async function onIssueChange() {
   if (!result.ok) {
     setStatus('Files are loaded, but Mermaid could not render the selected issue.', 'error');
   }
+  
+  appState.step = 3;
+  renderStep();
 }
 
 

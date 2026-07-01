@@ -1,11 +1,14 @@
-import { buildIssueFlowchart, renderMermaid } from './flowchart.js';
 import { validateLibraries } from './utils.js';
-import { disableLoading, setStatus } from './components/upload/dom.js';
+import { disableLoading } from './components/upload/dom.js';
 import { initEditor } from './components/editor/controller.js';
 import { initUpload } from './components/upload/controller.js';
 import { initViewer } from './components/viewer/controller.js';
 import { initPreview } from './components/preview/controller.js';
+import { initTabBar } from './components/tab-bar/controller.js';
 
+/**
+ * Main js entry point.
+ */
 document.addEventListener("DOMContentLoaded", main);
 
 async function main() {
@@ -18,8 +21,9 @@ async function main() {
   }
 }
 
-
-// Load HTML parts
+/**
+ * Asynchronously load in HTML segments.
+ */
 async function loadParts() {
   const includeElements = document.querySelectorAll("[data-include]");
 
@@ -38,7 +42,7 @@ async function loadParts() {
 
 /**
  * Start the application.
- * Ensures that the required third-party libraries are loaded
+ * Ensures that the required third-party libraries are loaded.
  */
 function initApp() {
   try {
@@ -47,6 +51,7 @@ function initApp() {
     window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
 
     initUpload();
+    initTabBar();
     initEditor();
     initViewer();
     initPreview();

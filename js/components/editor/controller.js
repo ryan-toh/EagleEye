@@ -1,5 +1,5 @@
-import { buildIssueFlowchart, renderMermaid } from '../../flowchart.js';
-import { previewDom, renderIssueSummary } from '../preview/dom.js';
+import { buildIssueFlowchart } from '../../flowchart.js';
+import { displayGraph, displayIssueSummary } from '../preview/controller.js';
 import { viewerDom } from '../viewer/dom.js';
 import { renderIssueOptions, renderTopicOptions } from '../viewer/dom.js';
 import { setStatus } from '../upload/dom.js';
@@ -167,9 +167,8 @@ function onSaveCombinationRules() {
 async function renderSelectedIssuePreview() {
   if (!appState.selectedIssueId) return;
 
-  renderIssueSummary(appState.selectedIssueId);
+  displayIssueSummary(appState.selectedIssueId);
   const graphDefinition = buildIssueFlowchart(appState.selectedIssueId);
-  await renderMermaid(previewDom.flowchart, graphDefinition);
-  previewDom.copyMermaidBtn.disabled = false;
+  await displayGraph(graphDefinition);
   setStatus('Editor changes saved to app state. Export workbook to persist them.', 'success');
 }

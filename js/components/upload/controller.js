@@ -1,6 +1,6 @@
 import { initUploadDomElements, uploadDom, setStatus, getFileInput } from "./dom.js";
 import { saveWorkbookData, loadWorkbookData, validateWorkbookData } from "./fileService.js";
-import { loadState, appState } from "../../state.js";
+import { loadState, appState, renderStep } from "../../state.js";
 import { renderTopicOptions } from "../viewer/dom.js";
 
 export function initUpload() {
@@ -20,6 +20,10 @@ async function onLoadFiles() {
     loadState(workbookData);
     renderTopicOptions();
     setStatus('Files loaded successfully.', 'success');
+
+    appState.step = 2;
+    renderStep();
+
   } catch (error) {
     console.error(error);
     setStatus(error.message || 'Failed to load files.', 'error');

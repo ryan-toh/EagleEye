@@ -8,7 +8,9 @@ export const appState = {
   recommendations: [],
   selectedTopicId: '',
   selectedIssueId: '',
-  lastMermaid: ''
+  lastMermaid: '',
+  step: 1,
+  flow: null
 };
 
 export function loadState(workbookData) {
@@ -251,4 +253,28 @@ function validateStateRelationships(state) {
 
 function uniqueValues(rows, key) {
   return [...new Set(rows.map(row => str(row[key])).filter(Boolean))];
+}
+
+/**
+ * Updates the visibility of major UI components based on uiState
+ */
+export function renderStep() {
+  const tabBar = document.getElementById('tab-bar');
+  const viewPanel = document.getElementById('view-panel');
+  const editorPanel = document.getElementById('editor-panel');
+  const previewPanel = document.getElementById('preview-panel');
+
+  // Toggle Tab Bar visibility
+  tabBar.classList.toggle('hidden', appState.step < 2);
+
+  // Toggle Flow Panels
+  // Only show the panel if we are at step 2 or 3 AND the flow matches
+  const isViewFlow = appState.step >= 2 && appState.flow === 'view';
+  const isEditFlow = appState.step >= 2 && appState.flow === 'edit';
+
+  viewPanel.classList.toggle('hidden', !isViewFlow);
+  editorPanel.classList.toggle('hidden', !isEditFlow);
+
+  // Toggle Preview Panel visibility
+  previewPanel.classList.toggle('hidden', appState.step < 3);
 }
