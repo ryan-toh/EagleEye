@@ -11,7 +11,7 @@ import { str } from '../../utils.js';
 
 export function parseAllowedValues(value) {
   return str(value)
-    .split(/[|,\n]/)
+    .split(/[|;,\n]/)
     .map(item => item.trim())
     .filter(Boolean);
 }

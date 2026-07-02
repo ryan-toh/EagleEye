@@ -3,7 +3,7 @@ import { displayGraph, displayIssueSummary } from '../preview/controller.js';
 import { viewerDom } from '../viewer/dom.js';
 import { renderIssueOptions, renderTopicOptions } from '../viewer/dom.js';
 import { setStatus } from '../upload/dom.js';
-import { appState, setSelectedIssue, setSelectedTopic, upsertIssue, upsertParameter, upsertTopic } from '../../state.js';
+import { renderStep, appState, setSelectedIssue, setSelectedTopic, upsertIssue, upsertParameter, upsertTopic } from '../../state.js';
 import { saveCombinationRecommendations } from './service.js';
 import {
   collectCombinationRows,
@@ -63,6 +63,7 @@ function onEditorIssuePicked() {
     renderParameterPicker(issueId);
     renderSelectedIssuePreview();
   }
+
 }
 
 function onSaveTopic() {
@@ -171,4 +172,7 @@ async function renderSelectedIssuePreview() {
   const graphDefinition = buildIssueFlowchart(appState.selectedIssueId);
   await displayGraph(graphDefinition);
   setStatus('Editor changes saved to app state. Export workbook to persist them.', 'success');
+
+  appState.step = 3;
+  renderStep();
 }

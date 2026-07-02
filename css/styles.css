@@ -15,7 +15,6 @@
 }
 
 body {
-  margin: 10;
   font-family: Arial, Helvetica, sans-serif;
   background: var(--bg);
   color: var(--text);
@@ -35,12 +34,6 @@ header h1 {
 header p {
   margin: 0;
   color: #d1d5db;
-}
-
-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
 }
 
 .panel,
@@ -230,26 +223,3 @@ textarea,
   overflow-x: auto;
 }
 
-.matrix-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 900px;
-}
-
-.matrix-table th,
-.matrix-table td {
-  border: 1px solid var(--border);
-  padding: 8px;
-  vertical-align: top;
-}
-
-.matrix-table th {
-  background: #eef2ff;
-  text-align: left;
-}
-
-.matrix-table textarea,
-.matrix-table input,
-.matrix-table select {
-  min-width: 150px;
-}

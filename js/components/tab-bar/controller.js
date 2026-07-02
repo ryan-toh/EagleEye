@@ -11,7 +11,6 @@ export function initTabBar() {
             if (flow) {
                 appState.flow = flow;
                 renderStep();
-                console.log("clicked on button: " + flow);
             }
         }
     )

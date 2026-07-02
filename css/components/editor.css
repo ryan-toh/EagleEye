@@ -1,0 +1,23 @@
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.matrix-table th,
+.matrix-table td {
+  border: 1px solid var(--border);
+  padding: 8px;
+  vertical-align: top;
+}
+
+.matrix-table th {
+  background: #eef2ff;
+  text-align: left;
+}
+
+.matrix-table textarea,
+.matrix-table input,
+.matrix-table select {
+  min-width: 150px;
+}
