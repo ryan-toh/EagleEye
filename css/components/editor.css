@@ -1,23 +1,57 @@
+/* ── Matrix / editor table ──────────────────────────────────── */
 .matrix-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 900px;
+  font-size: 13px;
 }
 
 .matrix-table th,
 .matrix-table td {
   border: 1px solid var(--border);
-  padding: 8px;
-  vertical-align: top;
+  padding: 8px 10px;
+  vertical-align: middle;           /* cleaner row alignment */
 }
 
 .matrix-table th {
-  background: #eef2ff;
+  background: var(--tint);          /* Teams purple tint (#E8EBFA) */
+  color: var(--accent-dark);        /* Teams dark purple text on header */
+  font-size: 12px;
+  font-weight: 600;
   text-align: left;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;        /* Teams-style column label convention */
 }
 
+/* ── Inputs / selects / textareas inside the matrix ─────────── */
 .matrix-table textarea,
 .matrix-table input,
 .matrix-table select {
   min-width: 150px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;               /* matches Teams input radius */
+  background: #FFFFFF;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+
+.matrix-table textarea:focus,
+.matrix-table input:focus,
+.matrix-table select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(98, 100, 167, 0.25);  /* Teams purple focus ring */
+}
+
+/* ── Zebra striping (optional, Teams list-view style) ────────── */
+.matrix-table tbody tr:nth-child(even) {
+  background: #FAFAFA;
+}
+
+.matrix-table tbody tr:hover {
+  background: var(--tint);          /* subtle purple highlight on hover */
 }

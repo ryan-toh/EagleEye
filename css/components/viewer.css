@@ -1,0 +1,32 @@
+/* ── Panel header row: h2 + labels as one unit ──────────────── */
+.panel__header-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: nowrap;            /* NEVER wraps mid-group */
+}
+
+.panel__header-row h2 {
+  margin: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Narrow viewport: hard switch to stacked layout ─────────── */
+@media (max-width: 640px) {
+  .panel__header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* ── Label pair: always stays together ──────────────────────── */
+.panel__label-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}

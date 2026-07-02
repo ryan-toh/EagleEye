@@ -10,6 +10,21 @@ export function initViewer() {
     viewerDom.issueSelect.addEventListener('change', onIssueChange);
 }
 
+export function getDomTopicValue() {
+  return viewerDom.topicSelect.value;
+}
+
+export function setDomTopicValue(value) {
+  viewerDom.topicSelect.value = value;
+}
+
+export function getDomIssueValue(value) {
+  return viewerDom.issueSelect.value;
+}
+
+export function setDomIssueValue(value) {
+  viewerDom.issueSelect.value = value;
+}
 
 function onTopicChange() {
   const topicId = viewerDom.topicSelect.value;

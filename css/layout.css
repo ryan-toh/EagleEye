@@ -1,4 +1,4 @@
 /* Utility for progressive disclosure */
 .hidden {
-    display: none !important;
-}
+    display: none;
+} 

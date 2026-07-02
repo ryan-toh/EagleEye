@@ -1,6 +1,6 @@
 import { buildIssueFlowchart } from '../../flowchart.js';
 import { displayGraph, displayIssueSummary } from '../preview/controller.js';
-import { viewerDom } from '../viewer/dom.js';
+import { setDomTopicValue, getDomTopicValue, setDomIssueValue } from '../viewer/controller.js';
 import { renderIssueOptions, renderTopicOptions } from '../viewer/dom.js';
 import { setStatus } from '../upload/dom.js';
 import { renderStep, appState, setSelectedIssue, setSelectedTopic, upsertIssue, upsertParameter, upsertTopic } from '../../state.js';
@@ -46,7 +46,8 @@ function onEditorTopicPicked() {
 
   if (topicId !== '__new__') {
     setSelectedTopic(topicId);
-    viewerDom.topicSelect.value = topicId;
+    // viewerDom.topicSelect.value = topicId;
+    setDomTopicValue(topicId);
     renderIssueOptions(topicId);
   }
 
@@ -59,7 +60,8 @@ function onEditorIssuePicked() {
 
   if (issueId !== '__new__') {
     setSelectedIssue(issueId);
-    viewerDom.issueSelect.value = issueId;
+    // viewerDom.issueSelect.value = issueId;
+    setDomIssueValue(issueId);
     renderParameterPicker(issueId);
     renderSelectedIssuePreview();
   }
@@ -76,7 +78,8 @@ function onSaveTopic() {
     });
 
     renderTopicOptions();
-    viewerDom.topicSelect.value = topic.topic_id;
+    // viewerDom.topicSelect.value = topic.topic_id;
+    setDomTopicValue(topic.topic_id);
     setSelectedTopic(topic.topic_id);
     renderIssueOptions(topic.topic_id);
     renderTopicPicker();
@@ -101,7 +104,8 @@ function onSaveIssue() {
     });
 
     renderIssueOptions(issue.topic_id);
-    viewerDom.issueSelect.value = issue.issue_id;
+    // viewerDom.issueSelect.value = issue.issue_id;
+    setDomIssueValue(issue.issue_id)
     renderIssuePicker(issue.topic_id);
     renderParameterPicker(issue.issue_id);
     renderSelectedIssuePreview();
