@@ -27,6 +27,7 @@ export function initEditorDom() {
 
     parameterPicker: document.getElementById('editorParameterPicker'),
     parameterId: document.getElementById('editorParameterId'),
+    parameterName: document.getElementById('editorParameterName'),
     parameterQuestion: document.getElementById('editorParameterQuestion'),
     parameterRequired: document.getElementById('editorParameterRequired'),
     parameterAllowedValues: document.getElementById('editorParameterAllowedValues'),
@@ -37,7 +38,9 @@ export function initEditorDom() {
     buildCombinationsBtn: document.getElementById('buildCombinationsBtn'),
     saveCombinationRulesBtn: document.getElementById('saveCombinationRulesBtn'),
     recommendationMatrix: document.getElementById('recommendationMatrix'),
-    editorStatus: document.getElementById('editorStatus')
+    editorStatus: document.getElementById('editorStatus'),
+
+    saveSheetBtn: document.getElementById('saveSheetBtn'),
   });
 
   return editorDom;
@@ -60,7 +63,8 @@ export function renderTopicPicker() {
   appState.topics.forEach(topic => {
     const option = document.createElement('option');
     option.value = str(topic.topic_id);
-    option.textContent = `${topic.topic_name} (${topic.topic_id})`;
+    // option.textContent = `${topic.topic_name} (${topic.topic_id})`;
+    option.textContent = `${topic.topic_name}`;
     editorDom.topicPicker.appendChild(option);
   });
 
@@ -75,7 +79,8 @@ export function renderIssuePicker(topicId) {
     getIssuesForTopic(topicId).forEach(issue => {
       const option = document.createElement('option');
       option.value = str(issue.issue_id);
-      option.textContent = `${issue.issue_name} (${issue.issue_id})`;
+      // option.textContent = `${issue.issue_name} (${issue.issue_id})`;
+      option.textContent = `${issue.issue_name}`;
       editorDom.issuePicker.appendChild(option);
     });
   }
@@ -92,7 +97,8 @@ export function renderParameterPicker(issueId) {
     getIssueParameters(issueId).forEach(parameter => {
       const option = document.createElement('option');
       option.value = str(parameter.parameter_id);
-      option.textContent = `${parameter.parameter_id} (${parameter.required || 'required'})`;
+      // option.textContent = `${parameter.parameter_id} (${parameter.required || 'required'})`;
+      option.textContent = `${parameter.parameter_id}`;
       editorDom.parameterPicker.appendChild(option);
     });
   }
@@ -111,8 +117,8 @@ export function renderParameterPicker(issueId) {
 export function fillTopicForm(topicId) {
   const topic = topicId === '__new__' ? null : getTopic(topicId);
 
-  // editorDom.topicId.value = topic?.topic_id || makeUniqueId('TOPIC', appState.topics, 'topic_id');
-  editorDom.topicId.value = makeUniqueId('TOPIC', appState.topics, 'topic_id');
+  editorDom.topicId.value = topic?.topic_id || makeUniqueId('TOPIC', appState.topics, 'topic_id');
+  // editorDom.topicId.value = makeUniqueId('TOPIC', appState.topics, 'topic_id');
   editorDom.topicName.value = topic?.topic_name || '';
   editorDom.topicDescription.value = topic?.description || '';
   editorDom.topicExamples.value = topic?.example_phrases || '';
@@ -121,8 +127,8 @@ export function fillTopicForm(topicId) {
 export function fillIssueForm(issueId) {
   const issue = issueId === '__new__' ? null : getIssue(issueId);
 
-  // editorDom.issueId.value = issue?.issue_id || makeUniqueId('ISSUE', appState.issues, 'issue_id');
-  editorDom.issueId.value = makeUniqueId('ISSUE', appState.issues, 'issue_id');
+  editorDom.issueId.value = issue?.issue_id || makeUniqueId('ISSUE', appState.issues, 'issue_id');
+  // editorDom.issueId.value = makeUniqueId('ISSUE', appState.issues, 'issue_id');
   editorDom.issueName.value = issue?.issue_name || '';
   editorDom.issueDescription.value = issue?.issue_description || '';
   editorDom.issueExamples.value = issue?.example_phrases || '';
@@ -132,8 +138,9 @@ export function fillParameterForm(parameterId) {
   const parameter = getIssueParameters(appState.selectedIssueId)
     .find(item => str(item.parameter_id) === str(parameterId));
 
-  // editorDom.parameterId.value = parameter?.parameter_id || makeUniqueId('PARAM', appState.parameters, 'parameter_id');
-  editorDom.parameterId.value = makeUniqueId('PARAM', appState.parameters, 'parameter_id');
+  editorDom.parameterId.value = parameter?.parameter_id || makeUniqueId('PARAM', appState.parameters, 'parameter_id');
+  // editorDom.parameterId.value = makeUniqueId('PARAM', appState.parameters, 'parameter_id');
+  editorDom.parameterName.value = parameter?.parameter_name || '';
   editorDom.parameterQuestion.value = parameter?.question_to_ask || '';
   editorDom.parameterRequired.value = parameter?.required || 'yes';
   editorDom.parameterAllowedValues.value = parameter?.allowed_values || '';

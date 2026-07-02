@@ -61,10 +61,14 @@ export function getIssueParameters(issueId) {
 }
 
 export function getIssueRules(issueId) {
+  console.log(appState.rules);
   return appState.rules
     .filter(rule => str(rule.issue_id) === str(issueId))
     .sort((a, b) => Number(a.priority || 999999) - Number(b.priority || 999999));
 }
+
+// export function getIssueRuleNames(issueId) {
+// }
 
 export function getRecommendation(recommendationId) {
   return appState.recommendations.find(rec => str(rec.recommendation_id) === str(recommendationId));
@@ -118,6 +122,7 @@ export function upsertParameter(parameter) {
   const normalized = {
     issue_id: str(parameter.issue_id),
     parameter_id: str(parameter.parameter_id),
+    parameter_name: str(parameter.parameter_name),
     question_to_ask: str(parameter.question_to_ask),
     required: str(parameter.required || 'yes'),
     allowed_values: str(parameter.allowed_values),
@@ -125,7 +130,7 @@ export function upsertParameter(parameter) {
     order: str(parameter.order || nextParameterOrder(parameter.issue_id))
   };
 
-  requireFields(normalized, ['issue_id', 'parameter_id', 'question_to_ask', 'required', 'order'], 'parameter');
+  requireFields(normalized, ['issue_id', 'parameter_id', 'parameter_name', 'question_to_ask', 'required', 'order'], 'parameter');
 
   if (!getIssue(normalized.issue_id)) {
     throw new Error(`Cannot save parameter: issue_id ${normalized.issue_id} does not exist.`);
@@ -169,22 +174,18 @@ export function upsertRule(rule) {
     recommendation_id: str(rule.recommendation_id),
     priority: str(rule.priority)
   };
-  console.log(normalized);
+  
   requireFields(normalized, ['rule_id', 'issue_id', 'conditions', 'recommendation_id', 'priority'], 'rule');
 
-  console.log("1");
   if (!getIssue(normalized.issue_id)) {
     throw new Error(`Cannot save rule: issue_id ${normalized.issue_id} does not exist.`);
   }
-  console.log("2");
 
   if (!getRecommendation(normalized.recommendation_id)) {
     throw new Error(`Cannot save rule: recommendation_id ${normalized.recommendation_id} does not exist.`);
   }
-  console.log("3");
 
   upsertById(appState.rules, 'rule_id', normalized);
-  console.log("4");
   return normalized;
 }
 

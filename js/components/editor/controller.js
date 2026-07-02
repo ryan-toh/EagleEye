@@ -19,12 +19,14 @@ import {
   renderTopicPicker,
   setEditorStatus
 } from './dom.js';
+import { saveWorkbookData } from '../../fileService.js';
 
 export function initEditor() {
   initEditorDom();
 
   editorDom.topicPicker.addEventListener('change', onEditorTopicPicked);
   editorDom.issuePicker.addEventListener('change', onEditorIssuePicked);
+  
   editorDom.parameterPicker.addEventListener('change', () => fillParameterForm(editorDom.parameterPicker.value));
 
   editorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
@@ -32,6 +34,8 @@ export function initEditor() {
   editorDom.saveParameterBtn.addEventListener('click', onSaveParameter);
   editorDom.buildCombinationsBtn.addEventListener('click', onBuildCombinations);
   editorDom.saveCombinationRulesBtn.addEventListener('click', onSaveCombinationRules);
+
+  editorDom.saveSheetBtn.addEventListener('click', saveSheet);
 
   refreshEditorPickers();
 }
@@ -124,6 +128,7 @@ function onSaveParameter() {
     upsertParameter({
       issue_id: appState.selectedIssueId,
       parameter_id: editorDom.parameterId.value,
+      parameter_name: editorDom.parameterName.value,
       question_to_ask: editorDom.parameterQuestion.value,
       required: editorDom.parameterRequired.value,
       allowed_values: editorDom.parameterAllowedValues.value,
@@ -179,4 +184,8 @@ async function renderSelectedIssuePreview() {
 
   appState.step = 3;
   renderStep();
+}
+
+export async function saveSheet() {
+  await saveWorkbookData(appState)
 }

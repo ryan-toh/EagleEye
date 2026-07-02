@@ -24,6 +24,9 @@ body {
   color: var(--text);
   font-size: 14px;
   line-height: 1.5;
+  width: 85%;
+  margin: auto;
+  margin-top: 8%;
 }
 
 /* ── Header (Teams top-bar style) ───────────────────────────── */
@@ -206,7 +209,7 @@ button:disabled {
 /* ── Misc ───────────────────────────────────────────────────── */
 .empty        { color: var(--muted); font-size: 13px; }
 pre           { white-space: pre-wrap; font-size: 13px; }
-.helper-text  { color: var(--muted); font-size: 12px; margin-top: -4px; }
+.helper-text  { color: var(--muted); font-size: 12px; margin-top: 10px; }
 
 /* ── Editor grid ────────────────────────────────────────────── */
 .editor-grid {

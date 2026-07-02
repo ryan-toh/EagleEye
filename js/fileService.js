@@ -1,9 +1,10 @@
-import { FILE_CONFIG } from "../../schema.js";
-import { uploadDom } from "./dom.js";
+import { FILE_CONFIG } from "./schema.js";
+import { uploadDom } from "./components/upload/dom.js";
+import { getSampleWorkbookData } from "./schema.js";
 
 /* Save and Export */
 
-export function saveWorkbookData(workbookData, filename = "bot-input.xlsx") {
+export function saveWorkbookData(workbookData, filename = FILE_CONFIG.filename) {
   validateExportData(workbookData);
 
   console.log("Attempting to save.");
@@ -12,8 +13,12 @@ export function saveWorkbookData(workbookData, filename = "bot-input.xlsx") {
     throw new Error("XLSX library not loaded.");
   }
 
+  const dataToExport = isWorkbookDataEmpty(workbookData)
+    ? getSampleWorkbookData()
+    : workbookData;
+
   const workbook = window.XLSX.utils.book_new();
-  const sheet_config = FILE_CONFIG.sheet
+  const sheet_config = FILE_CONFIG.sheet;
 
   const sheets = [
     { key: "topics", config: sheet_config.topics },
@@ -25,7 +30,7 @@ export function saveWorkbookData(workbookData, filename = "bot-input.xlsx") {
 
   for (const { key, config } of sheets) {
     const columns = getExportColumns(key);
-    const normalizedRows = workbookData[key].map((row) =>
+    const normalizedRows = dataToExport[key].map((row) =>
       normalizeRowForExport(row, columns)
     );
 
@@ -37,6 +42,12 @@ export function saveWorkbookData(workbookData, filename = "bot-input.xlsx") {
   }
 
   window.XLSX.writeFile(workbook, filename);
+}
+
+function isWorkbookDataEmpty(workbookData) {
+  return Object.keys(FILE_CONFIG.sheet).every(
+    (key) => !workbookData[key]?.length
+  );
 }
 
 function normalizeRowForExport(row, columns) {

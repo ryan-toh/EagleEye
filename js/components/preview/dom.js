@@ -21,8 +21,14 @@ export function renderIssueSummary(issueId) {
   previewDom.parametersList.classList.remove('empty');
   previewDom.parametersList.innerHTML = toList(issueParameters, param => {
     const required = isRequired(param.required);
+    // return `
+    //   <strong>${escapeHtml(param.parameter_id)}</strong>
+    //   <span class="badge ${required ? 'required' : 'optional'}">${required ? 'required' : 'optional'}</span><br />
+    //   ${escapeHtml(param.question_to_ask)}
+    //   ${param.allowed_values ? `<br /><small>Allowed: ${escapeHtml(param.allowed_values)}</small>` : ''}
+    // `;
     return `
-      <strong>${escapeHtml(param.parameter_id)}</strong>
+      <strong>${escapeHtml(param.parameter_name)}</strong>
       <span class="badge ${required ? 'required' : 'optional'}">${required ? 'required' : 'optional'}</span><br />
       ${escapeHtml(param.question_to_ask)}
       ${param.allowed_values ? `<br /><small>Allowed: ${escapeHtml(param.allowed_values)}</small>` : ''}
@@ -30,10 +36,15 @@ export function renderIssueSummary(issueId) {
   });
 
   previewDom.rulesList.classList.remove('empty');
+  // previewDom.rulesList.innerHTML = toList(issueRules, rule => `
+  //   <strong>Priority ${escapeHtml(rule.priority)}</strong><br />
+  //   ${escapeHtml(rule.conditions)}<br />
+  //   <small>Recommendation: ${escapeHtml(rule.recommendation_id)}</small>
+  // `);
   previewDom.rulesList.innerHTML = toList(issueRules, rule => `
     <strong>Priority ${escapeHtml(rule.priority)}</strong><br />
     ${escapeHtml(rule.conditions)}<br />
-    <small>Recommendation: ${escapeHtml(rule.recommendation_id)}</small>
+    <small>Recommendation: ${escapeHtml(rule.recommendation_name)}</small>
   `);
 
   previewDom.recommendationsList.classList.remove('empty');

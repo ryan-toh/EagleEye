@@ -34,6 +34,10 @@ header#main-header {
   opacity: 0.95;
 }
 
+.header__logo {
+  max-width: 32px;
+}
+
 .header__title-group {
   display: flex;
   flex-direction: column;

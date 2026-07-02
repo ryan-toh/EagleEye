@@ -18,8 +18,9 @@ export function renderTopicOptions() {
 
   appState.topics.forEach(topic => {
     const option = document.createElement('option');
-    option.value = String(topic.topic_id);
-    option.textContent = `${topic.topic_name} (${topic.topic_id})`;
+    option.value = String(topic.topic_id);` `
+    // option.textContent = `${topic.topic_name} (${topic.topic_id})`;
+    option.textContent = `${topic.topic_name}`;
     viewerDom.topicSelect.appendChild(option);
   });
 
@@ -39,7 +40,8 @@ export function renderIssueOptions(topicId) {
   issues.forEach(issue => {
     const option = document.createElement('option');
     option.value = String(issue.issue_id);
-    option.textContent = `${issue.issue_name} (${issue.issue_id})`;
+    // option.textContent = `${issue.issue_name} (${issue.issue_id})`;
+    option.textContent = `${issue.issue_name}`;
     viewerDom.issueSelect.appendChild(option);
   });
 

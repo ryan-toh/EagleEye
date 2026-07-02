@@ -1,11 +1,15 @@
 <section class="panel" id="upload-panel">
-    <h2>1. Upload XLSX file</h2>
+    <h2>Upload your Decision Tree Excel File.</h2>
+    <p class="helper-text">It should be of '.xls' or '.xlsx' format.</p>
+    
     <div class="upload-grid">
-    <label>bot-input.xlsx <input type="file" id="botInputFile" accept=".xlsx,.xls"></label>
+    <label>decision-tree.xlsx <input type="file" id="botInputFile" accept=".xlsx,.xls"></label>
     </div>
-    <button id="loadBtn">Load files</button>
-    <button id="saveSheetBtn">Download changes</button>
-    <p>You can download a template file by downloading without an input file.</p>
+    <button id="loadBtn">Continue</button>
+
+    <p class="helper-text">Don't have one? Click to download a Template.</p>
+    <button id="downloadSheetTemplateBtn">Download a Template</button>
+    
     <br>
     <p id="loadStatus" class="status"></p>
     

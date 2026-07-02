@@ -1,14 +1,14 @@
 import { getRequiredElement } from "../../utils.js";
-import { saveWorkbookData } from "./fileService.js";
+import { saveWorkbookData } from "../../fileService.js";
 
 export const uploadDom = {};
 
 export function initUploadDomElements() {
     Object.assign(uploadDom, {
-            loadBtn:             document.getElementById('loadBtn'),
-            loadStatus:          document.getElementById('loadStatus'),
-            saveSheetBtn:        document.getElementById('saveSheetBtn'),
-            fileInputBtn:        document.getElementById('botInputFile'),
+            loadBtn: document.getElementById('loadBtn'),
+            loadStatus: document.getElementById('loadStatus'),
+            downloadSheetTemplateBtn: document.getElementById('downloadSheetTemplateBtn'),
+            fileInputBtn: document.getElementById('botInputFile'),
     })
 
     return uploadDom;
