@@ -1,13 +1,33 @@
-.preview-grid {
+/* ============================================================
+   preview.css — preview panel cards and flowchart preview
+   Used by: parts/preview-panel.html
+   ============================================================ */
+
+.preview-panel .preview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
   margin-bottom: 16px;
 }
 
-.preview-card {
-  border: 1px solid var(--border);
-  border-radius: 6px;
+.preview-panel .preview-card {
   padding: 16px;
   background: #FAFAFA;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.preview-panel .flowchart {
+  overflow: auto;
+  min-height: 220px;
+  max-height: 70vh;
+  padding: 16px;
+  background: #FAFAFA;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  cursor: grab;
+}
+
+.preview-panel .flowchart:active {
+  cursor: grabbing;
 }

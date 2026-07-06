@@ -1,4 +1,29 @@
-/* Utility for progressive disclosure */
+/* ============================================================
+   layout.css — shared layout utilities
+   ============================================================ */
+
 .hidden {
-    display: none;
-} 
+  display: none;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.flowchart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+
+#tab-bar:not(.hidden) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#tab-bar .tab-button {
+  width: fit-content;
+}

@@ -1,57 +1,87 @@
-/* ── Matrix / editor table ──────────────────────────────────── */
-.matrix-table {
+/* ============================================================
+   editor.css — editor panel and recommendation matrix
+   Used by: parts/editor-panel.html
+   ============================================================ */
+
+.editor-panel .editor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.editor-panel .editor-card {
+  padding: 16px;
+  background: #FAFAFA;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.editor-panel .editor-card.wide {
+  margin-top: 10px;
+}
+
+.editor-panel .editor-card label {
+  margin-bottom: 10px;
+}
+
+.editor-panel .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.editor-panel .matrix-table {
   width: 100%;
-  border-collapse: collapse;
   min-width: 900px;
+  border-collapse: collapse;
   font-size: 13px;
 }
 
-.matrix-table th,
-.matrix-table td {
-  border: 1px solid var(--border);
+.editor-panel .matrix-table th,
+.editor-panel .matrix-table td {
   padding: 8px 10px;
-  vertical-align: middle;           /* cleaner row alignment */
+  border: 1px solid var(--border);
+  vertical-align: middle;
 }
 
-.matrix-table th {
-  background: var(--tint);          /* Teams purple tint (#E8EBFA) */
-  color: var(--accent-dark);        /* Teams dark purple text on header */
+.editor-panel .matrix-table th {
+  background: var(--tint);
+  color: var(--accent-dark);
   font-size: 12px;
   font-weight: 600;
   text-align: left;
   letter-spacing: 0.02em;
-  text-transform: uppercase;        /* Teams-style column label convention */
+  text-transform: uppercase;
 }
 
-/* ── Inputs / selects / textareas inside the matrix ─────────── */
-.matrix-table textarea,
-.matrix-table input,
-.matrix-table select {
+.editor-panel .matrix-table textarea,
+.editor-panel .matrix-table input,
+.editor-panel .matrix-table select {
   min-width: 150px;
   width: 100%;
   padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;               /* matches Teams input radius */
   background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 4px;
   color: var(--text);
   font: inherit;
   font-size: 13px;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.matrix-table textarea:focus,
-.matrix-table input:focus,
-.matrix-table select:focus {
+.editor-panel .matrix-table textarea:focus,
+.editor-panel .matrix-table input:focus,
+.editor-panel .matrix-table select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(98, 100, 167, 0.25);  /* Teams purple focus ring */
+  box-shadow: 0 0 0 2px rgba(98, 100, 167, 0.25);
 }
 
-/* ── Zebra striping (optional, Teams list-view style) ────────── */
-.matrix-table tbody tr:nth-child(even) {
+.editor-panel .matrix-table tbody tr:nth-child(even) {
   background: #FAFAFA;
 }
 
-.matrix-table tbody tr:hover {
-  background: var(--tint);          /* subtle purple highlight on hover */
+.editor-panel .matrix-table tbody tr:hover {
+  background: var(--tint);
 }

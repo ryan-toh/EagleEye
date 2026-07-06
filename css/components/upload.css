@@ -1,0 +1,26 @@
+/* ============================================================
+   upload.css — upload panel
+   Used by: parts/upload-panel.html
+   ============================================================ */
+
+#upload-panel .upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+#upload-panel input[type='file'] {
+  padding: 8px 10px;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+#upload-panel input[type='file']:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(98, 100, 167, 0.25);
+}

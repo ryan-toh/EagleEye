@@ -61,7 +61,6 @@ export function getIssueParameters(issueId) {
 }
 
 export function getIssueRules(issueId) {
-  console.log(appState.rules);
   return appState.rules
     .filter(rule => str(rule.issue_id) === str(issueId))
     .sort((a, b) => Number(a.priority || 999999) - Number(b.priority || 999999));
