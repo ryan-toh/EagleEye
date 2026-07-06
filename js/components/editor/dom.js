@@ -98,7 +98,8 @@ export function renderParameterPicker(issueId) {
       const option = document.createElement('option');
       option.value = str(parameter.parameter_id);
       // option.textContent = `${parameter.parameter_id} (${parameter.required || 'required'})`;
-      option.textContent = `${parameter.parameter_id}`;
+      // option.textContent = `${parameter.parameter_id}`;
+      option.textContent = `${parameter.parameter_name}`;
       editorDom.parameterPicker.appendChild(option);
     });
   }

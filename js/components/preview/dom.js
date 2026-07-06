@@ -44,12 +44,13 @@ export function renderIssueSummary(issueId) {
   previewDom.rulesList.innerHTML = toList(issueRules, rule => `
     <strong>Priority ${escapeHtml(rule.priority)}</strong><br />
     ${escapeHtml(rule.conditions)}<br />
-    <small>Recommendation: ${escapeHtml(rule.recommendation_name)}</small>
+    <small>Recommendation id: ${escapeHtml(rule.recommendation_id)}</small>
   `);
 
   previewDom.recommendationsList.classList.remove('empty');
   previewDom.recommendationsList.innerHTML = toList(issueRecommendations, rec => `
     <strong>${escapeHtml(rec.final_decision)}</strong><br />
+    <small>Recommendation id: ${escapeHtml(rec.recommendation_id)}</small><br />
     ${escapeHtml(rec.recommendation_text)}
     ${rec.next_steps ? `<br /><small>Next steps: ${escapeHtml(rec.next_steps)}</small>` : ''}
     ${rec.escalation_note ? `<br /><small>Escalation: ${escapeHtml(rec.escalation_note)}</small>` : ''}

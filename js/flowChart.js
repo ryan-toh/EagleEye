@@ -21,7 +21,7 @@ export function buildIssueFlowchart(issueId) {
       const nodeId = `param${index}`;
       const fromNode = index === 0 ? 'issue' : `param${index - 1}`;
       const requiredText = isRequired(param.required) ? 'Required' : 'Optional';
-      const label = `${requiredText}: ${param.parameter_id}\n${param.question_to_ask}`;
+      const label = `${requiredText}: ${param.parameter_name}\n${param.question_to_ask}`;
 
       lines.push(`  ${fromNode} --> ${nodeId}["${safeMermaidLabel(label)}"]`);
     });
