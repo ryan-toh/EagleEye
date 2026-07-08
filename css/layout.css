@@ -17,13 +17,11 @@
   gap: 12px;
 }
 
-
-#tab-bar:not(.hidden) {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 #tab-bar .tab-button {
   width: fit-content;
+} 
+
+.tab-bar__item {
+  display: flex;
+  gap: 1rem;
 }
