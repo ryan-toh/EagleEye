@@ -1,13 +1,12 @@
-import { initUploadDomElements, uploadDom, setStatus, getFileInput } from "./dom.js";
+import { initUploadDomElements, uploadDom, renderStatus, getFileInput } from "./dom.js";
 import { saveWorkbookData, loadWorkbookData, validateWorkbookData } from "../../fileService.js";
 import { loadState, appState, renderStep } from "../../state.js";
-import { renderTopicOptions } from "../viewer/dom.js";
+import { setTopicOptions } from "../viewer/controller.js";
 
 export function initUpload() {
     initUploadDomElements();
 
     uploadDom.loadBtn.addEventListener('click', onLoadFiles);
-    // uploadDom.saveSheetBtn.addEventListener('click', saveSheet);
     uploadDom.downloadSheetTemplateBtn.addEventListener('click', downloadSheetTemplate);
     
 }
@@ -19,7 +18,7 @@ async function onLoadFiles() {
     const workbookData = await loadWorkbookData(getFileInput());
     validateWorkbookData(workbookData);
     loadState(workbookData);
-    renderTopicOptions();
+    setTopicOptions();
     setStatus('Files loaded successfully.', 'success');
 
     appState.step = 2;
@@ -33,6 +32,10 @@ async function onLoadFiles() {
 
 export async function downloadSheetTemplate() {
   await saveWorkbookData(appState);
+}
+
+export function setStatus(message) {
+  renderStatus(message);
 }
 
 

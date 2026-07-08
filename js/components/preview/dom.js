@@ -57,7 +57,7 @@ export function renderIssueSummary(issueId) {
   `);
 }
 
-export function clearIssueView() {
+export function renderEmptyIssueView() {
   previewDom.parametersList.className = 'empty';
   previewDom.parametersList.textContent = 'No issue selected.';
 

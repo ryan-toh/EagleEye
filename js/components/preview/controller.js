@@ -1,5 +1,5 @@
-import { previewDom, initPreviewDomElements, renderIssueSummary } from "./dom.js";
-import { renderMermaid } from "../../flowChart.js";
+import { previewDom, initPreviewDomElements, renderIssueSummary, renderEmptyIssueView } from "./dom.js";
+import { renderMermaid } from "../../flowchart.js";
 import { appState } from "../../state.js";
 
 export function initPreview() {
@@ -16,11 +16,15 @@ export async function copyGraph() {
   setTimeout(() => (previewDom.copyMermaidBtn.textContent = 'Copy Mermaid'), 1200);
 }
 
-export function displayGraph(graphDefinition) {
-  renderMermaid(previewDom.flowchart, graphDefinition);
+export function setGraph(graphDefinition) {
   previewDom.copyMermaidBtn.disabled = false;
+  return renderMermaid(previewDom.flowchart, graphDefinition);
 }
 
-export function displayIssueSummary(issueId) {
+export function clearIssueView() {
+  renderEmptyIssueView();
+}
+
+export function setIssueSummary(issueId) {
   renderIssueSummary(issueId);
 }

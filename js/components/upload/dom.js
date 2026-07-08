@@ -1,4 +1,3 @@
-import { getRequiredElement } from "../../utils.js";
 import { saveWorkbookData } from "../../fileService.js";
 
 export const uploadDom = {};
@@ -19,7 +18,7 @@ export function disableLoading(message) {
   uploadDom.loadBtn.disabled = true;
 }
 
-export function setStatus(message, type = '') {
+export function renderStatus(message, type = '') {
   uploadDom.loadStatus.textContent = message;
   uploadDom.loadStatus.className = `status ${type}`.trim();
 }

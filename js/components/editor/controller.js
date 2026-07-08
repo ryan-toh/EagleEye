@@ -1,8 +1,7 @@
-import { buildIssueFlowchart } from '../../flowchart.js';
-import { displayGraph, displayIssueSummary } from '../preview/controller.js';
-import { setDomTopicValue, getDomTopicValue, setDomIssueValue } from '../viewer/controller.js';
-import { renderIssueOptions, renderTopicOptions } from '../viewer/dom.js';
-import { setStatus } from '../upload/dom.js';
+import { buildIssueFlowchart } from '../preview/flowchart.js';
+import { setGraph, setIssueSummary } from '../preview/controller.js';
+import { setDomTopicValue, getDomTopicValue, setDomIssueValue, setTopicOptions, setIssueOptions, onTopicChange } from '../viewer/controller.js';
+import { setStatus } from '../upload/controller.js';
 import { renderStep, appState, setSelectedIssue, setSelectedTopic, upsertIssue, upsertParameter, upsertTopic } from '../../state.js';
 import { saveCombinationRecommendations } from './service.js';
 import {
@@ -20,6 +19,7 @@ import {
   setEditorStatus
 } from './dom.js';
 import { saveWorkbookData } from '../../fileService.js';
+import { viewerDom } from '../viewer/dom.js';
 
 export function initEditor() {
   initEditorDom();
@@ -44,18 +44,23 @@ export function refreshEditor() {
   refreshEditorPickers();
 }
 
-function onEditorTopicPicked() {
+export function onEditorTopicPicked() {
   const topicId = editorDom.topicPicker.value;
+
   fillTopicForm(topicId);
 
   if (topicId !== '__new__') {
     setSelectedTopic(topicId);
     // viewerDom.topicSelect.value = topicId;
     setDomTopicValue(topicId);
-    renderIssueOptions(topicId);
+    setIssueOptions(topicId);
   }
 
   renderIssuePicker(appState.selectedTopicId);
+}
+
+export function setEditorDomTopicValue(value) {
+
 }
 
 function onEditorIssuePicked() {
@@ -81,11 +86,11 @@ function onSaveTopic() {
       example_phrases: editorDom.topicExamples.value
     });
 
-    renderTopicOptions();
+    setTopicOptions();
     // viewerDom.topicSelect.value = topic.topic_id;
     setDomTopicValue(topic.topic_id);
     setSelectedTopic(topic.topic_id);
-    renderIssueOptions(topic.topic_id);
+    setIssueOptions(topic.topic_id);
     renderTopicPicker();
     setEditorStatus('Topic saved.', 'success');
   } catch (error) {
@@ -107,7 +112,7 @@ function onSaveIssue() {
       example_phrases: editorDom.issueExamples.value
     });
 
-    renderIssueOptions(issue.topic_id);
+    setIssueOptions(issue.topic_id);
     // viewerDom.issueSelect.value = issue.issue_id;
     setDomIssueValue(issue.issue_id)
     renderIssuePicker(issue.topic_id);
@@ -177,9 +182,9 @@ function onSaveCombinationRules() {
 async function renderSelectedIssuePreview() {
   if (!appState.selectedIssueId) return;
 
-  displayIssueSummary(appState.selectedIssueId);
+  setIssueSummary(appState.selectedIssueId);
   const graphDefinition = buildIssueFlowchart(appState.selectedIssueId);
-  await displayGraph(graphDefinition);
+  await setGraph(graphDefinition);
   setStatus('Editor changes saved to app state. Export workbook to persist them.', 'success');
 
   appState.step = 3;

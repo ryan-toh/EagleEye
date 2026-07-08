@@ -1,7 +1,10 @@
-import { initViewerDomElements, viewerDom, renderIssueOptions } from "./dom.js";
+import { initViewerDomElements, viewerDom, renderIssueOptions, renderTopicOptions } from "./dom.js";
 import { appState, setSelectedIssue, setSelectedTopic, renderStep } from "../../state.js";
-import { buildIssueFlowchart, renderMermaid } from "../../flowchart.js";
-import { clearIssueView, previewDom, renderIssueSummary } from "../preview/dom.js";
+import { renderMermaid } from "../../flowchart.js";
+import { clearIssueView, setIssueSummary, setGraph } from "../preview/controller.js";
+import { editorDom } from "../editor/dom.js";
+import { onEditorTopicPicked } from "../editor/controller.js";
+import { buildIssueFlowchart } from "../preview/flowchart.js";
 
 export function initViewer() {
     initViewerDomElements();
@@ -26,8 +29,21 @@ export function setDomIssueValue(value) {
   viewerDom.issueSelect.value = value;
 }
 
-function onTopicChange() {
+export function setTopicOptions() {
+  renderTopicOptions();
+}
+
+export function setIssueOptions(topic_id) {
+  renderIssueOptions(topic_id);
+}
+
+export function onTopicChange() {
   const topicId = viewerDom.topicSelect.value;
+
+  // exception: temporary link between viewer and editor
+  editorDom.topicPicker.value = topicId;
+  onEditorTopicPicked();
+
   setSelectedTopic(topicId);
   renderIssueOptions(topicId);
   clearIssueView();
@@ -42,11 +58,12 @@ async function onIssueChange() {
     return;
   }
 
-  renderIssueSummary(issueId);
+  setIssueSummary(issueId);
 
   const graphDefinition = buildIssueFlowchart(issueId);
-  const result = await renderMermaid(previewDom.flowchart, graphDefinition);
-  previewDom.copyMermaidBtn.disabled = false;
+  const result = await setGraph(graphDefinition);
+  // const result = await renderMermaid(previewDom.flowchart, graphDefinition);
+  // previewDom.copyMermaidBtn.disabled = false;
 
   if (!result.ok) {
     setStatus('Files are loaded, but Mermaid could not render the selected issue.', 'error');

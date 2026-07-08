@@ -18,6 +18,7 @@ header#main-header {
   padding: 10px 24px;
   background: rgba(0, 0, 0, 0.12);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
 }
 
 .header__logo-area {
@@ -45,7 +46,7 @@ header#main-header {
 .header__app-name {
   margin: 0;
   color: #FFFFFF;
-  font-size: 16px;
+  font-size: 26px;
   font-weight: 600;
   letter-spacing: -0.1px;
   line-height: 1.3;
