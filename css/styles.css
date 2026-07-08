@@ -20,9 +20,9 @@
 }
 
 body {
-  width: 85%;
+  width: 95%;
+  padding: 1.5rem;
   margin: auto;
-  margin-top: 10%;
   background: var(--bg);
   color: var(--text);
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;

@@ -39,4 +39,12 @@ export function validateLibraries() {
   if (!window.mermaid) {
     throw new Error('Mermaid library not loaded. Check the script tag in index.html.');
   }
+
+  if (!window.marked) {
+    throw new Error(`Marked library not loaded. Check the script tag in index.html.`);
+  }
+}
+
+export function toHtml(markdown) {
+  return window.marked.parse(markdown)
 }

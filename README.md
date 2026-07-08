@@ -1,6 +1,9 @@
-# EagleView
+# EagleEye
 
 A custom built web app to view, create, edit or remove decision trees in an Excel sheet.
+
+## User Guide
+
 
 ## Use Cases
 
