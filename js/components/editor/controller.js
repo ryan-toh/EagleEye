@@ -118,6 +118,7 @@ function onSaveIssue() {
     });
 
     setIssueOptions(issue.topic_id);
+    setSelectedIssue(issue.issue_id);
     // viewerDom.issueSelect.value = issue.issue_id;
     setDomIssueValue(issue.issue_id)
     renderIssuePicker(issue.topic_id);
