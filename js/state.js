@@ -91,7 +91,7 @@ export function upsertTopic(topic) {
   };
 
   requireFields(normalized, ['topic_id', 'topic_name'], 'topic');
-  upsertById(appState.topics, normalized.topic_id, normalized);
+  upsertById(appState.topics, 'topic_id', normalized);
   appState.selectedTopicId = normalized.topic_id;
   return normalized;
 }
