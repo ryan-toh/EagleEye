@@ -165,7 +165,7 @@ export function renderRecommendationMatrix(issueId) {
     return;
   }
 
-  const headerCells = parameters.map(param => `<th>${escapeHtml(param.parameter_id)}</th>`).join('');
+  const headerCells = parameters.map(param => `<th>${escapeHtml(param.parameter_name)}</th>`).join('');
   const rows = combinations.map((combination, index) => {
     const rule = getRuleForCombination(issueId, combination);
     const rec = getRecommendationForCombination(issueId, combination);

@@ -90,8 +90,9 @@ export function upsertTopic(topic) {
     example_phrases: str(topic.example_phrases)
   };
 
+  console.log(str(topic.description));
   requireFields(normalized, ['topic_id', 'topic_name'], 'topic');
-  upsertById(appState.topics, 'topic_id', normalized);
+  upsertById(appState.topics, topic_id, normalized);
   appState.selectedTopicId = normalized.topic_id;
   return normalized;
 }

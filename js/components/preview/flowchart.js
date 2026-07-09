@@ -43,15 +43,15 @@ export function buildIssueFlowchart(issueId) {
         lines.push(`  ${prevNode} -- Yes --> ${nodeId}`);
       }
 
+      lines.push(`  ${nodeId} -- Yes --> ${nextNode}`);
+
       if (required) {
-        lines.push(`  ${nodeId} -- Yes --> ${nextNode}`);
         lines.push(
           `  ${nodeId} -- No / missing --> askMissing${index}["Ask for ${safeMermaidLabel(
             param.parameter_name
           )}"]`
         );
       } else {
-        lines.push(`  ${nodeId} -- Yes --> ${nextNode}`);
         lines.push(`  ${nodeId} -- No / skip --> ${nextNode}`);
       }
     });
