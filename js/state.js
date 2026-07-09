@@ -90,9 +90,8 @@ export function upsertTopic(topic) {
     example_phrases: str(topic.example_phrases)
   };
 
-  console.log(str(topic.description));
   requireFields(normalized, ['topic_id', 'topic_name'], 'topic');
-  upsertById(appState.topics, topic_id, normalized);
+  upsertById(appState.topics, normalized.topic_id, normalized);
   appState.selectedTopicId = normalized.topic_id;
   return normalized;
 }
@@ -211,7 +210,7 @@ function upsertById(rows, idKey, nextRow) {
   const index = rows.findIndex(row => str(row[idKey]) === str(nextRow[idKey]));
 
   if (index >= 0) {
-    rows[index] = { ...rows[index], ...rows[nextRow]};
+    rows[index] = { ...rows[index], ...nextRow};
   } else {
     rows.push(nextRow);
   }

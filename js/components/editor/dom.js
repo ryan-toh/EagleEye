@@ -119,6 +119,7 @@ export function fillTopicForm(topicId) {
   const topic = topicId === '__new__' ? null : getTopic(topicId);
 
   editorDom.topicId.value = topic?.topic_id || makeUniqueId('TOPIC', appState.topics, 'topic_id');
+  console.log(editorDom.topicId.value);
   // editorDom.topicId.value = makeUniqueId('TOPIC', appState.topics, 'topic_id');
   editorDom.topicName.value = topic?.topic_name || '';
   editorDom.topicDescription.value = topic?.description || '';

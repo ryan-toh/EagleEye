@@ -91,7 +91,12 @@ function onSaveTopic() {
     setDomTopicValue(topic.topic_id);
     setSelectedTopic(topic.topic_id);
     setIssueOptions(topic.topic_id);
+
     renderTopicPicker();
+
+    renderIssuePicker(topic.topic_id);
+    renderParameterPicker(topic.topic_id);  
+
     setEditorStatus('Topic saved.', 'success');
   } catch (error) {
     setEditorStatus(error.message, 'error');
