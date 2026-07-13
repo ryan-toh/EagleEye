@@ -1,4 +1,6 @@
+import { topicEditorDom } from './components/editor/topic/dom.js';
 import { str } from './utils.js';
+import { clearTopicForm } from './components/editor/topic/dom.js';
 
 export const appState = {
   topics: [],
@@ -6,8 +8,6 @@ export const appState = {
   parameters: [],
   rules: [],
   recommendations: [],
-  selectedTopicId: '',
-  selectedIssueId: '',
   lastMermaid: '',
   step: 1,
   flow: null
@@ -19,23 +19,11 @@ export function loadState(workbookData) {
   appState.parameters = workbookData.parameters || [];
   appState.rules = workbookData.rules || [];
   appState.recommendations = workbookData.recommendations || [];
-  appState.selectedTopicId = '';
-  appState.selectedIssueId = '';
   appState.lastMermaid = '';
 
   validateStateRelationships(appState);
 }
 
-export function setSelectedTopic(topicId) {
-  appState.selectedTopicId = str(topicId);
-  appState.selectedIssueId = '';
-  appState.lastMermaid = '';
-}
-
-export function setSelectedIssue(issueId) {
-  appState.selectedIssueId = str(issueId);
-  appState.lastMermaid = '';
-}
 
 export function getIssuesForTopic(topicId) {
   return appState.issues.filter(issue => str(issue.topic_id) === str(topicId));
@@ -66,9 +54,6 @@ export function getIssueRules(issueId) {
     .sort((a, b) => Number(a.priority || 999999) - Number(b.priority || 999999));
 }
 
-// export function getIssueRuleNames(issueId) {
-// }
-
 export function getRecommendation(recommendationId) {
   return appState.recommendations.find(rec => str(rec.recommendation_id) === str(recommendationId));
 }
@@ -92,7 +77,7 @@ export function upsertTopic(topic) {
 
   requireFields(normalized, ['topic_id', 'topic_name'], 'topic');
   upsertById(appState.topics, 'topic_id', normalized);
-  appState.selectedTopicId = normalized.topic_id;
+  // appState.selectedTopicId = normalized.topic_id;
   return normalized;
 }
 
@@ -112,8 +97,8 @@ export function upsertIssue(issue) {
   }
 
   upsertById(appState.issues, 'issue_id', normalized);
-  appState.selectedTopicId = normalized.topic_id;
-  appState.selectedIssueId = normalized.issue_id;
+  // appState.selectedTopicId = normalized.topic_id;
+  // appState.selectedIssueId = normalized.issue_id;
   return normalized;
 }
 
@@ -274,6 +259,8 @@ export function renderStep() {
 
   viewPanel.classList.toggle('hidden', !isViewFlow);
   editorPanel.classList.toggle('hidden', !isEditFlow);
+  // To refresh editor
+  if (isEditFlow) clearTopicForm();
 
   // Toggle Preview Panel visibility
   previewPanel.classList.toggle('hidden', appState.step < 3);

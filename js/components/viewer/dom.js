@@ -1,5 +1,5 @@
 import { appState, getIssuesForTopic } from "../../state.js";
-import { renderTopicPicker } from "../editor/dom.js";
+import { renderTopicPicker } from "../editor/topic/dom.js";
 import { clearIssueView } from "../preview/controller.js";
 
 export const viewerDom = {};

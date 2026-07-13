@@ -1,6 +1,6 @@
 import { validateLibraries } from './utils.js';
 import { disableLoading } from './components/upload/dom.js';
-import { initEditor } from './components/editor/controller.js';
+import { initEditor } from './components/editor/shared/controller.js';
 import { initUpload } from './components/upload/controller.js';
 import { initViewer } from './components/viewer/controller.js';
 import { initPreview } from './components/preview/controller.js';
@@ -45,19 +45,20 @@ async function loadParts() {
  * Ensures that the required third-party libraries are loaded.
  */
 function initApp() {
-  try {
-    validateLibraries();
+  // try {
+  validateLibraries();
 
-    window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+  window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
 
-    initUpload();
-    initTabBar();
-    initEditor();
-    initViewer();
-    initPreview();
+  initUpload();
+  initTabBar();
+  initEditor();
+  initViewer();
+  initPreview();
 
-  } catch (error) {
-    disableLoading(error.message);
-    return;
-  }
+  // } catch (error) {
+  //   console.log(`init failed`);
+  //   disableLoading(error.message);
+  //   return;
+  // }
 }

@@ -1,9 +1,8 @@
 import { initViewerDomElements, viewerDom, renderIssueOptions, renderTopicOptions } from "./dom.js";
-import { appState, setSelectedIssue, setSelectedTopic, renderStep } from "../../state.js";
+import { appState, renderStep } from "../../state.js";
 import { renderMermaid } from "../../flowchart.js";
 import { clearIssueView, setIssueSummary, setGraph } from "../preview/controller.js";
-import { editorDom } from "../editor/dom.js";
-import { onEditorTopicPicked } from "../editor/controller.js";
+import { onTopicPicked } from "../editor/topic/controller.js";
 import { buildIssueFlowchart } from "../preview/flowchart.js";
 
 export function initViewer() {
@@ -41,17 +40,17 @@ export function onTopicChange() {
   const topicId = viewerDom.topicSelect.value;
 
   // exception: temporary link between viewer and editor
-  editorDom.topicPicker.value = topicId;
-  onEditorTopicPicked();
+  // editorDom.topicPicker.value = topicId;
+  // onTopicPicked();
 
-  setSelectedTopic(topicId);
+  // setSelectedTopic(topicId);
   renderIssueOptions(topicId);
   clearIssueView();
 }
 
 async function onIssueChange() {
   const issueId = viewerDom.issueSelect.value;
-  setSelectedIssue(issueId);
+  // setSelectedIssue(issueId);
 
   if (!issueId) {
     clearIssueView();
