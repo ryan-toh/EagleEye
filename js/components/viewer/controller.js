@@ -39,7 +39,7 @@ export function setDomIssueValue(value) {
   setIssueSelectedState(value);
 }
 
-export function setTopicOptions() {
+export function setViewerTopicOptions() {
   renderTopicOptions();
   clearIssueView();
 }

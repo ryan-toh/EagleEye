@@ -1,4 +1,4 @@
-import { initTopicEditor } from "../1_topic/controller.js";
+import { initTopicEditor, refreshTopicPicker } from "../1_topic/controller.js";
 import { getSelectedIssue, initIssueEditor } from "../2_issue/controller.js";
 import { initParamEditor } from "../3_parameter/controller.js";
 import { initRecomEditor } from "../4_recommendationMatrix/controller.js";
@@ -24,6 +24,10 @@ export function initSharedEditor() {
   initSharedEditorDom();
 
   sharedEditorDom.saveSheetBtn.addEventListener('click', saveSheet);
+}
+
+export function setEditorTopicOptions() {
+  refreshTopicPicker();
 }
 
 export async function renderSelectedIssuePreview() {
