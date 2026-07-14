@@ -1,6 +1,6 @@
-import { getSelectedIssue } from "../issue/controller.js";
+import { getSelectedIssue } from "../2_issue/controller.js";
 import { initRecomEditorDom, recomEditorDom, renderRecommendationMatrix, collectCombinationRows } from "./dom.js";
-import { appState } from "../../../state.js";
+import { appState } from "../../../appState.js";
 import { setEditorStatus, renderSelectedIssuePreview } from "../shared/controller.js";
 import { saveCombinationRecommendations } from "./service.js";
 

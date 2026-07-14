@@ -1,4 +1,4 @@
-import { appState } from './state.js';
+import { appState } from './appState.js';
 import { isRequired, safeMermaidLabel, str } from './utils.js';
 
 export async function renderMermaid(targetElement, graphDefinition) {

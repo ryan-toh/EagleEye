@@ -1,4 +1,4 @@
-import { appState, getTopic, makeUniqueId } from "../../../state.js";
+import { appState, getTopic, makeUniqueId } from "../../../appState.js";
 import { str } from "../../../utils.js";
 
 export const topicEditorDom = {};

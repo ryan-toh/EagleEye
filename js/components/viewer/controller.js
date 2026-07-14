@@ -1,8 +1,8 @@
 import { initViewerDomElements, viewerDom, renderIssueOptions, renderTopicOptions } from "./dom.js";
-import { appState, renderStep } from "../../state.js";
+import { appState, renderStep } from "../../appState.js";
 import { renderMermaid } from "../../flowchart.js";
 import { clearIssueView, setIssueSummary, setGraph } from "../preview/controller.js";
-import { onTopicPicked } from "../editor/topic/controller.js";
+import { onTopicPicked } from "../editor/1_topic/controller.js";
 import { buildIssueFlowchart } from "../preview/flowchart.js";
 
 export function initViewer() {
@@ -50,7 +50,6 @@ export function onTopicChange() {
 
 async function onIssueChange() {
   const issueId = viewerDom.issueSelect.value;
-  // setSelectedIssue(issueId);
 
   if (!issueId) {
     clearIssueView();
@@ -61,8 +60,6 @@ async function onIssueChange() {
 
   const graphDefinition = buildIssueFlowchart(issueId);
   const result = await setGraph(graphDefinition);
-  // const result = await renderMermaid(previewDom.flowchart, graphDefinition);
-  // previewDom.copyMermaidBtn.disabled = false;
 
   if (!result.ok) {
     setStatus('Files are loaded, but Mermaid could not render the selected issue.', 'error');

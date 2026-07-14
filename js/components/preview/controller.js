@@ -1,6 +1,6 @@
 import { previewDom, initPreviewDomElements, renderIssueSummary, renderEmptyIssueView } from "./dom.js";
 import { renderMermaid } from "../../flowchart.js";
-import { appState } from "../../state.js";
+import { appState } from "../../appState.js";
 
 export function initPreview() {
     initPreviewDomElements();
@@ -16,7 +16,7 @@ export async function copyGraph() {
   setTimeout(() => (previewDom.copyMermaidBtn.textContent = 'Copy Mermaid'), 1200);
 }
 
-export function setGraph(graphDefinition) {
+export async function setGraph(graphDefinition) {
   previewDom.copyMermaidBtn.disabled = false;
   return renderMermaid(previewDom.flowchart, graphDefinition);
 }

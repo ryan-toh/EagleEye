@@ -1,8 +1,8 @@
-import { refreshIssue } from "../issue/controller.js";
-import { refreshParam } from "../parameter/controller.js";
+import { refreshIssue } from "../2_issue/controller.js";
+import { refreshParam } from "../3_parameter/controller.js";
 import { setEditorStatus } from "../shared/controller.js";
 import { initTopicEditorDom, topicEditorDom, renderTopicFormFor, renderTopicPicker } from "./dom.js";
-import { upsertTopic } from "../../../state.js";
+import { upsertTopic } from "../../../appState.js";
 
 export function initTopicEditor() {
     initTopicEditorDom();

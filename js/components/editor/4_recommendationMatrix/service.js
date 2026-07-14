@@ -6,7 +6,7 @@ import {
   makeUniqueId,
   upsertRecommendation,
   upsertRule
-} from '../../../state.js';
+} from '../../../appState.js';
 import { str } from '../../../utils.js';
 
 export function parseAllowedValues(value) {

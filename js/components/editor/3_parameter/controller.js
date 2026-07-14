@@ -1,6 +1,6 @@
-import { getSelectedIssue } from "../issue/controller.js";
+import { getSelectedIssue } from "../2_issue/controller.js";
 import { initParamEditorDom, paramEditorDom, renderParameterPicker, renderParamFormFor } from "./dom.js";
-import { upsertParameter } from "../../../state.js";
+import { upsertParameter } from "../../../appState.js";
 import { setEditorStatus } from "../shared/controller.js";
 
 export function initParamEditor() {

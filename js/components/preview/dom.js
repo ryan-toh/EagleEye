@@ -1,4 +1,4 @@
-import { appState, getIssueParameters, getIssueRules, getRecommendationsForRules } from '../../state.js';
+import { appState, getIssueParameters, getIssueRules, getRecommendationsForRules } from '../../appState.js';
 import { escapeHtml, isRequired, str, toList } from '../../utils.js';
 
 export const previewDom = {}

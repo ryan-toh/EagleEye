@@ -1,7 +1,9 @@
-import { topicEditorDom } from './components/editor/topic/dom.js';
+import { topicEditorDom } from './components/editor/1_topic/dom.js';
 import { str } from './utils.js';
-import { clearTopicForm } from './components/editor/topic/dom.js';
+import { clearTopicForm } from './components/editor/1_topic/dom.js';
 
+
+// core appState
 export const appState = {
   topics: [],
   issues: [],
@@ -23,7 +25,6 @@ export function loadState(workbookData) {
 
   validateStateRelationships(appState);
 }
-
 
 export function getIssuesForTopic(topicId) {
   return appState.issues.filter(issue => str(issue.topic_id) === str(topicId));
@@ -77,7 +78,6 @@ export function upsertTopic(topic) {
 
   requireFields(normalized, ['topic_id', 'topic_name'], 'topic');
   upsertById(appState.topics, 'topic_id', normalized);
-  // appState.selectedTopicId = normalized.topic_id;
   return normalized;
 }
 
@@ -97,8 +97,6 @@ export function upsertIssue(issue) {
   }
 
   upsertById(appState.issues, 'issue_id', normalized);
-  // appState.selectedTopicId = normalized.topic_id;
-  // appState.selectedIssueId = normalized.issue_id;
   return normalized;
 }
 
@@ -209,7 +207,6 @@ function requireFields(row, fields, entityName) {
   }
 }
 
-
 function validateStateRelationships(state) {
   const topicIds = new Set(state.topics.map(topic => str(topic.topic_id)));
   const issueIds = new Set(state.issues.map(issue => str(issue.issue_id)));
@@ -259,8 +256,6 @@ export function renderStep() {
 
   viewPanel.classList.toggle('hidden', !isViewFlow);
   editorPanel.classList.toggle('hidden', !isEditFlow);
-  // To refresh editor
-  if (isEditFlow) clearTopicForm();
 
   // Toggle Preview Panel visibility
   previewPanel.classList.toggle('hidden', appState.step < 3);

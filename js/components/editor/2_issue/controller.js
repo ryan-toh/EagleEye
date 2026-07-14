@@ -1,8 +1,9 @@
-import { getSelectedTopic } from "../topic/controller.js";
-import { refreshParam } from "../parameter/controller.js";
-import { upsertIssue } from "../../../state.js";
-import { setEditorStatus } from "../shared/controller.js";
+import { getSelectedTopic } from "../1_topic/controller.js";
+import { refreshParam } from "../3_parameter/controller.js";
+import { upsertIssue, appState } from "../../../appState.js";
+import { renderSelectedIssuePreview, setEditorStatus } from "../shared/controller.js";
 import { issueEditorDom, initIssueEditorDom, renderIssueFormFor, renderIssuePickerFor } from "./dom.js";
+import { buildIssueFlowchart } from "../../preview/flowchart.js";
 
 export function initIssueEditor() {
     initIssueEditorDom();
@@ -24,13 +25,16 @@ export function clearIssueForm() {
   renderIssueFormFor('__new__');
 }
 
-export function onIssuePicked() {
+export async function onIssuePicked() {
   const issueId = issueEditorDom.issuePicker.value;
 
   renderIssueFormFor(issueId);
 
   // Automatically load params after choosing an issue
   refreshParam(issueId);
+
+  // Automatically load graph, token required 
+  await renderSelectedIssuePreview();
 }
 
 export function setIssueForm(issueId) {
@@ -52,7 +56,7 @@ function onSaveIssue() {
 
     refreshIssuePicker(topic_id);
 
-    // // To restore state
+    // To restore state
     issueEditorDom.issuePicker.value = issue_id
 
     setEditorStatus('Issue saved.', 'success');

@@ -1,6 +1,6 @@
 import { initUploadDomElements, uploadDom, renderStatus, getFileInput } from "./dom.js";
 import { saveWorkbookData, loadWorkbookData, validateWorkbookData } from "../../fileService.js";
-import { loadState, appState, renderStep } from "../../state.js";
+import { loadState, appState, renderStep } from "../../appState.js";
 import { setTopicOptions } from "../viewer/controller.js";
 
 export function initUpload() {

@@ -1,5 +1,5 @@
 import { tabBarDom, initTabBarDomElements } from "./dom.js";
-import { renderStep, appState } from "../../state.js";
+import { renderStep, appState } from "../../appState.js";
 
 export function initTabBar() {
     initTabBarDomElements();

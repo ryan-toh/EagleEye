@@ -1,5 +1,5 @@
 import { isRequired, safeMermaidLabel, str } from '../../utils.js';
-import { getIssue, getIssueParameters, getIssueRules, getRecommendationMap, getTopicName } from '../../state.js';
+import { getIssue, getIssueParameters, getIssueRules, getRecommendationMap, getTopicName } from '../../appState.js';
 
 export function buildIssueFlowchart(issueId) {
   const issue = getIssue(issueId);

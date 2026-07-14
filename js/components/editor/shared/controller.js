@@ -1,7 +1,7 @@
-import { initTopicEditor } from "../topic/controller.js";
-import { getSelectedIssue, initIssueEditor } from "../issue/controller.js";
-import { initParamEditor } from "../parameter/controller.js";
-import { initRecomEditor } from "../recommendationMatrix/controller.js";
+import { initTopicEditor } from "../1_topic/controller.js";
+import { getSelectedIssue, initIssueEditor } from "../2_issue/controller.js";
+import { initParamEditor } from "../3_parameter/controller.js";
+import { initRecomEditor } from "../4_recommendationMatrix/controller.js";
 
 import { initSharedEditorDom, sharedEditorDom, renderEditorStatus } from "./dom.js";
 
@@ -10,7 +10,7 @@ import { setGraph, setIssueSummary } from "../../preview/controller.js";
 import { setStatus } from "../../upload/controller.js";
 
 import { saveWorkbookData } from "../../../fileService.js";
-import { appState, renderStep } from "../../../state.js";
+import { appState, renderStep } from "../../../appState.js";
 
 export function initEditor() {
   initTopicEditor();
@@ -28,10 +28,14 @@ export function initSharedEditor() {
 
 export async function renderSelectedIssuePreview() {
   setIssueSummary(getSelectedIssue());
-  const graphDefinition = buildIssueFlowchart(getSelectedIssue());
-  await setGraph(graphDefinition);
-  setStatus('Editor changes saved to app state. Export workbook to persist them.', 'success');
 
+  const graphDefinition = buildIssueFlowchart(getSelectedIssue());
+  const result = await setGraph(graphDefinition);
+
+  if (!result.ok) {
+    setStatus('Files are loaded, but Mermaid could not render the selected issue', 'error');
+  }
+  
   appState.step = 3;
   renderStep();
 }

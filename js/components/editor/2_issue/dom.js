@@ -1,4 +1,4 @@
-import { getIssue, getIssuesForTopic, makeUniqueId, appState } from "../../../state.js";
+import { getIssue, getIssuesForTopic, makeUniqueId, appState } from "../../../appState.js";
 import { str } from "../../../utils.js";
 
 export const issueEditorDom = {};

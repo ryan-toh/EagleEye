@@ -1,6 +1,6 @@
-import { appState, getIssuesForTopic, getIssueParameters, makeUniqueId } from "../../../state.js";
+import { appState, getIssuesForTopic, getIssueParameters, makeUniqueId } from "../../../appState.js";
 import { str } from "../../../utils.js";
-import { getSelectedIssue } from "../issue/controller.js";
+import { getSelectedIssue } from "../2_issue/controller.js";
 
 export const paramEditorDom = {};
 
