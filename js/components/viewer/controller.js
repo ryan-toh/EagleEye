@@ -1,15 +1,24 @@
-import { initViewerDomElements, viewerDom, renderIssueOptions, renderTopicOptions } from "./dom.js";
+import {
+  initViewerDomElements,
+  viewerDom,
+  renderIssueOptions,
+  renderTopicOptions,
+  getClickedTopicId,
+  getClickedIssueId,
+  setTopicSelectedState,
+  setIssueSelectedState,
+} from "./dom.js";
+
 import { appState, renderStep } from "../../appState.js";
-import { renderMermaid } from "../../flowchart.js";
 import { clearIssueView, setIssueSummary, setGraph } from "../preview/controller.js";
-import { onTopicPicked } from "../editor/1_topic/controller.js";
 import { buildIssueFlowchart } from "../preview/flowchart.js";
+import { setStatus } from "../upload/controller.js";
 
 export function initViewer() {
-    initViewerDomElements();
+  initViewerDomElements();
 
-    viewerDom.topicSelect.addEventListener('change', onTopicChange);
-    viewerDom.issueSelect.addEventListener('change', onIssueChange);
+  viewerDom.topicList.addEventListener("click", onTopicClick);
+  viewerDom.issueList.addEventListener("click", onIssueClick);
 }
 
 export function getDomTopicValue() {
@@ -18,39 +27,53 @@ export function getDomTopicValue() {
 
 export function setDomTopicValue(value) {
   viewerDom.topicSelect.value = value;
+  setTopicSelectedState(value);
 }
 
-export function getDomIssueValue(value) {
+export function getDomIssueValue() {
   return viewerDom.issueSelect.value;
 }
 
 export function setDomIssueValue(value) {
   viewerDom.issueSelect.value = value;
+  setIssueSelectedState(value);
 }
 
 export function setTopicOptions() {
   renderTopicOptions();
+  clearIssueView();
 }
 
-export function setIssueOptions(topic_id) {
-  renderIssueOptions(topic_id);
+export function setIssueOptions(topicId) {
+  renderIssueOptions(topicId);
 }
 
-export function onTopicChange() {
-  const topicId = viewerDom.topicSelect.value;
+function onTopicClick(event) {
+  const topicId = getClickedTopicId(event);
 
-  // exception: temporary link between viewer and editor
-  // editorDom.topicPicker.value = topicId;
-  // onTopicPicked();
+  if (!topicId) {
+    return;
+  }
 
-  // setSelectedTopic(topicId);
+  setDomTopicValue(topicId);
+  setDomIssueValue("");
+
   renderIssueOptions(topicId);
   clearIssueView();
 }
 
-async function onIssueChange() {
-  const issueId = viewerDom.issueSelect.value;
+async function onIssueClick(event) {
+  const issueId = getClickedIssueId(event);
 
+  if (!issueId) {
+    return;
+  }
+
+  setDomIssueValue(issueId);
+  await renderSelectedIssue(issueId);
+}
+
+async function renderSelectedIssue(issueId) {
   if (!issueId) {
     clearIssueView();
     return;
@@ -62,11 +85,12 @@ async function onIssueChange() {
   const result = await setGraph(graphDefinition);
 
   if (!result.ok) {
-    setStatus('Files are loaded, but Mermaid could not render the selected issue.', 'error');
+    setStatus(
+      "Files are loaded, but Mermaid could not render the selected issue.",
+      "error"
+    );
   }
-  
+
   appState.step = 3;
   renderStep();
 }
-
-
