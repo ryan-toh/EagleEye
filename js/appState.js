@@ -1,6 +1,5 @@
 import { topicEditorDom } from './components/editor/1_topic/dom.js';
 import { str } from './utils.js';
-import { clearTopicForm } from './components/editor/1_topic/dom.js';
 
 
 // core appState

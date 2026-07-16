@@ -17,8 +17,8 @@ import { setStatus } from "../upload/controller.js";
 export function initViewer() {
   initViewerDomElements();
 
-  viewerDom.topicList.addEventListener("click", onTopicClick);
-  viewerDom.issueList.addEventListener("click", onIssueClick);
+  viewerDom.topicList.addEventListener('click', onTopicClick);
+  viewerDom.issueList.addEventListener('click', onIssueClick);
 }
 
 export function getDomTopicValue() {

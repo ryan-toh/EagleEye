@@ -1,9 +1,83 @@
 
 <section class="panel editor-panel hidden" id="editor-panel">
-    <h2>Edit or create a decision tree</h2>
-    <p class="helper-text">Create or edit a topic, issue, parameters, then generate recommendation rule/rows from parameter value combinations.</p>
+  <div class="editor-panel__header">
+    <div>
+      <h2>Edit or create a decision tree</h2>
+      <p class="helper-text">Create or edit a topic, issue, parameters, then generate recommendation rule/rows from parameter value combinations.</p>
+    </div>
+  </div>
 
-    <div class="editor-grid">
+  <!-- Hidden values keep the existing controller-style getter/setter API working -->
+  <input type="hidden" id="editorTopicSelect" value="">
+  <input type="hidden" id="editorIssueSelect" value="">
+  <input type="hidden" id="editorParamSelect" value="">
+
+  <div class="decision-explorer">
+    <section class="decision-explorer__pane decision-explorer__pane--topics">
+      <div class="decision-explorer__pane-header">
+        <h3>Topics</h3>
+        <p class="helper-text">Choose a topic</p>
+      </div>
+
+      <div 
+        class="decision-explorer__list" 
+        id="editorTopicList"
+        aria-label="Topics"
+      >
+        <div class="decision-explorer__empty">
+          Load files first
+        </div>
+      </div>
+    </section>
+
+    <section class="decision-explorer__pane decision-explorer__pane--issues">
+      <div class="decision-explorer__pane-header">
+        <h3>Issues</h3>
+        <p class="helper-text" id="editorIssuePaneHint">
+          Select a topic first
+        </p>
+      </div>
+
+      <div 
+        class="decision-explorer__list" 
+        id="editorIssueList"
+        aria-label="Issues"
+      >
+        <div class="decision-explorer__empty">
+          Select a topic first
+        </div>
+      </div>
+    </section>
+
+    <section class="decision-explorer__pane decision-explorer__pane--params">
+      <div class="decision-explorer__pane-header">
+        <h3>Parameters</h3>
+        <p class="helper-text" id="editorParamPanelHint">
+          Select an issue first
+        </p>
+      </div>
+
+      <div 
+        class="decision-explorer__list" 
+        id="editorParamList"
+        aria-label="Parameters"
+      >
+        <div class="decision-explorer__empty">
+          Select an issue first
+        </div>
+      </div>
+    </section>
+
+    <section class="decision-explorer__pane editor-form-pane">
+    <div class="decision-explorer__pane-header">
+        <h3>Editor</h3>
+        <p class="helper-text">
+            Edit the currently selected item.
+        </p>
+    </div>
+
+    <div class="editor-form-content">
+      <div class="editor-grid">
         <div class="editor-card">
           <h3>Topic</h3>
           <label>
@@ -73,8 +147,9 @@
         <div id="recommendationMatrix" class="empty">Select an issue, add parameters with allowed_values, then build combinations.</div>
       </div>
 
-      <p id="editorStatus" class="status"></p>
-      <br>
-
-      <button id="saveSheetBtn">Download all changes</button>
+        <p id="editorStatus" class="status"></p>
+        <button id="saveSheetBtn">
+            Download all changes
+        </button>
+    </div>
 </section>

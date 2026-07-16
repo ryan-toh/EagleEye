@@ -1,14 +1,15 @@
 import { getSelectedIssue } from "../2_issue/controller.js";
-import { initParamEditorDom, paramEditorDom, renderParameterPicker, renderParamFormFor } from "./dom.js";
+import { initParamEditorDom, paramEditorDom, renderParameterPicker, renderParamFormFor, renderParamOptions, getClickedParamId, setParamSelectedState } from "./dom.js";
 import { upsertParameter } from "../../../appState.js";
 import { setEditorStatus } from "../shared/controller.js";
 
 export function initParamEditor() {
     initParamEditorDom();
 
-    paramEditorDom.parameterPicker.addEventListener('change', onEditorParamPicked);
+    paramEditorDom.parameterPicker.addEventListener('change', onParamPicked);
     paramEditorDom.saveParameterBtn.addEventListener('click', onSaveParameter);
-    
+
+    paramEditorDom.paramList.addEventListener('click', onParamClick);
 }
 
 export function refreshParamPicker(issueId) {
@@ -24,8 +25,28 @@ export function clearParamForm() {
   renderParamFormFor('__new__');
 }
 
-export function onEditorParamPicked() {
+export function onParamClick(event) {
+  const paramId = getClickedParamId(event);
+
+  if (!paramId) {
+    return;
+  }
+
+  setDomParamValue(paramId);
+}
+
+export function setDomParamValue(value) {
+  paramEditorDom.paramSelect.value = value;
+  setParamSelectedState(value);
+}
+
+export function setParamOptions(issueId) {
+  renderParamOptions(issueId);
+}
+
+export function onParamPicked() {
     const paramId = paramEditorDom.parameterPicker.value;
+
     renderParamFormFor(paramId);
 }
 
@@ -53,6 +74,9 @@ function onSaveParameter() {
 
     // To restore state
     paramEditorDom.parameterPicker.value = parameter_id;
+    paramEditorDom.parameterId.value = parameter_id;
+
+    renderParamOptions(issue_id);
 
     setEditorStatus('Parameter saved.', 'success');
   } catch (error) {

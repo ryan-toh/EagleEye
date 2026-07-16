@@ -1,4 +1,4 @@
-import { initTopicEditor, refreshTopicPicker } from "../1_topic/controller.js";
+import { clearTopicForm, initTopicEditor, refreshTopicPicker, setTopicOptions } from "../1_topic/controller.js";
 import { getSelectedIssue, initIssueEditor } from "../2_issue/controller.js";
 import { initParamEditor } from "../3_parameter/controller.js";
 import { initRecomEditor } from "../4_recommendationMatrix/controller.js";
@@ -28,6 +28,9 @@ export function initSharedEditor() {
 
 export function setEditorTopicOptions() {
   refreshTopicPicker();
+  clearTopicForm();
+
+  setTopicOptions();
 }
 
 export async function renderSelectedIssuePreview() {

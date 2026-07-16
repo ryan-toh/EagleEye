@@ -14,8 +14,62 @@ export function initParamEditorDom() {
         parameterAllowedValues: document.getElementById('editorParameterAllowedValues'),
         parameterExampleValues: document.getElementById('editorParameterExampleValues'),
         parameterOrder: document.getElementById('editorParameterOrder'),
-        saveParameterBtn: document.getElementById('saveParameterBtn')
+        saveParameterBtn: document.getElementById('saveParameterBtn'),
+
+        paramSelect: document.getElementById("editorParamSelect"),
+        paramList: document.getElementById("editorParamList"),
+        paramPanelHint: document.getElementById("editorParamPanelHint")
+
     });
+}
+
+export function setParamSelectedState(paramId) {
+  setSelectedState(paramEditorDom.paramList, "paramId", paramId);
+}
+
+export function renderParamOptions(issueId) {
+  const params = issueId ? getIssueParameters(issueId) : [];
+
+  paramEditorDom.paramSelect.value = "";
+  paramEditorDom.paramList.innerHTML = "";
+
+  if (!issueId) {
+    paramEditorDom.paramPanelHint.textContent = "Select an issue first";
+    paramEditorDom.paramList.innerHTML = `
+      <div class="decision-explorer__empty>
+        Select a topic first
+      </div>
+    `;
+    return;
+  }
+
+  paramEditorDom.paramPanelHint.textContent = "Choose a parameter";
+
+  if (!params.length) {
+    paramEditorDom.paramList.innerHTML = `
+      <div class="decision-explorer__empty">
+        No parameters found for this issue
+      </div>
+    `;
+    return;
+  }
+
+  params.forEach(param => {
+    const item = createExplorerItem({
+      id: param.parameter_id,
+      title: param.parameter_name,
+      meta: param.question_to_ask || "",
+      type: "param",
+      icon: "✏️",
+    });
+
+    paramEditorDom.paramList.appendChild(item);
+  });
+}
+
+export function getClickedParamId(event) {
+  const item = event.target.closest("[data-param-id]");
+  return item ? item.dataset.paramId : "";
 }
 
 export function renderParameterPicker(issueId) {
@@ -43,8 +97,65 @@ export function renderParamFormFor(parameterId) {
   paramEditorDom.parameterId.value = parameter?.parameter_id || makeUniqueId('PARAM', appState.parameters, 'parameter_id');
   paramEditorDom.parameterName.value = parameter?.parameter_name || '';
   paramEditorDom.parameterQuestion.value = parameter?.question_to_ask || '';
-  paramEditorDom.parameterRequired.value = parameter?.required || 'yes';
+  paramEditorDom.parameterRequired.value =
+    parameter == null || parameter.required
+        ? "yes"
+        : "no";
   paramEditorDom.parameterAllowedValues.value = parameter?.allowed_values || '';
   paramEditorDom.parameterExampleValues.value = parameter?.example_values || '';
   paramEditorDom.parameterOrder.value = parameter?.order || getIssueParameters(getSelectedIssue()).length + 1;
+}
+
+function setSelectedState(container, datasetKey, selectedId) {
+  const items = container.querySelectorAll(".decision-explorer__item");
+
+  items.forEach(item => {
+    item.classList.toggle(
+      "is-selected",
+      item.dataset[datasetKey] === String(selectedId)
+    );
+  });
+}
+
+function createExplorerItem({ id, title, meta, type, icon }) {
+  const button = document.createElement("button");
+
+  button.type = "button";
+  button.className = "decision-explorer__item";
+
+  if (type === "topic") {
+    button.dataset.topicId = String(id);
+  }
+
+  if (type === "issue") {
+    button.dataset.issueId = String(id);
+  }
+
+  if (type === "param") {
+    button.dataset.paramId = String(id);
+  }
+
+  button.innerHTML = `
+    <span class="decision-explorer__item-icon" aria-hidden="true">
+      ${icon}
+    </span>
+    <span class="decision-explorer__item-main">
+      <span class="decision-explorer__item-title"></span>
+      ${
+        meta
+          ? '<span class="decision-explorer__item-meta"></span>'
+          : ""
+      }
+    </span>
+  `;
+
+  button.querySelector(".decision-explorer__item-title").textContent = title;
+
+  const metaElement = button.querySelector(".decision-explorer__item-meta");
+
+  if (metaElement) {
+    metaElement.textContent = meta;
+  }
+
+  return button;
 }

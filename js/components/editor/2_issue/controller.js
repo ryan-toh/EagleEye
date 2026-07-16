@@ -1,8 +1,8 @@
 import { getSelectedTopic } from "../1_topic/controller.js";
-import { refreshParam } from "../3_parameter/controller.js";
+import { refreshParam, setDomParamValue, setParamOptions } from "../3_parameter/controller.js";
 import { upsertIssue, appState } from "../../../appState.js";
 import { renderSelectedIssuePreview, setEditorStatus } from "../shared/controller.js";
-import { issueEditorDom, initIssueEditorDom, renderIssueFormFor, renderIssuePickerFor } from "./dom.js";
+import { issueEditorDom, initIssueEditorDom, renderIssueFormFor, renderIssuePickerFor, renderIssueOptions, getClickedIssueId, setIssueSelectedState } from "./dom.js";
 import { buildIssueFlowchart } from "../../preview/flowchart.js";
 
 export function initIssueEditor() {
@@ -10,6 +10,30 @@ export function initIssueEditor() {
 
     issueEditorDom.issuePicker.addEventListener('change', onIssuePicked);
     issueEditorDom.saveIssueBtn.addEventListener('click', onSaveIssue);
+
+    issueEditorDom.issueList.addEventListener('click', onIssueClick);
+}
+
+function onIssueClick(event) {
+  const issueId = getClickedIssueId(event);
+
+  if (!issueId) {
+    return;
+  }
+
+  setDomIssueValue(issueId);
+  setDomParamValue("");
+
+  setParamOptions(issueId);
+}
+
+export function setDomIssueValue(value) {
+  issueEditorDom.issueSelect.value = value;
+  setIssueSelectedState(value);
+}
+
+export function setIssueOptions(topicId) {
+  renderIssueOptions(topicId);
 }
 
 export function refreshIssue(topicId) {
@@ -57,9 +81,16 @@ function onSaveIssue() {
     refreshIssuePicker(topic_id);
 
     // To restore state
-    issueEditorDom.issuePicker.value = issue_id
+    issueEditorDom.issuePicker.value = issue_id;
+    issueEditorDom.issueId.value = issue_id;
 
     setEditorStatus('Issue saved.', 'success');
+
+    // temp
+    renderIssueOptions(topic_id);
+    setParamOptions("");
+
+
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }
