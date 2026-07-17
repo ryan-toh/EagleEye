@@ -54,3 +54,12 @@ export async function saveSheet() {
 export function setEditorStatus(message, type = '') {
   renderEditorStatus(message, type);
 }
+
+export function closeDialog(dialog) {
+    dialog.classList.add("closing");
+
+    dialog.addEventListener("animationend", () => {
+        dialog.classList.remove("closing");
+        dialog.close();
+    }, { once: true });
+}

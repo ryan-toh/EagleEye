@@ -17,6 +17,7 @@
   flex-direction: column;
   min-width: 0;
   background: var(--panel);
+  border-right: 1px solid var(--border);
 }
 
 .decision-explorer__pane--topics {
@@ -25,12 +26,17 @@
 }
 
 .decision-explorer__pane-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   padding: 12px 14px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
 
 .decision-explorer__pane-header h3 {
+  width: 100%;
   margin-bottom: 2px;
 }
 

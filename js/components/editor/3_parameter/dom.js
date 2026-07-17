@@ -1,6 +1,7 @@
 import { appState, getIssuesForTopic, getIssueParameters, makeUniqueId } from "../../../appState.js";
 import { str } from "../../../utils.js";
 import { getSelectedIssue } from "../2_issue/controller.js";
+import { createExplorerItem } from "../shared/dom.js";
 
 export const paramEditorDom = {};
 
@@ -18,7 +19,8 @@ export function initParamEditorDom() {
 
         paramSelect: document.getElementById("editorParamSelect"),
         paramList: document.getElementById("editorParamList"),
-        paramPanelHint: document.getElementById("editorParamPanelHint")
+        paramPanelHint: document.getElementById("editorParamPanelHint"),
+        paramDialog: document.getElementById("editorParamDialog"),
 
     });
 }
@@ -115,47 +117,4 @@ function setSelectedState(container, datasetKey, selectedId) {
       item.dataset[datasetKey] === String(selectedId)
     );
   });
-}
-
-function createExplorerItem({ id, title, meta, type, icon }) {
-  const button = document.createElement("button");
-
-  button.type = "button";
-  button.className = "decision-explorer__item";
-
-  if (type === "topic") {
-    button.dataset.topicId = String(id);
-  }
-
-  if (type === "issue") {
-    button.dataset.issueId = String(id);
-  }
-
-  if (type === "param") {
-    button.dataset.paramId = String(id);
-  }
-
-  button.innerHTML = `
-    <span class="decision-explorer__item-icon" aria-hidden="true">
-      ${icon}
-    </span>
-    <span class="decision-explorer__item-main">
-      <span class="decision-explorer__item-title"></span>
-      ${
-        meta
-          ? '<span class="decision-explorer__item-meta"></span>'
-          : ""
-      }
-    </span>
-  `;
-
-  button.querySelector(".decision-explorer__item-title").textContent = title;
-
-  const metaElement = button.querySelector(".decision-explorer__item-meta");
-
-  if (metaElement) {
-    metaElement.textContent = meta;
-  }
-
-  return button;
 }

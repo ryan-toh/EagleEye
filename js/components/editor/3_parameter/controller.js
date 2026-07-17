@@ -1,7 +1,7 @@
 import { getSelectedIssue } from "../2_issue/controller.js";
 import { initParamEditorDom, paramEditorDom, renderParameterPicker, renderParamFormFor, renderParamOptions, getClickedParamId, setParamSelectedState } from "./dom.js";
 import { upsertParameter } from "../../../appState.js";
-import { setEditorStatus } from "../shared/controller.js";
+import { setEditorStatus, closeDialog } from "../shared/controller.js";
 
 export function initParamEditor() {
     initParamEditorDom();
@@ -10,6 +10,7 @@ export function initParamEditor() {
     paramEditorDom.saveParameterBtn.addEventListener('click', onSaveParameter);
 
     paramEditorDom.paramList.addEventListener('click', onParamClick);
+    paramEditorDom.paramList.addEventListener('dblclick', onParamDblClick);
 }
 
 export function refreshParamPicker(issueId) {
@@ -29,10 +30,24 @@ export function onParamClick(event) {
   const paramId = getClickedParamId(event);
 
   if (!paramId) {
+    setEditorStatus("invalid param id.", "error");
     return;
   }
 
   setDomParamValue(paramId);
+}
+
+function onParamDblClick(event) {
+  const paramId = getClickedParamId(event);
+
+  if (!paramId) {
+    setEditorStatus("invalid param id.", "error");
+    return;
+  }
+
+  renderParamFormFor(paramId);
+
+  paramEditorDom.paramDialog.showModal();
 }
 
 export function setDomParamValue(value) {
@@ -57,11 +72,11 @@ export function setParamForm(paramId) {
 function onSaveParameter() {
   try {
     const issue_id = getSelectedIssue();
-    const parameter_id = paramEditorDom.parameterId.value;
+    const param_id = paramEditorDom.parameterId.value;
 
     upsertParameter({
       issue_id: issue_id,
-      parameter_id: parameter_id,
+      parameter_id: param_id,
       parameter_name: paramEditorDom.parameterName.value,
       question_to_ask: paramEditorDom.parameterQuestion.value,
       required: paramEditorDom.parameterRequired.value,
@@ -73,10 +88,13 @@ function onSaveParameter() {
     renderParameterPicker(issue_id);
 
     // To restore state
-    paramEditorDom.parameterPicker.value = parameter_id;
-    paramEditorDom.parameterId.value = parameter_id;
+    paramEditorDom.parameterPicker.value = param_id;
+    paramEditorDom.parameterId.value = param_id;
+    setDomParamValue(param_id);
 
     renderParamOptions(issue_id);
+
+    closeDialog(paramEditorDom.paramDialog);
 
     setEditorStatus('Parameter saved.', 'success');
   } catch (error) {

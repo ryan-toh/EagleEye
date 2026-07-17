@@ -2,6 +2,7 @@ import { appState, getTopic, makeUniqueId } from "../../../appState.js";
 import { str } from "../../../utils.js";
 import { viewerDom } from "../../viewer/dom.js";
 import { setIssueOptions } from "../2_issue/controller.js";
+import { createExplorerItem } from "../shared/dom.js";
 
 export const topicEditorDom = {};
 
@@ -15,8 +16,8 @@ export function initTopicEditorDom() {
         saveTopicBtn: document.getElementById('saveTopicBtn'),
 
         topicSelect: document.getElementById("editorTopicSelect"),
-        topicList: document.getElementById("editorTopicList")
-
+        topicList: document.getElementById("editorTopicList"),
+        topicDialog: document.getElementById("editorTopicDialog"),
     });
 
     renderTopicPicker();
@@ -90,49 +91,6 @@ function setSelectedState(container, datasetKey, selectedId) {
       item.dataset[datasetKey] === String(selectedId)
     );
   });
-}
-
-function createExplorerItem({ id, title, meta, type, icon }) {
-  const button = document.createElement("button");
-
-  button.type = "button";
-  button.className = "decision-explorer__item";
-
-  if (type === "topic") {
-    button.dataset.topicId = String(id);
-  }
-
-  if (type === "issue") {
-    button.dataset.issueId = String(id);
-  }
-
-  if (type === "param") {
-    button.dataset.paramId = String(id);
-  }
-
-  button.innerHTML = `
-    <span class="decision-explorer__item-icon" aria-hidden="true">
-      ${icon}
-    </span>
-    <span class="decision-explorer__item-main">
-      <span class="decision-explorer__item-title"></span>
-      ${
-        meta
-          ? '<span class="decision-explorer__item-meta"></span>'
-          : ""
-      }
-    </span>
-  `;
-
-  button.querySelector(".decision-explorer__item-title").textContent = title;
-
-  const metaElement = button.querySelector(".decision-explorer__item-meta");
-
-  if (metaElement) {
-    metaElement.textContent = meta;
-  }
-
-  return button;
 }
 
 

@@ -1,7 +1,7 @@
 import { getSelectedTopic } from "../1_topic/controller.js";
 import { refreshParam, setDomParamValue, setParamOptions } from "../3_parameter/controller.js";
 import { upsertIssue, appState } from "../../../appState.js";
-import { renderSelectedIssuePreview, setEditorStatus } from "../shared/controller.js";
+import { closeDialog, renderSelectedIssuePreview, setEditorStatus } from "../shared/controller.js";
 import { issueEditorDom, initIssueEditorDom, renderIssueFormFor, renderIssuePickerFor, renderIssueOptions, getClickedIssueId, setIssueSelectedState } from "./dom.js";
 import { buildIssueFlowchart } from "../../preview/flowchart.js";
 
@@ -12,12 +12,14 @@ export function initIssueEditor() {
     issueEditorDom.saveIssueBtn.addEventListener('click', onSaveIssue);
 
     issueEditorDom.issueList.addEventListener('click', onIssueClick);
+    issueEditorDom.issueList.addEventListener('dblclick', onIssueDblClick);
 }
 
 function onIssueClick(event) {
   const issueId = getClickedIssueId(event);
 
   if (!issueId) {
+    setEditorStatus("invalid issue id.", "error");
     return;
   }
 
@@ -25,6 +27,21 @@ function onIssueClick(event) {
   setDomParamValue("");
 
   setParamOptions(issueId);
+}
+
+function onIssueDblClick(event) {
+  const issueId = getClickedIssueId(event);
+
+  if (!issueId) {
+    setEditorStatus("invalid issue id.", "error");
+    return;
+  }
+
+  renderIssueFormFor(issueId);
+
+  issueEditorDom.issueDialog.showModal();
+
+  refreshParam(issueId);
 }
 
 export function setDomIssueValue(value) {
@@ -85,6 +102,8 @@ function onSaveIssue() {
     issueEditorDom.issueId.value = issue_id;
 
     setEditorStatus('Issue saved.', 'success');
+
+    closeDialog(issueEditorDom.issueDialog);
 
     // temp
     renderIssueOptions(topic_id);

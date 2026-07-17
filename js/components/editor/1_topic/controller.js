@@ -1,6 +1,6 @@
 import { refreshIssue, setDomIssueValue, setIssueOptions } from "../2_issue/controller.js";
 import { refreshParam, setDomParamValue } from "../3_parameter/controller.js";
-import { setEditorStatus } from "../shared/controller.js";
+import { setEditorStatus, closeDialog } from "../shared/controller.js";
 import { initTopicEditorDom, topicEditorDom, renderTopicFormFor, renderTopicPicker, getClickedTopicId, setTopicSelectedState, renderTopicOptions } from "./dom.js";
 import { upsertTopic } from "../../../appState.js";
 import { clearIssueView } from "../../preview/controller.js";
@@ -13,6 +13,7 @@ export function initTopicEditor() {
     topicEditorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
     
     topicEditorDom.topicList.addEventListener('click', onTopicClick);
+    topicEditorDom.topicList.addEventListener('dblclick', onTopicDblClick);
 }
 
 export function refreshTopicPicker() {
@@ -33,15 +34,16 @@ export function onTopicPicked() {
 
     renderTopicFormFor(topicId);
 
-    // Automatically load params after choosing a topic
+    // Automatically load issue after choosing a topic
     refreshIssue(topicId);
-    refreshParam(topicId);
+    refreshParam("");
 }
 
 export function onTopicClick(event) {
   const topicId = getClickedTopicId(event);
 
   if (!topicId) {
+    setEditorStatus("invalid topic id.", "error");
     return;
   }
 
@@ -51,6 +53,22 @@ export function onTopicClick(event) {
 
   setIssueOptions(topicId);
   clearIssueView();
+}
+
+function onTopicDblClick(event) {
+  const topicId = getClickedTopicId(event);
+
+  if (!topicId) {
+    setEditorStatus("invalid topic id.", "error");
+    return;
+  }
+
+  renderTopicFormFor(topicId);
+
+  topicEditorDom.topicDialog.showModal();
+
+  refreshIssue(topicId);
+  refreshParam("");
 }
 
 export function setTopicOptions() {
@@ -87,8 +105,11 @@ function onSaveTopic() {
     // To restore state
     topicEditorDom.topicId.value = topic_id;
     topicEditorDom.topicPicker.value = topic_id;
+    setDomTopicValue(topic_id);
 
     setEditorStatus('Topic saved, refreshed data.', 'success');
+
+    closeDialog(topicEditorDom.topicDialog);
 
     // temp
     renderTopicOptions();

@@ -16,7 +16,10 @@
     <section class="decision-explorer__pane decision-explorer__pane--topics">
       <div class="decision-explorer__pane-header">
         <h3>Topics</h3>
-        <p class="helper-text">Choose a topic</p>
+        <p class="helper-text">Double click to edit</p>
+        <button id="createTopicBtn", class="editor-explorer__add-btn" type="button">
+          +
+        </button>
       </div>
 
       <div 
@@ -31,11 +34,15 @@
     </section>
 
     <section class="decision-explorer__pane decision-explorer__pane--issues">
+
       <div class="decision-explorer__pane-header">
         <h3>Issues</h3>
         <p class="helper-text" id="editorIssuePaneHint">
           Select a topic first
         </p>
+        <button id="createIssueBtn" class="editor-explorer__add-btn" type="button">
+          +
+        </button>
       </div>
 
       <div 
@@ -55,6 +62,9 @@
         <p class="helper-text" id="editorParamPanelHint">
           Select an issue first
         </p>
+        <button id="createParamBtn", class="editor-explorer__add-btn" type="button">
+          +
+        </button>
       </div>
 
       <div 
@@ -76,63 +86,60 @@
         </p>
     </div>
 
-    <div class="editor-form-content">
-      <div class="editor-grid">
-        <div class="editor-card">
-          <h3>Topic</h3>
-          <label>
-            Now editing..
-            <select id="editorTopicPicker"></select>
-          </label>
-          <!-- <label>Topic ID <input id="editorTopicId" type="text" /></label> -->
-          <label class="hidden">Topic ID <input id="editorTopicId" type="text" /></label>
-          <label>Topic name <input id="editorTopicName" type="text" /></label>
-          <label>Description <textarea id="editorTopicDescription" rows="3"></textarea></label>
-          <label>Example phrases <textarea id="editorTopicExamples" rows="3"></textarea></label>
-          <button id="saveTopicBtn" type="button">Save topic</button>
-        </div>
+    <dialog id="editorTopicDialog" class="editor-card">
+      <h3>Topic</h3>
+      <label>
+        Now editing..
+        <select id="editorTopicPicker"></select>
+      </label>
+      <!-- <label>Topic ID <input id="editorTopicId" type="text" /></label> -->
+      <label class="hidden">Topic ID <input id="editorTopicId" type="text" /></label>
+      <label>Topic name <input id="editorTopicName" type="text" /></label>
+      <label>Description <textarea id="editorTopicDescription" rows="3"></textarea></label>
+      <label>Example phrases <textarea id="editorTopicExamples" rows="3"></textarea></label>
+      <button id="saveTopicBtn" type="button">Save topic</button>
+    </dialog>
 
-        <div class="editor-card">
-          <h3>Issue</h3>
-          <label>
-            Now editing..
-            <select id="editorIssuePicker"></select>
-          </label>
-          <!-- <label>Issue ID <input id="editorIssueId" type="text" /></label> -->
-          <label class="hidden">Issue ID <input id="editorIssueId" type="text" /></label>
-          <label>Issue name <input id="editorIssueName" type="text" /></label>
-          <label>Issue description <textarea id="editorIssueDescription" rows="3"></textarea></label>
-          <label>Example phrases <textarea id="editorIssueExamples" rows="3"></textarea></label>
-          <button id="saveIssueBtn" type="button">Save issue</button>
-        </div>
+    <dialog id="editorIssueDialog" class="editor-card">
+      <h3>Issue</h3>
+      <label>
+        Now editing..
+        <select id="editorIssuePicker"></select>
+      </label>
+      <!-- <label>Issue ID <input id="editorIssueId" type="text" /></label> -->
+      <label class="hidden">Issue ID <input id="editorIssueId" type="text" /></label>
+      <label>Issue name <input id="editorIssueName" type="text" /></label>
+      <label>Issue description <textarea id="editorIssueDescription" rows="3"></textarea></label>
+      <label>Example phrases <textarea id="editorIssueExamples" rows="3"></textarea></label>
+      <button id="saveIssueBtn" type="button">Save issue</button>
+    </dialog>
 
-        <div class="editor-card">
-          <h3>Parameter</h3>
-          <label>
-            Now editing..
-            <select id="editorParameterPicker"></select>
-          </label>
-          <!-- <label>Parameter ID <input id="editorParameterId" type="text" /></label> -->
-          <label class="hidden">Parameter ID <input id="editorParameterId" type="text" /></label>
-          <label>Parameter name <input id="editorParameterName" type="text" /></label>
-          <label>Question to ask <textarea id="editorParameterQuestion" rows="3"></textarea></label>
-          <label>
-            Required
-            <select id="editorParameterRequired">
-              <option value="yes">yes</option>
-              <option value="no">no</option>
-            </select>
-          </label>
-          <label>
-            Allowed values 
-            <p class="helper-text">Seperate the values with ';' or ',' or a new line.</p>
-            <textarea id="editorParameterAllowedValues" rows="3" placeholder="yes, no, unclear"></textarea>
-          </label>
-          <label>Example values <textarea id="editorParameterExampleValues" rows="2"></textarea></label>
-          <label>Order <input id="editorParameterOrder" type="number" min="1" /></label>
-          <button id="saveParameterBtn" type="button">Save parameter</button>
-        </div>
-      </div>
+    <dialog id="editorParamDialog" class="editor-card">
+      <h3>Parameter</h3>
+      <label>
+        Now editing..
+        <select id="editorParameterPicker"></select>
+      </label>
+      <!-- <label>Parameter ID <input id="editorParameterId" type="text" /></label> -->
+      <label class="hidden">Parameter ID <input id="editorParameterId" type="text" /></label>
+      <label>Parameter name <input id="editorParameterName" type="text" /></label>
+      <label>Question to ask <textarea id="editorParameterQuestion" rows="3"></textarea></label>
+      <label>
+        Required
+        <select id="editorParameterRequired">
+          <option value="yes">yes</option>
+          <option value="no">no</option>
+        </select>
+      </label>
+      <label>
+        Allowed values 
+        <p class="helper-text">Seperate the values with ';' or ',' or a new line.</p>
+        <textarea id="editorParameterAllowedValues" rows="3" placeholder="yes, no, unclear"></textarea>
+      </label>
+      <label>Example values <textarea id="editorParameterExampleValues" rows="2"></textarea></label>
+      <label>Order <input id="editorParameterOrder" type="number" min="1" /></label>
+      <button id="saveParameterBtn" type="button">Save parameter</button>
+    </dialog>
 
       <div class="editor-card wide">
         <div class="flowchart-header">
@@ -146,10 +153,9 @@
         <p class="helper-text">The matrix uses parameters with allowed_values. Each saved row creates or updates one decision rule and one linked recommendation.</p>
         <div id="recommendationMatrix" class="empty">Select an issue, add parameters with allowed_values, then build combinations.</div>
       </div>
-
-        <p id="editorStatus" class="status"></p>
-        <button id="saveSheetBtn">
-            Download all changes
-        </button>
     </div>
+  <p id="editorStatus" class="status"></p>
+  <button id="saveSheetBtn">
+      Download all changes
+  </button>
 </section>
