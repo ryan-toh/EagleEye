@@ -11,10 +11,37 @@
 }
 
 .preview-panel .preview-card {
+  min-width: 0;
   padding: 16px;
   background: #FAFAFA;
   border: 1px solid var(--border);
   border-radius: 6px;
+}
+
+.preview-panel .rule-conditions {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.preview-panel .rule-conditions__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+}
+
+.preview-panel .rule-conditions__name {
+  font-weight: 600;
+}
+
+.preview-panel .rule-conditions__value,
+.preview-panel .rule-conditions__name,
+.preview-panel .rule-conditions__raw {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .preview-panel .flowchart {

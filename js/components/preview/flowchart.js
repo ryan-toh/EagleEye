@@ -6,85 +6,115 @@ export function buildIssueFlowchart(issueId) {
   if (!issue) return 'flowchart TD\n  missing["Issue not found"]';
 
   const topicName = getTopicName(issue.topic_id);
-  const params = [...getIssueParameters(issueId)].sort(
-    (a, b) => (Number(a.order) || 0) - (Number(b.order) || 0)
-  );
-  const rules = [...getIssueRules(issueId)].sort(
-    (a, b) => (Number(a.priority) || 0) - (Number(b.priority) || 0)
-  );
+  const params = getIssueParameters(issueId);
+  const rules = getIssueRules(issueId).map(rule => ({
+    rule,
+    conditions: parseConditions(rule.conditions)
+  }));
   const recommendationById = getRecommendationMap();
-
   const lines = ['flowchart TD'];
+  const nodeIds = { parameter: 0, rule: 0 };
 
-  // One combined node for topic + issue
   lines.push(
     `  start([User query]) --> issueNode["${safeMermaidLabel(
       `Topic: ${topicName}\nIssue: ${issue.issue_name}`
     )}"]`
   );
 
-  // Parameter flow: one question leads to the next on the Yes path
-  lines.push('  rulesStart["Apply decision rules by priority"]');
-
-  if (params.length === 0) {
-    lines.push('  issueNode --> rulesStart');
-  } else {
-    params.forEach((param, index) => {
-      const nodeId = `param${index}`;
-      const nextNode = index === params.length - 1 ? 'rulesStart' : `param${index + 1}`;
-      const required = isRequired(param.required);
-
-      const label = `${required ? 'Required' : 'Optional'}: ${param.parameter_name}\n${param.question_to_ask}`;
-
-      if (index === 0) {
-        lines.push(`  issueNode --> ${nodeId}{"${safeMermaidLabel(label)}"}`);
-      } else {
-        const prevNode = `param${index - 1}`;
-        lines.push(`  ${prevNode} -- Yes --> ${nodeId}`);
-      }
-
-      lines.push(`  ${nodeId} -- Yes --> ${nextNode}`);
-
-      if (required) {
-        lines.push(
-          `  ${nodeId} -- No / missing --> askMissing${index}["Ask for ${safeMermaidLabel(
-            param.parameter_name
-          )}"]`
-        );
-      } else {
-        lines.push(`  ${nodeId} -- No / skip --> ${nextNode}`);
-      }
-    });
+  if (!rules.length) {
+    lines.push('  issueNode --> noRules["No rules defined: clarify or escalate"]');
+    return lines.join('\n');
   }
 
-  // Rule flow: evaluate rules in priority order, one by one
-  if (rules.length === 0) {
-    lines.push('  rulesStart --> noRules["No rules defined: clarify or escalate"]');
-  } else {
-    rules.forEach((rule, index) => {
-      const ruleNode = `rule${index}`;
-      const rec = recommendationById.get(str(rule.recommendation_id));
-      const decision = rec ? rec.final_decision : 'Unknown recommendation';
-
-      const conditionLabel = `Priority ${rule.priority}\nIf ${rule.conditions}`;
-      const recLabel = `${decision}\n${
-        rec ? rec.recommendation_text : `Missing recommendation ${rule.recommendation_id}`
-      }`;
-
-      if (index === 0) {
-        lines.push(`  rulesStart --> ${ruleNode}{"${safeMermaidLabel(conditionLabel)}"}`);
-      } else {
-        const prevRule = `rule${index - 1}`;
-        lines.push(`  ${prevRule} -- No match --> ${ruleNode}{"${safeMermaidLabel(conditionLabel)}"}`);
-      }
-
-      lines.push(`  ${ruleNode} -- Match --> rec${index}["${safeMermaidLabel(recLabel)}"]`);
-
-      if (index === rules.length - 1) {
-        lines.push('  rule' + index + ' -- No match --> fallback["No clear rule match: clarify or escalate"]');
-      }
-    });
-  }
+  // Build a decision tree: each level asks one parameter and each rule is a leaf.
+  appendParameterBranch({
+    parentNodeId: 'issueNode',
+    edgeLabel: '',
+    candidates: rules,
+    params,
+    parameterIndex: 0,
+    recommendationById,
+    nodeIds,
+    lines
+  });
 
   return lines.join('\n');
+}
+
+function appendParameterBranch({
+  parentNodeId,
+  edgeLabel,
+  candidates,
+  params,
+  parameterIndex,
+  recommendationById,
+  nodeIds,
+  lines
+}) {
+  if (parameterIndex >= params.length) {
+    appendRuleLeaves({ parentNodeId, edgeLabel, candidates, recommendationById, nodeIds, lines });
+    return;
+  }
+
+  const parameter = params[parameterIndex];
+  const parameterId = str(parameter.parameter_id);
+  const parameterNodeId = `parameter${nodeIds.parameter++}`;
+  const required = isRequired(parameter.required);
+  const label = `${required ? 'Required' : 'Optional'}: ${parameter.parameter_name}\n${parameter.question_to_ask}`;
+
+  appendEdge(lines, parentNodeId, edgeLabel, `${parameterNodeId}{"${safeMermaidLabel(label)}"}`);
+
+  const candidatesByValue = new Map();
+  candidates.forEach(candidate => {
+    const value = Object.prototype.hasOwnProperty.call(candidate.conditions, parameterId)
+      ? candidate.conditions[parameterId]
+      : 'Any value';
+    const key = str(value) || 'Blank';
+
+    if (!candidatesByValue.has(key)) candidatesByValue.set(key, []);
+    candidatesByValue.get(key).push(candidate);
+  });
+
+  candidatesByValue.forEach((matchingCandidates, value) => {
+    appendParameterBranch({
+      parentNodeId: parameterNodeId,
+      edgeLabel: value,
+      candidates: matchingCandidates,
+      params,
+      parameterIndex: parameterIndex + 1,
+      recommendationById,
+      nodeIds,
+      lines
+    });
+  });
+}
+
+function appendRuleLeaves({ parentNodeId, edgeLabel, candidates, recommendationById, nodeIds, lines }) {
+  candidates.forEach((candidate, index) => {
+    const { rule } = candidate;
+    const recommendation = recommendationById.get(str(rule.recommendation_id));
+    const decision = recommendation ? recommendation.final_decision : 'Unknown recommendation';
+    const response = recommendation
+      ? recommendation.recommendation_text
+      : `Missing recommendation ${rule.recommendation_id}`;
+    const ruleNodeId = `rule${nodeIds.rule++}`;
+    const label = `Priority ${rule.priority}\n${decision}\n${response}`;
+    const labelForEdge = candidates.length === 1 ? edgeLabel : `${edgeLabel} (rule ${index + 1})`;
+
+    appendEdge(lines, parentNodeId, labelForEdge, `${ruleNodeId}["${safeMermaidLabel(label)}"]`);
+  });
+}
+
+function appendEdge(lines, from, label, to) {
+  const edge = label ? ` -- ${safeMermaidLabel(label)} --> ` : ' --> ';
+  lines.push(`  ${from}${edge}${to}`);
+}
+
+function parseConditions(value) {
+  try {
+    const parsed = JSON.parse(str(value));
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
 }
