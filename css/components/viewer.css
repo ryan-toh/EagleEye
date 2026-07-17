@@ -27,3 +27,10 @@
 .viewer-panel__header .helper-text {
   margin: 0;
 }
+
+/* Viewer intentionally uses the shared explorer's default 2-pane layout. */
+@media (max-width: 720px) {
+  .viewer-panel__header {
+    flex-direction: column;
+  }
+}

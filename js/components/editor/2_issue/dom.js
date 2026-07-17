@@ -12,6 +12,7 @@ export function initIssueEditorDom() {
         issueDescription: document.getElementById('editorIssueDescription'),
         issueExamples: document.getElementById('editorIssueExamples'),
         saveIssueBtn: document.getElementById('saveIssueBtn'),
+        createIssueBtn: document.getElementById('createIssueBtn'),
 
         issueSelect: document.getElementById("editorIssueSelect"),
         issueList: document.getElementById("editorIssueList"),

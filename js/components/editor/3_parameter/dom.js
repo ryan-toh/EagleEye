@@ -1,6 +1,5 @@
-import { appState, getIssuesForTopic, getIssueParameters, makeUniqueId } from "../../../appState.js";
+import { appState, getIssueParameters, makeUniqueId } from "../../../appState.js";
 import { str } from "../../../utils.js";
-import { getSelectedIssue } from "../2_issue/controller.js";
 import { createExplorerItem } from "../shared/dom.js";
 
 export const paramEditorDom = {};
@@ -16,6 +15,7 @@ export function initParamEditorDom() {
         parameterExampleValues: document.getElementById('editorParameterExampleValues'),
         parameterOrder: document.getElementById('editorParameterOrder'),
         saveParameterBtn: document.getElementById('saveParameterBtn'),
+        createParamBtn: document.getElementById('createParamBtn'),
 
         paramSelect: document.getElementById("editorParamSelect"),
         paramList: document.getElementById("editorParamList"),
@@ -38,8 +38,8 @@ export function renderParamOptions(issueId) {
   if (!issueId) {
     paramEditorDom.paramPanelHint.textContent = "Select an issue first";
     paramEditorDom.paramList.innerHTML = `
-      <div class="decision-explorer__empty>
-        Select a topic first
+      <div class="decision-explorer__empty">
+        Select an issue first
       </div>
     `;
     return;
@@ -89,11 +89,12 @@ export function renderParameterPicker(issueId) {
   const disabled = !issueId;
   paramEditorDom.saveParameterBtn.disabled = disabled;
   paramEditorDom.parameterPicker.disabled = disabled;
-  paramEditorDom.parameterPicker.value = '__new__';  
+  paramEditorDom.parameterPicker.value = '__new__';
 }
 
-export function renderParamFormFor(parameterId) {
-  const parameter = getIssueParameters(getSelectedIssue())
+export function renderParamFormFor(parameterId, issueId) {
+  const parameters = issueId ? getIssueParameters(issueId) : [];
+  const parameter = parameters
     .find(item => str(item.parameter_id) === str(parameterId));
 
   paramEditorDom.parameterId.value = parameter?.parameter_id || makeUniqueId('PARAM', appState.parameters, 'parameter_id');
@@ -105,7 +106,7 @@ export function renderParamFormFor(parameterId) {
         : "no";
   paramEditorDom.parameterAllowedValues.value = parameter?.allowed_values || '';
   paramEditorDom.parameterExampleValues.value = parameter?.example_values || '';
-  paramEditorDom.parameterOrder.value = parameter?.order || getIssueParameters(getSelectedIssue()).length + 1;
+  paramEditorDom.parameterOrder.value = parameter?.order || parameters.length + 1;
 }
 
 function setSelectedState(container, datasetKey, selectedId) {

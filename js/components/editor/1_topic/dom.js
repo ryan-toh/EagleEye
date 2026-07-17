@@ -1,7 +1,5 @@
 import { appState, getTopic, makeUniqueId } from "../../../appState.js";
 import { str } from "../../../utils.js";
-import { viewerDom } from "../../viewer/dom.js";
-import { setIssueOptions } from "../2_issue/controller.js";
 import { createExplorerItem } from "../shared/dom.js";
 
 export const topicEditorDom = {};
@@ -14,6 +12,7 @@ export function initTopicEditorDom() {
         topicDescription: document.getElementById('editorTopicDescription'),
         topicExamples: document.getElementById('editorTopicExamples'),
         saveTopicBtn: document.getElementById('saveTopicBtn'),
+        createTopicBtn: document.getElementById('createTopicBtn'),
 
         topicSelect: document.getElementById("editorTopicSelect"),
         topicList: document.getElementById("editorTopicList"),
@@ -42,7 +41,6 @@ export function renderTopicOptions() {
         Load files first
       </div>
     `;
-    setIssueOptions("");
     return;
   }
 
@@ -58,7 +56,6 @@ export function renderTopicOptions() {
     topicEditorDom.topicList.appendChild(item)
   });
 
-  setIssueOptions("");
 }
 
 export function renderTopicPicker() {

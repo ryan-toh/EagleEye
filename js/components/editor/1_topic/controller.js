@@ -1,16 +1,14 @@
-import { refreshIssue, setDomIssueValue, setIssueOptions } from "../2_issue/controller.js";
-import { refreshParam, setDomParamValue } from "../3_parameter/controller.js";
+import { handleTopicSelection } from "../2_issue/controller.js";
 import { setEditorStatus, closeDialog } from "../shared/controller.js";
 import { initTopicEditorDom, topicEditorDom, renderTopicFormFor, renderTopicPicker, getClickedTopicId, setTopicSelectedState, renderTopicOptions } from "./dom.js";
 import { upsertTopic } from "../../../appState.js";
-import { clearIssueView } from "../../preview/controller.js";
-import { setParamOptions } from "../3_parameter/controller.js";
 
 export function initTopicEditor() {
     initTopicEditorDom();
 
     topicEditorDom.topicPicker.addEventListener('change', onTopicPicked);
     topicEditorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
+    topicEditorDom.createTopicBtn.addEventListener('click', onCreateTopic);
     
     topicEditorDom.topicList.addEventListener('click', onTopicClick);
     topicEditorDom.topicList.addEventListener('dblclick', onTopicDblClick);
@@ -21,7 +19,6 @@ export function refreshTopicPicker() {
 }
 
 export function refreshTopic() {
-  refreshIssuePicker();
   clearTopicForm();
 }
 
@@ -33,10 +30,8 @@ export function onTopicPicked() {
     const topicId = topicEditorDom.topicPicker.value;
 
     renderTopicFormFor(topicId);
-
-    // Automatically load issue after choosing a topic
-    refreshIssue(topicId);
-    refreshParam("");
+    setDomTopicValue(topicId === '__new__' ? '' : topicId);
+    handleTopicSelection(topicId === '__new__' ? '' : topicId);
 }
 
 export function onTopicClick(event) {
@@ -48,11 +43,7 @@ export function onTopicClick(event) {
   }
 
   setDomTopicValue(topicId);
-  setDomIssueValue("");
-  setDomParamValue("");
-
-  setIssueOptions(topicId);
-  clearIssueView();
+  handleTopicSelection(topicId);
 }
 
 function onTopicDblClick(event) {
@@ -63,12 +54,8 @@ function onTopicDblClick(event) {
     return;
   }
 
-  renderTopicFormFor(topicId);
-
+  selectTopicForEditing(topicId);
   topicEditorDom.topicDialog.showModal();
-
-  refreshIssue(topicId);
-  refreshParam("");
 }
 
 export function setTopicOptions() {
@@ -77,6 +64,7 @@ export function setTopicOptions() {
 
 export function setDomTopicValue(value) {
   topicEditorDom.topicSelect.value = value;
+  topicEditorDom.topicPicker.value = value || '__new__';
   setTopicSelectedState(value);
 }
 
@@ -87,6 +75,16 @@ export function getSelectedTopic() {
 
 export function setTopicForm(topicId) {
     renderTopicFormFor(topicId);
+}
+
+function onCreateTopic() {
+  selectTopicForEditing('__new__');
+  topicEditorDom.topicDialog.showModal();
+}
+
+function selectTopicForEditing(topicId) {
+  setDomTopicValue(topicId === '__new__' ? '' : topicId);
+  renderTopicFormFor(topicId);
 }
 
 function onSaveTopic() {
@@ -102,19 +100,14 @@ function onSaveTopic() {
 
     refreshTopicPicker();
 
-    // To restore state
-    topicEditorDom.topicId.value = topic_id;
-    topicEditorDom.topicPicker.value = topic_id;
     setDomTopicValue(topic_id);
 
     setEditorStatus('Topic saved, refreshed data.', 'success');
 
     closeDialog(topicEditorDom.topicDialog);
 
-    // temp
     renderTopicOptions();
-    setIssueOptions("");
-    setParamOptions("");
+    handleTopicSelection(topic_id);
     
   } catch (error) {
     setEditorStatus(error.message, 'error');

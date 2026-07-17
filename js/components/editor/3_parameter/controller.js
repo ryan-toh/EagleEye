@@ -8,6 +8,7 @@ export function initParamEditor() {
 
     paramEditorDom.parameterPicker.addEventListener('change', onParamPicked);
     paramEditorDom.saveParameterBtn.addEventListener('click', onSaveParameter);
+    paramEditorDom.createParamBtn.addEventListener('click', onCreateParam);
 
     paramEditorDom.paramList.addEventListener('click', onParamClick);
     paramEditorDom.paramList.addEventListener('dblclick', onParamDblClick);
@@ -18,12 +19,11 @@ export function refreshParamPicker(issueId) {
 }
 
 export function refreshParam(issueId) {
-  refreshParamPicker(issueId);
-  clearParamForm();
+  handleIssueSelection(issueId);
 }
 
 export function clearParamForm() {
-  renderParamFormFor('__new__');
+  renderParamFormFor('__new__', getSelectedIssue());
 }
 
 export function onParamClick(event) {
@@ -45,14 +45,25 @@ function onParamDblClick(event) {
     return;
   }
 
-  renderParamFormFor(paramId);
-
+  selectParameterForEditing(paramId);
   paramEditorDom.paramDialog.showModal();
 }
 
 export function setDomParamValue(value) {
   paramEditorDom.paramSelect.value = value;
   setParamSelectedState(value);
+}
+
+export function handleIssueSelection(issueId) {
+  renderParamOptions(issueId);
+  renderParameterPicker(issueId);
+  clearParamForm();
+  setDomParamValue('');
+}
+
+export function selectParameter(paramId) {
+  paramEditorDom.parameterPicker.value = paramId;
+  setDomParamValue(paramId);
 }
 
 export function setParamOptions(issueId) {
@@ -62,11 +73,12 @@ export function setParamOptions(issueId) {
 export function onParamPicked() {
     const paramId = paramEditorDom.parameterPicker.value;
 
-    renderParamFormFor(paramId);
+    renderParamFormFor(paramId, getSelectedIssue());
+    setDomParamValue(paramId === '__new__' ? '' : paramId);
 }
 
 export function setParamForm(paramId) {
-    renderParamFormFor(paramId);
+    renderParamFormFor(paramId, getSelectedIssue());
 }
 
 function onSaveParameter() {
@@ -86,12 +98,7 @@ function onSaveParameter() {
     });
 
     renderParameterPicker(issue_id);
-
-    // To restore state
-    paramEditorDom.parameterPicker.value = param_id;
-    paramEditorDom.parameterId.value = param_id;
-    setDomParamValue(param_id);
-
+    selectParameter(param_id);
     renderParamOptions(issue_id);
 
     closeDialog(paramEditorDom.paramDialog);
@@ -100,5 +107,20 @@ function onSaveParameter() {
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }
+}
+
+function onCreateParam() {
+  if (paramEditorDom.parameterPicker.disabled) {
+    setEditorStatus('Select an issue before creating a parameter.', 'error');
+    return;
+  }
+
+  selectParameterForEditing('__new__');
+  paramEditorDom.paramDialog.showModal();
+}
+
+function selectParameterForEditing(paramId) {
+  selectParameter(paramId);
+  renderParamFormFor(paramId, getSelectedIssue());
 }
 

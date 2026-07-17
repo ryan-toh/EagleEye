@@ -1,15 +1,15 @@
 import { getSelectedTopic } from "../1_topic/controller.js";
-import { refreshParam, setDomParamValue, setParamOptions } from "../3_parameter/controller.js";
-import { upsertIssue, appState } from "../../../appState.js";
+import { handleIssueSelection } from "../3_parameter/controller.js";
+import { upsertIssue } from "../../../appState.js";
 import { closeDialog, renderSelectedIssuePreview, setEditorStatus } from "../shared/controller.js";
 import { issueEditorDom, initIssueEditorDom, renderIssueFormFor, renderIssuePickerFor, renderIssueOptions, getClickedIssueId, setIssueSelectedState } from "./dom.js";
-import { buildIssueFlowchart } from "../../preview/flowchart.js";
 
 export function initIssueEditor() {
     initIssueEditorDom();
 
     issueEditorDom.issuePicker.addEventListener('change', onIssuePicked);
     issueEditorDom.saveIssueBtn.addEventListener('click', onSaveIssue);
+    issueEditorDom.createIssueBtn.addEventListener('click', onCreateIssue);
 
     issueEditorDom.issueList.addEventListener('click', onIssueClick);
     issueEditorDom.issueList.addEventListener('dblclick', onIssueDblClick);
@@ -23,10 +23,8 @@ function onIssueClick(event) {
     return;
   }
 
-  setDomIssueValue(issueId);
-  setDomParamValue("");
-
-  setParamOptions(issueId);
+  selectIssue(issueId);
+  handleIssueSelection(issueId);
 }
 
 function onIssueDblClick(event) {
@@ -37,16 +35,25 @@ function onIssueDblClick(event) {
     return;
   }
 
-  renderIssueFormFor(issueId);
-
+  selectIssueForEditing(issueId);
   issueEditorDom.issueDialog.showModal();
-
-  refreshParam(issueId);
 }
-
 export function setDomIssueValue(value) {
   issueEditorDom.issueSelect.value = value;
   setIssueSelectedState(value);
+}
+
+export function handleTopicSelection(topicId) {
+  renderIssueOptions(topicId);
+  renderIssuePickerFor(topicId);
+  clearIssueForm();
+  setDomIssueValue('');
+  handleIssueSelection('');
+}
+
+export function selectIssue(issueId) {
+  issueEditorDom.issuePicker.value = issueId;
+  setDomIssueValue(issueId);
 }
 
 export function setIssueOptions(topicId) {
@@ -54,8 +61,7 @@ export function setIssueOptions(topicId) {
 }
 
 export function refreshIssue(topicId) {
-  refreshIssuePicker(topicId);
-  clearIssueForm();
+  handleTopicSelection(topicId);
 }
 
 export function refreshIssuePicker(topicId) {
@@ -71,8 +77,8 @@ export async function onIssuePicked() {
 
   renderIssueFormFor(issueId);
 
-  // Automatically load params after choosing an issue
-  refreshParam(issueId);
+  setDomIssueValue(issueId === '__new__' ? '' : issueId);
+  handleIssueSelection(issueId === '__new__' ? '' : issueId);
 
   // Automatically load graph, token required 
   await renderSelectedIssuePreview();
@@ -97,17 +103,14 @@ function onSaveIssue() {
 
     refreshIssuePicker(topic_id);
 
-    // To restore state
-    issueEditorDom.issuePicker.value = issue_id;
-    issueEditorDom.issueId.value = issue_id;
+    selectIssue(issue_id);
 
     setEditorStatus('Issue saved.', 'success');
 
     closeDialog(issueEditorDom.issueDialog);
 
-    // temp
     renderIssueOptions(topic_id);
-    setParamOptions("");
+    handleIssueSelection(issue_id);
 
 
   } catch (error) {
@@ -117,4 +120,19 @@ function onSaveIssue() {
 
 export function getSelectedIssue() {
     return issueEditorDom.issuePicker.value;
+}
+
+function onCreateIssue() {
+  if (issueEditorDom.issuePicker.disabled) {
+    setEditorStatus('Select a topic before creating an issue.', 'error');
+    return;
+  }
+
+  selectIssueForEditing('__new__');
+  issueEditorDom.issueDialog.showModal();
+}
+
+function selectIssueForEditing(issueId) {
+  selectIssue(issueId);
+  renderIssueFormFor(issueId);
 }
