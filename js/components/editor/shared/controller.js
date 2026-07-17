@@ -1,5 +1,5 @@
-import { initTopicEditor, refreshTopicPicker } from "../1_topic/controller.js";
-import { getSelectedIssue, initIssueEditor } from "../2_issue/controller.js";
+import { clearTopicForm, initTopicEditor, refreshTopicPicker, setTopicOptions } from "../1_topic/controller.js";
+import { getSelectedIssue, handleTopicSelection, initIssueEditor } from "../2_issue/controller.js";
 import { initParamEditor } from "../3_parameter/controller.js";
 import { initRecomEditor } from "../4_recommendationMatrix/controller.js";
 
@@ -28,6 +28,10 @@ export function initSharedEditor() {
 
 export function setEditorTopicOptions() {
   refreshTopicPicker();
+  clearTopicForm();
+
+  setTopicOptions();
+  handleTopicSelection('');
 }
 
 export async function renderSelectedIssuePreview() {
@@ -50,4 +54,13 @@ export async function saveSheet() {
 
 export function setEditorStatus(message, type = '') {
   renderEditorStatus(message, type);
+}
+
+export function closeDialog(dialog) {
+    dialog.classList.add("closing");
+
+    dialog.addEventListener("animationend", () => {
+        dialog.classList.remove("closing");
+        dialog.close();
+    }, { once: true });
 }

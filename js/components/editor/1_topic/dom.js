@@ -1,5 +1,6 @@
 import { appState, getTopic, makeUniqueId } from "../../../appState.js";
 import { str } from "../../../utils.js";
+import { createExplorerItem } from "../shared/dom.js";
 
 export const topicEditorDom = {};
 
@@ -11,16 +12,50 @@ export function initTopicEditorDom() {
         topicDescription: document.getElementById('editorTopicDescription'),
         topicExamples: document.getElementById('editorTopicExamples'),
         saveTopicBtn: document.getElementById('saveTopicBtn'),
+        createTopicBtn: document.getElementById('createTopicBtn'),
+
+        topicSelect: document.getElementById("editorTopicSelect"),
+        topicList: document.getElementById("editorTopicList"),
+        topicDialog: document.getElementById("editorTopicDialog"),
     });
 
     renderTopicPicker();
 }
 
-export function clearTopicForm() {
-    topicEditorDom.topicId.value = makeUniqueId('TOPIC', appState.topics, 'topic_id');
-    topicEditorDom.topicName.value = '';
-    topicEditorDom.topicDescription.value = '';
-    topicEditorDom.topicExamples.value = '';
+export function getClickedTopicId(event) {
+  const item = event.target.closest("[data-topic-id]");
+  return item ? item.dataset.topicId: "";
+}
+
+export function setTopicSelectedState(topicId) {
+  setSelectedState(topicEditorDom.topicList, "topicId", topicId);
+}
+
+export function renderTopicOptions() {
+  topicEditorDom.topicSelect.value = "";
+  topicEditorDom.topicList.innerHTML = "";
+
+  if (!appState.topics.length) {
+    topicEditorDom.topicList.innerHTML = `
+      <div class="decision-explorer__empty">
+        Load files first
+      </div>
+    `;
+    return;
+  }
+
+  appState.topics.forEach(topic => {
+    const item = createExplorerItem({
+      id: topic.topic_id,
+      title: topic.topic_name,
+      meta: topic.description || "",
+      type: "topic",
+      icon: "📁"
+    });
+
+    topicEditorDom.topicList.appendChild(item)
+  });
+
 }
 
 export function renderTopicPicker() {
@@ -43,4 +78,16 @@ export function renderTopicFormFor(topicId) {
   topicEditorDom.topicDescription.value = topic?.description || '';
   topicEditorDom.topicExamples.value = topic?.example_phrases || '';
 }
+
+function setSelectedState(container, datasetKey, selectedId) {
+  const items = container.querySelectorAll(".decision-explorer__item");
+
+  items.forEach(item => {
+    item.classList.toggle(
+      "is-selected",
+      item.dataset[datasetKey] === String(selectedId)
+    );
+  });
+}
+
 

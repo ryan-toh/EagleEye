@@ -1,7 +1,6 @@
 import { initUploadDomElements, uploadDom, renderStatus, getFileInput } from "./dom.js";
 import { saveWorkbookData, loadWorkbookData, validateWorkbookData } from "../../fileService.js";
 import { loadState, appState, renderStep } from "../../appState.js";
-import { setViewerTopicOptions } from "../viewer/controller.js";
 import { setEditorTopicOptions } from "../editor/shared/controller.js";
 
 export function initUpload() {
@@ -19,7 +18,6 @@ async function onLoadFiles() {
     const workbookData = await loadWorkbookData(getFileInput());
     validateWorkbookData(workbookData);
     loadState(workbookData);
-    setViewerTopicOptions();
     setEditorTopicOptions();
     setStatus('Files loaded successfully.', 'success');
 

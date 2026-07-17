@@ -2,9 +2,7 @@ import { validateLibraries } from './utils.js';
 import { disableLoading } from './components/upload/dom.js';
 import { initEditor } from './components/editor/shared/controller.js';
 import { initUpload } from './components/upload/controller.js';
-import { initViewer } from './components/viewer/controller.js';
 import { initPreview } from './components/preview/controller.js';
-import { initTabBar } from './components/tab-bar/controller.js';
 
 /**
  * Main js entry point.
@@ -51,9 +49,7 @@ function initApp() {
   window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
 
   initUpload();
-  initTabBar();
   initEditor();
-  initViewer();
   initPreview();
 
   // } catch (error) {

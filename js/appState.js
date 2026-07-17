@@ -1,6 +1,5 @@
 import { topicEditorDom } from './components/editor/1_topic/dom.js';
 import { str } from './utils.js';
-import { clearTopicForm } from './components/editor/1_topic/dom.js';
 
 
 // core appState
@@ -241,21 +240,11 @@ function uniqueValues(rows, key) {
  * Updates the visibility of major UI components based on uiState
  */
 export function renderStep() {
-  const tabBar = document.getElementById('tab-bar');
-  const viewPanel = document.getElementById('view-panel');
   const editorPanel = document.getElementById('editor-panel');
   const previewPanel = document.getElementById('preview-panel');
 
-  // Toggle Tab Bar visibility
-  tabBar.classList.toggle('hidden', appState.step < 2);
-
-  // Toggle Flow Panels
-  // Only show the panel if we are at step 2 or 3 AND the flow matches
-  const isViewFlow = appState.step >= 2 && appState.flow === 'view';
-  const isEditFlow = appState.step >= 2 && appState.flow === 'edit';
-
-  viewPanel.classList.toggle('hidden', !isViewFlow);
-  editorPanel.classList.toggle('hidden', !isEditFlow);
+  // Toggle Editor Panel visibility
+  editorPanel.classList.toggle('hidden', appState.step < 2);
 
   // Toggle Preview Panel visibility
   previewPanel.classList.toggle('hidden', appState.step < 3);
