@@ -15,7 +15,7 @@ export function initIssueEditor() {
     issueEditorDom.issueList.addEventListener('dblclick', onIssueDblClick);
 }
 
-function onIssueClick(event) {
+async function onIssueClick(event) {
   const issueId = getClickedIssueId(event);
 
   if (!issueId) {
@@ -25,6 +25,7 @@ function onIssueClick(event) {
 
   selectIssue(issueId);
   handleIssueSelection(issueId);
+  await renderSelectedIssuePreview();
 }
 
 function onIssueDblClick(event) {

@@ -85,84 +85,94 @@
             Edit parameter combinatiions for a given issue.
         </p>
     </div>
-
-    <div class="editor-card wide">
-      <div class="flowchart-header">
-        <h3>Recommendation matrix</h3>
-        <div class="button-row">
-          <button id="buildCombinationsBtn" type="button">Build combinations</button>
-          <button id="saveCombinationRulesBtn" type="button" disabled>Save recommendation rules</button>
-        </div>
+    <div 
+        class="decision-explorer__list" 
+        id="editorRecommendationList"
+        aria-label="Recommendations"
+      >
+      <div class="decision-explorer__empty">
+        New recommendation matrix UI coming soon..
       </div>
-      <br>
+    </div>
+    </section>
+  </div>
+
+  <dialog id="editorTopicDialog" class="editor-card">
+    <form method="dialog" class="editor-dialog__close-form">
+      <button class="editor-dialog__close" type="submit" aria-label="Close topic dialog" title="Close">×</button>
+    </form>
+    <h3>Topic</h3>
+    <label>
+      Now editing..
+      <select id="editorTopicPicker"></select>
+    </label>
+    <!-- <label>Topic ID <input id="editorTopicId" type="text" /></label> -->
+    <label class="hidden">Topic ID <input id="editorTopicId" type="text" /></label>
+    <label>Topic name <input id="editorTopicName" type="text" /></label>
+    <label>Description <textarea id="editorTopicDescription" rows="3"></textarea></label>
+    <label>Example phrases <textarea id="editorTopicExamples" rows="3"></textarea></label>
+    <button id="saveTopicBtn" type="button">Save topic</button>
+  </dialog>
+
+  <dialog id="editorIssueDialog" class="editor-card">
+    <form method="dialog" class="editor-dialog__close-form">
+      <button class="editor-dialog__close" type="submit" aria-label="Close issue dialog" title="Close">×</button>
+    </form>
+    <h3>Issue</h3>
+    <label>
+      Now editing..
+      <select id="editorIssuePicker"></select>
+    </label>
+    <!-- <label>Issue ID <input id="editorIssueId" type="text" /></label> -->
+    <label class="hidden">Issue ID <input id="editorIssueId" type="text" /></label>
+    <label>Issue name <input id="editorIssueName" type="text" /></label>
+    <label>Issue description <textarea id="editorIssueDescription" rows="3"></textarea></label>
+    <label>Example phrases <textarea id="editorIssueExamples" rows="3"></textarea></label>
+    <button id="saveIssueBtn" type="button">Save issue</button>
+  </dialog>
+
+  <dialog id="editorParamDialog" class="editor-card">
+    <form method="dialog" class="editor-dialog__close-form">
+      <button class="editor-dialog__close" type="submit" aria-label="Close parameter dialog" title="Close">×</button>
+    </form>
+    <h3>Parameter</h3>
+    <label>
+      Now editing..
+      <select id="editorParameterPicker"></select>
+    </label>
+    <!-- <label>Parameter ID <input id="editorParameterId" type="text" /></label> -->
+    <label class="hidden">Parameter ID <input id="editorParameterId" type="text" /></label>
+    <label>Parameter name <input id="editorParameterName" type="text" /></label>
+    <label>Question to ask <textarea id="editorParameterQuestion" rows="3"></textarea></label>
+    <label>
+      Required
+      <select id="editorParameterRequired">
+        <option value="yes">yes</option>
+        <option value="no">no</option>
+      </select>
+    </label>
+    <label>
+      Allowed values 
+      <p class="helper-text">Seperate the values with ';' or ',' or a new line.</p>
+      <textarea id="editorParameterAllowedValues" rows="3" placeholder="yes, no, unclear"></textarea>
+    </label>
+    <label>Example values <textarea id="editorParameterExampleValues" rows="2"></textarea></label>
+    <label>Order <input id="editorParameterOrder" type="number" min="1" /></label>
+    <button id="saveParameterBtn" type="button">Save parameter</button>
+  </dialog>
+
+  <div class="editor-card wide">
+    <div class="flowchart-header">
+      <h3>Recommendation matrix</h3>
+      <div class="button-row">
+        <button id="buildCombinationsBtn" type="button">Build combinations</button>
+        <button id="saveCombinationRulesBtn" type="button" disabled>Save recommendation rules</button>
+      </div>
+    </div>
+    <br>
       <p class="helper-text">The matrix uses parameters with allowed_values. Each saved row creates or updates one decision rule and one linked recommendation.</p>
       <div id="recommendationMatrix" class="empty">Select an issue, add parameters with allowed_values, then build combinations.</div>
-    </div>
   </div>
-  
-  <dialog id="editorTopicDialog" class="editor-card">
-  <form method="dialog" class="editor-dialog__close-form">
-    <button class="editor-dialog__close" type="submit" aria-label="Close topic dialog" title="Close">×</button>
-  </form>
-  <h3>Topic</h3>
-  <label>
-    Now editing..
-    <select id="editorTopicPicker"></select>
-  </label>
-  <!-- <label>Topic ID <input id="editorTopicId" type="text" /></label> -->
-  <label class="hidden">Topic ID <input id="editorTopicId" type="text" /></label>
-  <label>Topic name <input id="editorTopicName" type="text" /></label>
-  <label>Description <textarea id="editorTopicDescription" rows="3"></textarea></label>
-  <label>Example phrases <textarea id="editorTopicExamples" rows="3"></textarea></label>
-  <button id="saveTopicBtn" type="button">Save topic</button>
-</dialog>
-
-<dialog id="editorIssueDialog" class="editor-card">
-  <form method="dialog" class="editor-dialog__close-form">
-    <button class="editor-dialog__close" type="submit" aria-label="Close issue dialog" title="Close">×</button>
-  </form>
-  <h3>Issue</h3>
-  <label>
-    Now editing..
-    <select id="editorIssuePicker"></select>
-  </label>
-  <!-- <label>Issue ID <input id="editorIssueId" type="text" /></label> -->
-  <label class="hidden">Issue ID <input id="editorIssueId" type="text" /></label>
-  <label>Issue name <input id="editorIssueName" type="text" /></label>
-  <label>Issue description <textarea id="editorIssueDescription" rows="3"></textarea></label>
-  <label>Example phrases <textarea id="editorIssueExamples" rows="3"></textarea></label>
-  <button id="saveIssueBtn" type="button">Save issue</button>
-</dialog>
-
-<dialog id="editorParamDialog" class="editor-card">
-  <form method="dialog" class="editor-dialog__close-form">
-    <button class="editor-dialog__close" type="submit" aria-label="Close parameter dialog" title="Close">×</button>
-  </form>
-  <h3>Parameter</h3>
-  <label>
-    Now editing..
-    <select id="editorParameterPicker"></select>
-  </label>
-  <!-- <label>Parameter ID <input id="editorParameterId" type="text" /></label> -->
-  <label class="hidden">Parameter ID <input id="editorParameterId" type="text" /></label>
-  <label>Parameter name <input id="editorParameterName" type="text" /></label>
-  <label>Question to ask <textarea id="editorParameterQuestion" rows="3"></textarea></label>
-  <label>
-    Required
-    <select id="editorParameterRequired">
-      <option value="yes">yes</option>
-      <option value="no">no</option>
-    </select>
-  </label>
-  <label>
-    Allowed values 
-    <p class="helper-text">Seperate the values with ';' or ',' or a new line.</p>
-    <textarea id="editorParameterAllowedValues" rows="3" placeholder="yes, no, unclear"></textarea>
-  </label>
-  <label>Example values <textarea id="editorParameterExampleValues" rows="2"></textarea></label>
-  <label>Order <input id="editorParameterOrder" type="number" min="1" /></label>
-  <button id="saveParameterBtn" type="button">Save parameter</button>
-</dialog>
 
   <p id="editorStatus" class="status"></p>
   <button id="saveSheetBtn">
