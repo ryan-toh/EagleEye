@@ -1,5 +1,5 @@
 /* ============================================================
-   editor.css — editor panel and recommendation matrix
+   editor.css — editor panel and recommendation editor
    Used by: parts/editor-panel.html
    ============================================================ */
 
@@ -107,11 +107,6 @@
   box-shadow: 0 0 0 2px rgba(98, 100, 167, 0.4);
 }
 
-.editor-panel .editor-card.wide {
-  margin-top: 10px;
-  overflow-x: auto;
-}
-
 .editor-panel .editor-card label {
   margin-bottom: 10px;
 }
@@ -122,59 +117,47 @@
   gap: 8px;
 }
 
-.editor-panel .matrix-table {
-  width: 100%;
-  min-width: 900px;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.editor-panel .matrix-table th,
-.editor-panel .matrix-table td {
-  padding: 8px 10px;
+.recommendation-assignments-fieldset {
+  margin: 16px 0;
+  padding: 12px;
   border: 1px solid var(--border);
-  vertical-align: middle;
+  border-radius: 6px;
 }
 
-.editor-panel .matrix-table th {
-  background: var(--tint);
+.recommendation-assignments-fieldset legend {
+  padding: 0 4px;
   color: var(--accent-dark);
-  font-size: 12px;
   font-weight: 600;
-  text-align: left;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
 }
 
-.editor-panel .matrix-table textarea,
-.editor-panel .matrix-table input,
-.editor-panel .matrix-table select {
-  min-width: 150px;
-  width: 100%;
-  padding: 6px 8px;
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
-  font: inherit;
+.recommendation-assignment {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.recommendation-assignment:last-child {
+  border-bottom: 0;
+}
+
+.recommendation-assignment__summary {
+  min-width: 0;
   font-size: 13px;
-  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.editor-panel .matrix-table textarea:focus,
-.editor-panel .matrix-table input:focus,
-.editor-panel .matrix-table select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(98, 100, 167, 0.25);
+.recommendation-assignment__priority-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
-.editor-panel .matrix-table tbody tr:nth-child(even) {
-  background: #FAFAFA;
-}
-
-.editor-panel .matrix-table tbody tr:hover {
-  background: var(--tint);
+.recommendation-assignment__priority {
+  width: 58px;
 }
 
 .editor-explorer__add-btn {

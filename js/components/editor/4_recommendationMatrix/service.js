@@ -4,6 +4,7 @@ import {
   getIssueRules,
   getRecommendation,
   makeUniqueId,
+  removeRule,
   upsertRecommendation,
   upsertRule
 } from '../../../appState.js';
@@ -22,104 +23,89 @@ export function getParametersWithAllowedValues(issueId) {
 
 export function buildParameterCombinations(issueId) {
   const parameters = getParametersWithAllowedValues(issueId);
+  if (!parameters.length) return [];
 
-  if (!parameters.length) {
-    return [];
-  }
-
-  return cartesianProduct(parameters.map(param => {
-    return parseAllowedValues(param.allowed_values).map(value => ({
+  return cartesianProduct(parameters.map(param =>
+    parseAllowedValues(param.allowed_values).map(value => ({
       parameter_id: str(param.parameter_id),
       value
-    }));
-  })).map(items => {
-    return Object.fromEntries(items.map(item => [item.parameter_id, item.value]));
-  });
+    }))
+  )).map(items => Object.fromEntries(items.map(item => [item.parameter_id, item.value])));
+}
+
+export function getRecommendations() {
+  return [...appState.recommendations].sort((a, b) =>
+    str(a.recommendation_id).localeCompare(str(b.recommendation_id))
+  );
+}
+
+export function getRecommendationAssignments(issueId, recommendationId) {
+  return getIssueRules(issueId).filter(rule => str(rule.recommendation_id) === str(recommendationId));
 }
 
 export function getRuleForCombination(issueId, combination) {
-  const comboKey = stableConditionsKey(combination);
-
+  const comboKey = stringifyConditions(combination);
   return getIssueRules(issueId).find(rule => {
     const parsed = parseConditions(rule.conditions);
-    return parsed && stableConditionsKey(parsed) === comboKey;
+    return parsed && stringifyConditions(parsed) === comboKey;
   });
 }
 
-export function getRecommendationForCombination(issueId, combination) {
-  const rule = getRuleForCombination(issueId, combination);
-  return rule ? getRecommendation(rule.recommendation_id) : null;
+export function saveRecommendation({ recommendationId, finalDecision, recommendationText, nextSteps, escalationNote }) {
+  const id = str(recommendationId) || makeUniqueId('REC', appState.recommendations, 'recommendation_id');
+
+  return upsertRecommendation({
+    recommendation_id: id,
+    final_decision: str(finalDecision) || 'Clarify',
+    recommendation_text: str(recommendationText) || 'Clarify before giving a final recommendation.',
+    next_steps: nextSteps,
+    escalation_note: escalationNote
+  });
 }
 
-export function saveCombinationRecommendations(issueId, rows) {
+export function saveRecommendationAssignments(issueId, recommendationId, assignments) {
+  const selectedKeys = new Set(assignments.filter(item => item.selected).map(item => stringifyConditions(item.conditions)));
   let savedCount = 0;
 
-  rows.forEach((row, index) => {
-    const finalDecision = str(row.final_decision);
-    const recommendationText = str(row.recommendation_text);
-
-    if (!finalDecision && !recommendationText) {
-      return;
-    }
-
-    const existingRule = getRuleForCombination(issueId, row.conditions);
-    const recommendationId = existingRule?.recommendation_id || makeUniqueId('REC', appState.recommendations, 'recommendation_id');
+  assignments.filter(item => item.selected).forEach((assignment, index) => {
+    const existingRule = getRuleForCombination(issueId, assignment.conditions);
     const ruleId = existingRule?.rule_id || makeUniqueId('RULE', appState.rules, 'rule_id');
 
-    upsertRecommendation({
-      recommendation_id: recommendationId,
-      final_decision: finalDecision || 'Clarify',
-      recommendation_text: recommendationText || 'Clarify before giving a final recommendation.',
-      next_steps: row.next_steps,
-      escalation_note: row.escalation_note
-    });
-    
-    console.log("sending to upsertRule()");
     upsertRule({
       rule_id: ruleId,
       issue_id: issueId,
-      conditions: stringifyConditions(row.conditions),
+      conditions: stringifyConditions(assignment.conditions),
       recommendation_id: recommendationId,
-      priority: row.priority || index + 1
+      priority: assignment.priority || index + 1
     });
-    console.log("success");
-
     savedCount += 1;
+  });
+
+  getRecommendationAssignments(issueId, recommendationId).forEach(rule => {
+    const parsed = parseConditions(rule.conditions);
+    if (parsed && !selectedKeys.has(stringifyConditions(parsed))) removeRule(rule.rule_id);
   });
 
   return savedCount;
 }
 
 export function stringifyConditions(conditions) {
-  return JSON.stringify(sortObjectKeys(conditions));
+  return JSON.stringify(Object.fromEntries(
+    Object.entries(conditions)
+      .map(([key, value]) => [str(key), str(value)])
+      .sort(([a], [b]) => a.localeCompare(b))
+  ));
 }
 
 export function parseConditions(value) {
-  const text = str(value);
-  if (!text) return null;
-
   try {
-    const parsed = JSON.parse(text);
-    return typeof parsed === 'object' && parsed !== null ? parsed : null;
+    const parsed = JSON.parse(str(value));
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
   } catch {
     return null;
   }
 }
 
-function stableConditionsKey(conditions) {
-  return stringifyConditions(conditions);
-}
-
-function sortObjectKeys(object) {
-  return Object.fromEntries(
-    Object.entries(object)
-      .map(([key, value]) => [str(key), str(value)])
-      .sort(([a], [b]) => a.localeCompare(b))
-  );
-}
-
 function cartesianProduct(groups) {
-  return groups.reduce((acc, group) => {
-    return acc.flatMap(existing => group.map(item => [...existing, item]));
-  }, [[]]);
+  return groups.reduce((acc, group) => acc.flatMap(existing => group.map(item => [...existing, item])), [[]]);
 }

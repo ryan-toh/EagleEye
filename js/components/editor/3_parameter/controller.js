@@ -2,6 +2,7 @@ import { getSelectedIssue } from "../2_issue/controller.js";
 import { initParamEditorDom, paramEditorDom, renderParameterPicker, renderParamFormFor, renderParamOptions, getClickedParamId, setParamSelectedState } from "./dom.js";
 import { upsertParameter } from "../../../appState.js";
 import { setEditorStatus, closeDialog } from "../shared/controller.js";
+import { refreshRecommendations } from "../4_recommendationMatrix/controller.js";
 
 export function initParamEditor() {
     initParamEditorDom();
@@ -59,6 +60,7 @@ export function handleIssueSelection(issueId) {
   renderParameterPicker(issueId);
   clearParamForm();
   setDomParamValue('');
+  refreshRecommendations(issueId);
 }
 
 export function selectParameter(paramId) {

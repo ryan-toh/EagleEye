@@ -170,6 +170,14 @@ export function upsertRule(rule) {
   return normalized;
 }
 
+export function removeRule(ruleId) {
+  const index = appState.rules.findIndex(rule => str(rule.rule_id) === str(ruleId));
+
+  if (index >= 0) {
+    appState.rules.splice(index, 1);
+  }
+}
+
 export function makeUniqueId(prefix, rows, idKey) {
   let counter = rows.length + 1;
   let candidate = `${prefix}_${String(counter).padStart(3, '0')}`;

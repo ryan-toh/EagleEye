@@ -30,6 +30,10 @@ export function createExplorerItem({ id, title, meta, type, icon }) {
     button.dataset.paramId = String(id);
   }
 
+  if (type === "recommendation") {
+    button.dataset.recommendationId = String(id);
+  }
+
   button.innerHTML = `
     <span class="decision-explorer__item-icon" aria-hidden="true">
       ${icon}

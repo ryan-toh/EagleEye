@@ -3,7 +3,7 @@
   <div class="editor-panel__header">
     <div>
       <h2>Edit or create a decision tree</h2>
-      <p class="helper-text">Create or edit a topic, issue, parameters, then generate recommendation rule/rows from parameter value combinations.</p>
+      <p class="helper-text">Create topics, issues, parameters, and reusable recommendations. Assign each recommendation to the combinations where it applies.</p>
     </div>
   </div>
 
@@ -11,6 +11,7 @@
   <input type="hidden" id="editorTopicSelect" value="">
   <input type="hidden" id="editorIssueSelect" value="">
   <input type="hidden" id="editorParamSelect" value="">
+  <input type="hidden" id="editorRecommendationSelect" value="">
 
   <div class="decision-explorer">
     <section class="decision-explorer__pane decision-explorer__pane--topics">
@@ -80,10 +81,11 @@
 
     <section class="decision-explorer__pane editor-form-pane">
     <div class="decision-explorer__pane-header">
-        <h3>Parameter Combinations</h3>
-        <p class="helper-text">
-            Edit parameter combinatiions for a given issue.
+        <h3>Recommendations</h3>
+        <p class="helper-text" id="editorRecommendationPanelHint">
+            Select an issue to assign combinations.
         </p>
+        <button id="createRecommendationBtn" class="editor-explorer__add-btn" type="button">+</button>
     </div>
     <div 
         class="decision-explorer__list" 
@@ -91,7 +93,7 @@
         aria-label="Recommendations"
       >
       <div class="decision-explorer__empty">
-        New recommendation matrix UI coming soon..
+        Select an issue first
       </div>
     </div>
     </section>
@@ -161,18 +163,35 @@
     <button id="saveParameterBtn" type="button">Save parameter</button>
   </dialog>
 
-  <div class="editor-card wide">
-    <div class="flowchart-header">
-      <h3>Recommendation matrix</h3>
-      <div class="button-row">
-        <button id="buildCombinationsBtn" type="button">Build combinations</button>
-        <button id="saveCombinationRulesBtn" type="button" disabled>Save recommendation rules</button>
-      </div>
-    </div>
-    <br>
-      <p class="helper-text">The matrix uses parameters with allowed_values. Each saved row creates or updates one decision rule and one linked recommendation.</p>
-      <div id="recommendationMatrix" class="empty">Select an issue, add parameters with allowed_values, then build combinations.</div>
-  </div>
+  <dialog id="editorRecommendationDialog" class="editor-card">
+    <form method="dialog" class="editor-dialog__close-form">
+      <button class="editor-dialog__close" type="submit" aria-label="Close recommendation dialog" title="Close">×</button>
+    </form>
+    <h3>Recommendation</h3>
+    <label>
+      Now editing..
+      <select id="editorRecommendationPicker"></select>
+    </label>
+    <label class="hidden">Recommendation ID <input id="editorRecommendationId" type="text" /></label>
+    <label>
+      Final decision
+      <select id="editorRecommendationDecision">
+        <option value="Answered">Answered</option>
+        <option value="Unanswered">Unanswered</option>
+        <option value="Escalate">Escalate</option>
+        <option value="Clarify">Clarify</option>
+      </select>
+    </label>
+    <label>Final response <textarea id="editorRecommendationText" rows="3"></textarea></label>
+    <label>Next steps <textarea id="editorRecommendationNextSteps" rows="2"></textarea></label>
+    <label>Escalation note <textarea id="editorRecommendationEscalationNote" rows="2"></textarea></label>
+    <fieldset class="recommendation-assignments-fieldset">
+      <legend>Assign to combinations</legend>
+      <p class="helper-text">Check every combination that should use this recommendation. Saving an edited recommendation removes its unchecked assignments for the selected issue.</p>
+      <div id="editorRecommendationAssignments"></div>
+    </fieldset>
+    <button id="saveRecommendationBtn" type="button">Save recommendation</button>
+  </dialog>
 
   <p id="editorStatus" class="status"></p>
   <button id="saveSheetBtn">

@@ -17,10 +17,10 @@ export function initParamEditorDom() {
         saveParameterBtn: document.getElementById('saveParameterBtn'),
         createParamBtn: document.getElementById('createParamBtn'),
 
-        paramSelect: document.getElementById("editorParamSelect"),
-        paramList: document.getElementById("editorParamList"),
-        paramPanelHint: document.getElementById("editorParamPanelHint"),
-        paramDialog: document.getElementById("editorParamDialog"),
+        paramSelect: document.getElementById('editorParamSelect'),
+        paramList: document.getElementById('editorParamList'),
+        paramPanelHint: document.getElementById('editorParamPanelHint'),
+        paramDialog: document.getElementById('editorParamDialog'),
 
     });
 }

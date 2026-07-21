@@ -1,98 +1,140 @@
-import { getParametersWithAllowedValues, buildParameterCombinations, getRuleForCombination, getRecommendationForCombination } from "./service.js";
-import { escapeHtml, str } from "../../../utils.js";
+import { appState, getIssueParameters, makeUniqueId } from '../../../appState.js';
+import { escapeHtml, str } from '../../../utils.js';
+import { createExplorerItem } from '../shared/dom.js';
+import {
+  buildParameterCombinations,
+  getRecommendationAssignments,
+  getRecommendations,
+  getRuleForCombination,
+  getParametersWithAllowedValues
+} from './service.js';
 
 export const recomEditorDom = {};
 
 export function initRecomEditorDom() {
-    Object.assign(recomEditorDom, {
-        buildCombinationsBtn: document.getElementById('buildCombinationsBtn'),
-        saveCombinationRulesBtn: document.getElementById('saveCombinationRulesBtn'),
-        recommendationMatrix: document.getElementById('recommendationMatrix'),
+  Object.assign(recomEditorDom, {
+    createRecommendationBtn: document.getElementById('createRecommendationBtn'),
+    recommSelect: document.getElementById('editorRecommendationSelect'),
+    recommList: document.getElementById('editorRecommendationList'),
+    recommPanelHint: document.getElementById('editorRecommendationPanelHint'),
+    recommDialog: document.getElementById('editorRecommendationDialog'),
+    recommendationPicker: document.getElementById('editorRecommendationPicker'),
+    recommendationId: document.getElementById('editorRecommendationId'),
+    recommendationDecision: document.getElementById('editorRecommendationDecision'),
+    recommendationText: document.getElementById('editorRecommendationText'),
+    recommendationNextSteps: document.getElementById('editorRecommendationNextSteps'),
+    recommendationEscalationNote: document.getElementById('editorRecommendationEscalationNote'),
+    recommendationAssignments: document.getElementById('editorRecommendationAssignments'),
+    saveRecommendationBtn: document.getElementById('saveRecommendationBtn')
+  });
+}
+
+export function setRecommendationSelectedState(recommendationId) {
+  setSelectedState(recomEditorDom.recommList, 'recommendationId', recommendationId);
+}
+
+export function renderRecommendationOptions(issueId) {
+  recomEditorDom.recommSelect.value = '';
+  recomEditorDom.recommList.innerHTML = '';
+  recomEditorDom.recommPanelHint.textContent = issueId
+    ? 'Choose a recommendation to assign to this issue’s combinations'
+    : 'Select an issue first';
+
+  if (!issueId) {
+    recomEditorDom.recommList.innerHTML = '<div class="decision-explorer__empty">Select an issue first</div>';
+    return;
+  }
+
+  const recommendations = getRecommendations();
+
+  if (!recommendations.length) {
+    recomEditorDom.recommList.innerHTML = '<div class="decision-explorer__empty">No recommendations yet</div>';
+    return;
+  }
+
+  recommendations.forEach(recommendation => {
+    const assignmentCount = issueId
+      ? getRecommendationAssignments(issueId, recommendation.recommendation_id).length
+      : 0;
+    const item = createExplorerItem({
+      id: recommendation.recommendation_id,
+      title: recommendation.final_decision || 'Clarify',
+      meta: issueId
+        ? `${assignmentCount} assigned combination${assignmentCount === 1 ? '' : 's'} · ${recommendation.recommendation_text || 'No response text'}`
+        : recommendation.recommendation_text || 'No response text',
+      type: 'recommendation',
+      icon: '✦'
     });
+    recomEditorDom.recommList.appendChild(item);
+  });
 }
 
-export function disableRecomBtns() {
-  recomEditorDom.buildCombinationsBtn.disabled = true;
-  recomEditorDom.saveCombinationRulesBtn.disabled = true;
+export function getClickedRecommendationId(event) {
+  const item = event.target.closest('[data-recommendation-id]');
+  return item ? item.dataset.recommendationId : '';
 }
 
-export function renderRecommendationMatrix(issueId) {
-  const parameters = getParametersWithAllowedValues(issueId);
-  const combinations = buildParameterCombinations(issueId);
-
-  if (!parameters.length) {
-    recomEditorDom.recommendationMatrix.innerHTML = '<p class="empty">Add allowed_values to at least one parameter before building recommendation combinations.</p>';
-    recomEditorDom.saveCombinationRulesBtn.disabled = true;
-    return;
-  }
-
-  if (combinations.length > 200) {
-    recomEditorDom.recommendationMatrix.innerHTML = `<p class="status error">This would create ${combinations.length} combinations. Reduce allowed_values before generating the matrix.</p>`;
-    recomEditorDom.saveCombinationRulesBtn.disabled = true;
-    return;
-  }
-
-  const headerCells = parameters.map(param => `<th>${escapeHtml(param.parameter_name)}</th>`).join('');
-  const rows = combinations.map((combination, index) => {
-    const rule = getRuleForCombination(issueId, combination);
-    const rec = getRecommendationForCombination(issueId, combination);
-    const conditionCells = parameters.map(param => `<td>${escapeHtml(combination[param.parameter_id])}</td>`).join('');
-
-    return `
-      <tr data-combination='${escapeHtml(JSON.stringify(combination))}'>
-        ${conditionCells}
-        <td><input class="combo-priority" type="number" min="1" value="${escapeHtml(rule?.priority || index + 1)}" /></td>
-        <td>
-          <select class="combo-decision">
-            ${decisionOption('Answered', rec?.final_decision)}
-            ${decisionOption('Unanswered', rec?.final_decision)}
-            ${decisionOption('Escalate', rec?.final_decision)}
-            ${decisionOption('Clarify', rec?.final_decision)}
-          </select>
-        </td>
-        <td><textarea class="combo-text" rows="2">${escapeHtml(rec?.recommendation_text || '')}</textarea></td>
-        <td><textarea class="combo-next" rows="2">${escapeHtml(rec?.next_steps || '')}</textarea></td>
-        <td><textarea class="combo-escalation" rows="2">${escapeHtml(rec?.escalation_note || '')}</textarea></td>
-      </tr>
-    `;
-  }).join('');
-
-  recomEditorDom.recommendationMatrix.innerHTML = `
-    <div class="table-wrap">
-      <table class="matrix-table">
-        <thead>
-          <tr>
-            ${headerCells}
-            <th>Priority</th>
-            <th>Decision</th>
-            <th>Final response</th>
-            <th>Next steps</th>
-            <th>Escalation note</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-  `;
-
-  recomEditorDom.saveCombinationRulesBtn.disabled = false;
+export function renderRecommendationPicker() {
+  recomEditorDom.recommendationPicker.innerHTML = '<option value="__new__">+ Create new recommendation</option>';
+  getRecommendations().forEach(recommendation => {
+    const option = document.createElement('option');
+    option.value = recommendation.recommendation_id;
+    option.textContent = `${recommendation.final_decision || 'Clarify'} — ${recommendation.recommendation_id}`;
+    recomEditorDom.recommendationPicker.appendChild(option);
+  });
 }
 
-export function collectCombinationRows() {
-  return [...recomEditorDom.recommendationMatrix.querySelectorAll('tbody tr')].map(row => ({
+export function renderRecommendationFormFor(recommendationId, issueId) {
+  const recommendation = getRecommendations().find(item => str(item.recommendation_id) === str(recommendationId));
+  recomEditorDom.recommendationId.value = recommendation?.recommendation_id || makeUniqueId('REC', appState.recommendations, 'recommendation_id');
+  recomEditorDom.recommendationDecision.value = recommendation?.final_decision || 'Clarify';
+  recomEditorDom.recommendationText.value = recommendation?.recommendation_text || '';
+  recomEditorDom.recommendationNextSteps.value = recommendation?.next_steps || '';
+  recomEditorDom.recommendationEscalationNote.value = recommendation?.escalation_note || '';
+  recomEditorDom.recommendationPicker.value = recommendation ? recommendation.recommendation_id : '__new__';
+  renderAssignmentChoices(issueId, recommendation?.recommendation_id);
+}
+
+export function collectRecommendationAssignments() {
+  return [...recomEditorDom.recommendationAssignments.querySelectorAll('[data-combination]')].map(row => ({
     conditions: JSON.parse(row.dataset.combination),
-    priority: row.querySelector('.combo-priority').value,
-    final_decision: row.querySelector('.combo-decision').value,
-    recommendation_text: row.querySelector('.combo-text').value,
-    next_steps: row.querySelector('.combo-next').value,
-    escalation_note: row.querySelector('.combo-escalation').value
+    selected: row.querySelector('.recommendation-assignment__checkbox').checked,
+    priority: row.querySelector('.recommendation-assignment__priority').value
   }));
 }
 
-function clearRecommendationMatrix() {
-  recomEditorDom.recommendationMatrix.innerHTML = '<p class="empty">Select an issue, add parameters with allowed_values, then build combinations.</p>';
+function renderAssignmentChoices(issueId, recommendationId) {
+  if (!issueId) {
+    recomEditorDom.recommendationAssignments.innerHTML = '<p class="helper-text">Save the recommendation now; select an issue before assigning combinations.</p>';
+    return;
+  }
+
+  const parameters = getParametersWithAllowedValues(issueId);
+  const combinations = buildParameterCombinations(issueId);
+  if (!parameters.length) {
+    recomEditorDom.recommendationAssignments.innerHTML = '<p class="helper-text">Add allowed values to parameters before assigning combinations.</p>';
+    return;
+  }
+  if (combinations.length > 200) {
+    recomEditorDom.recommendationAssignments.innerHTML = `<p class="status error">This issue has ${combinations.length} combinations. Reduce allowed values before assigning them.</p>`;
+    return;
+  }
+
+  recomEditorDom.recommendationAssignments.innerHTML = combinations.map((combination, index) => {
+    const rule = getRuleForCombination(issueId, combination);
+    const selected = rule && str(rule.recommendation_id) === str(recommendationId);
+    const summary = parameters.map(param => `${param.parameter_name}: ${combination[param.parameter_id]}`).join(' · ');
+    return `
+      <label class="recommendation-assignment" data-combination='${escapeHtml(JSON.stringify(combination))}'>
+        <input class="recommendation-assignment__checkbox" type="checkbox" ${selected ? 'checked' : ''} />
+        <span class="recommendation-assignment__summary">${escapeHtml(summary)}</span>
+        <span class="recommendation-assignment__priority-wrap">Priority <input class="recommendation-assignment__priority" type="number" min="1" value="${escapeHtml(rule?.priority || index + 1)}" /></span>
+      </label>`;
+  }).join('');
 }
 
-function decisionOption(value, selectedValue) {
-  return `<option value="${value}" ${str(selectedValue || 'Clarify') === value ? 'selected' : ''}>${value}</option>`;
+function setSelectedState(container, datasetKey, selectedId) {
+  container.querySelectorAll('.decision-explorer__item').forEach(item => {
+    item.classList.toggle('is-selected', item.dataset[datasetKey] === String(selectedId));
+  });
 }
