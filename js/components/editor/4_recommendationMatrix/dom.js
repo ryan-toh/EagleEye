@@ -80,7 +80,7 @@ export function renderRecommendationPicker() {
   getRecommendations().forEach(recommendation => {
     const option = document.createElement('option');
     option.value = recommendation.recommendation_id;
-    option.textContent = `${recommendation.final_decision || 'Clarify'} — ${recommendation.recommendation_id}`;
+    option.textContent = `${recommendation.final_decision || 'Clarify'}: ${recommendation.recommendation_id}`;
     recomEditorDom.recommendationPicker.appendChild(option);
   });
 }

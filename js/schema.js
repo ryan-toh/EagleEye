@@ -84,7 +84,7 @@ export function getSampleWorkbookData() {
     topics: [{
       topic_id: "TOPIC_001",
       topic_name: "Sample Topic",
-      description: "Example topic — replace with your own.",
+      description: "Example topic replace with your own.",
       example_phrases: "e.g., sample phrase one; sample phrase two",
     }],
     issues: [{
