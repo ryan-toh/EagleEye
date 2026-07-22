@@ -1,5 +1,5 @@
 import { appState, getIssueParameters, makeUniqueId } from "../../../appState.js";
-import { str } from "../../../utils.js";
+import { isRequired, str } from "../../../utils.js";
 import { createExplorerItem } from "../shared/dom.js";
 
 export const paramEditorDom = {};
@@ -101,9 +101,9 @@ export function renderParamFormFor(parameterId, issueId) {
   paramEditorDom.parameterName.value = parameter?.parameter_name || '';
   paramEditorDom.parameterQuestion.value = parameter?.question_to_ask || '';
   paramEditorDom.parameterRequired.value =
-    parameter == null || parameter.required
-        ? "yes"
-        : "no";
+    parameter == null || isRequired(parameter.required)
+      ? "yes"
+      : "no";
   paramEditorDom.parameterAllowedValues.value = parameter?.allowed_values || '';
   paramEditorDom.parameterExampleValues.value = parameter?.example_values || '';
   paramEditorDom.parameterOrder.value = parameter?.order || parameters.length + 1;

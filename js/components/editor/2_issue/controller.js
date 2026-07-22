@@ -50,6 +50,7 @@ export function handleTopicSelection(topicId) {
   clearIssueForm();
   setDomIssueValue('');
   handleIssueSelection('');
+  void renderSelectedIssuePreview();
 }
 
 export function selectIssue(issueId) {
@@ -89,7 +90,7 @@ export function setIssueForm(issueId) {
     renderIssueFormFor(issueId);
 }
 
-function onSaveIssue() {
+async function onSaveIssue() {
   try {
     const topic_id = getSelectedTopic();
     const issue_id = issueEditorDom.issueId.value;
@@ -112,6 +113,7 @@ function onSaveIssue() {
 
     renderIssueOptions(topic_id);
     handleIssueSelection(issue_id);
+    await renderSelectedIssuePreview();
 
 
   } catch (error) {
@@ -120,7 +122,7 @@ function onSaveIssue() {
 }
 
 export function getSelectedIssue() {
-    return issueEditorDom.issuePicker.value;
+    return issueEditorDom.issueSelect.value;
 }
 
 function onCreateIssue() {

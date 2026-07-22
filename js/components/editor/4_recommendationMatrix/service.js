@@ -71,6 +71,10 @@ export function saveRecommendation({ recommendationId, finalDecision, recommenda
 }
 
 export function saveRecommendationAssignments(issueId, recommendationId, assignments) {
+  if (!Array.isArray(assignments)) {
+    return getRecommendationAssignments(issueId, recommendationId).length;
+  }
+
   const selectedKeys = new Set(assignments.filter(item => item.selected).map(item => stringifyConditions(item.conditions)));
   let savedCount = 0;
 

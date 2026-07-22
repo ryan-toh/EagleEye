@@ -11,8 +11,18 @@ export function initPreview() {
 export async function copyGraph() {
   if (!appState.lastMermaid) return;
 
-  await navigator.clipboard.writeText(appState.lastMermaid);
-  previewDom.copyMermaidBtn.textContent = 'Copied';
+  try {
+    if (!navigator.clipboard?.writeText) {
+      throw new Error('Clipboard access is unavailable.');
+    }
+
+    await navigator.clipboard.writeText(appState.lastMermaid);
+    previewDom.copyMermaidBtn.textContent = 'Copied';
+  } catch (error) {
+    console.error('Could not copy Mermaid:', error);
+    previewDom.copyMermaidBtn.textContent = 'Copy unavailable';
+  }
+
   setTimeout(() => (previewDom.copyMermaidBtn.textContent = 'Copy Mermaid'), 1200);
 }
 

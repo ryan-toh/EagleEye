@@ -6,7 +6,7 @@ import { initRecomEditor } from "../4_recommendationMatrix/controller.js";
 import { initSharedEditorDom, sharedEditorDom, renderEditorStatus } from "./dom.js";
 
 import { buildIssueFlowchart } from "../../preview/flowchart.js";
-import { setGraph, setIssueSummary } from "../../preview/controller.js";
+import { clearIssueView, setGraph, setIssueSummary } from "../../preview/controller.js";
 import { setStatus } from "../../upload/controller.js";
 
 import { saveWorkbookData } from "../../../fileService.js";
@@ -35,9 +35,15 @@ export function setEditorTopicOptions() {
 }
 
 export async function renderSelectedIssuePreview() {
-  setIssueSummary(getSelectedIssue());
+  const issueId = getSelectedIssue();
+  if (!issueId) {
+    clearIssueView();
+    return;
+  }
 
-  const graphDefinition = buildIssueFlowchart(getSelectedIssue());
+  setIssueSummary(issueId);
+
+  const graphDefinition = buildIssueFlowchart(issueId);
   const result = await setGraph(graphDefinition);
 
   if (!result.ok) {

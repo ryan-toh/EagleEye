@@ -2,7 +2,7 @@ export const headerDom = {};
 
 export function initHeaderDomElements() {
   Object.assign(headerDom, {
-    steppers: initHeaderDomElements(),
+    steppers: initStepperDomElements(),
   })
 }
 

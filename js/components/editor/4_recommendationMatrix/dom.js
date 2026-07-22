@@ -97,7 +97,10 @@ export function renderRecommendationFormFor(recommendationId, issueId) {
 }
 
 export function collectRecommendationAssignments() {
-  return [...recomEditorDom.recommendationAssignments.querySelectorAll('[data-combination]')].map(row => ({
+  const rows = [...recomEditorDom.recommendationAssignments.querySelectorAll('[data-combination]')];
+  if (!rows.length) return null;
+
+  return rows.map(row => ({
     conditions: JSON.parse(row.dataset.combination),
     selected: row.querySelector('.recommendation-assignment__checkbox').checked,
     priority: row.querySelector('.recommendation-assignment__priority').value
