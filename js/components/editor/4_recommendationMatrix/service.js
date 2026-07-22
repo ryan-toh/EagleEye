@@ -3,6 +3,7 @@ import {
   getIssueParameters,
   getIssueRules,
   getRecommendation,
+  getRecommendationsForRules,
   makeUniqueId,
   removeRule,
   upsertRecommendation,
@@ -35,6 +36,12 @@ export function buildParameterCombinations(issueId) {
 
 export function getRecommendations() {
   return [...appState.recommendations].sort((a, b) =>
+    str(a.recommendation_id).localeCompare(str(b.recommendation_id))
+  );
+}
+
+export function getRecommendationsForIssue(issueId) {
+  return getRecommendationsForRules(getIssueRules(issueId)).sort((a, b) =>
     str(a.recommendation_id).localeCompare(str(b.recommendation_id))
   );
 }

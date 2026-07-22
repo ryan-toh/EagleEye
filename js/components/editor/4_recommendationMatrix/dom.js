@@ -5,6 +5,7 @@ import {
   buildParameterCombinations,
   getRecommendationAssignments,
   getRecommendations,
+  getRecommendationsForIssue,
   getRuleForCombination,
   getParametersWithAllowedValues
 } from './service.js';
@@ -45,10 +46,10 @@ export function renderRecommendationOptions(issueId) {
     return;
   }
 
-  const recommendations = getRecommendations();
+  const recommendations = getRecommendationsForIssue(issueId);
 
   if (!recommendations.length) {
-    recomEditorDom.recommList.innerHTML = '<div class="decision-explorer__empty">No recommendations yet</div>';
+    recomEditorDom.recommList.innerHTML = '<div class="decision-explorer__empty">No recommendations assigned to this issue yet</div>';
     return;
   }
 
