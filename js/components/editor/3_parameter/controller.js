@@ -31,7 +31,6 @@ export function onParamClick(event) {
   const paramId = getClickedParamId(event);
 
   if (!paramId) {
-    setEditorStatus("invalid param id.", "error");
     return;
   }
 
@@ -42,7 +41,6 @@ function onParamDblClick(event) {
   const paramId = getClickedParamId(event);
 
   if (!paramId) {
-    setEditorStatus("invalid param id.", "error");
     return;
   }
 
@@ -105,7 +103,7 @@ function onSaveParameter() {
 
     closeDialog(paramEditorDom.paramDialog);
 
-    setEditorStatus('Parameter saved.', 'success');
+    setEditorStatus('Saved parameter. Download to see changes.', 'success');
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }

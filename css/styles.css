@@ -84,6 +84,7 @@ select,
 input[type='text'],
 input[type='number'],
 textarea {
+  resize: none;
   width: 100%;
   padding: 8px 10px;
   color: var(--text);

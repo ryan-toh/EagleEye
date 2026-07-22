@@ -38,7 +38,6 @@ export function onTopicClick(event) {
   const topicId = getClickedTopicId(event);
 
   if (!topicId) {
-    setEditorStatus("invalid topic id.", "error");
     return;
   }
 
@@ -50,7 +49,6 @@ function onTopicDblClick(event) {
   const topicId = getClickedTopicId(event);
 
   if (!topicId) {
-    setEditorStatus("invalid topic id.", "error");
     return;
   }
 
@@ -70,7 +68,7 @@ export function setDomTopicValue(value) {
 
 
 export function getSelectedTopic() {
-    return topicEditorDom.topicPicker.value;
+    return topicEditorDom.topicSelect.value;
 }
 
 export function setTopicForm(topicId) {
@@ -100,14 +98,13 @@ function onSaveTopic() {
 
     refreshTopicPicker();
 
-    setDomTopicValue(topic_id);
-
-    setEditorStatus('Topic saved, refreshed data.', 'success');
+    setEditorStatus('Saved topic. Download to see changes.', 'success');
 
     closeDialog(topicEditorDom.topicDialog);
 
     renderTopicOptions();
-    handleTopicSelection(topic_id);
+    setDomTopicValue('');
+    handleTopicSelection('');
     
   } catch (error) {
     setEditorStatus(error.message, 'error');

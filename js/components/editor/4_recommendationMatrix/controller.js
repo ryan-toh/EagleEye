@@ -70,11 +70,11 @@ async function onSaveRecommendation() {
       : 0;
 
     renderRecommendationOptions(issueId);
-    recomEditorDom.recommSelect.value = recommendation.recommendation_id;
-    setRecommendationSelectedState(recommendation.recommendation_id);
+    recomEditorDom.recommSelect.value = '';
+    setRecommendationSelectedState('');
     closeDialog(recomEditorDom.recommDialog);
     await renderSelectedIssuePreview();
-    setEditorStatus(`Recommendation saved${issueId ? ` with ${assignmentCount} assigned combination(s)` : ''}.`, 'success');
+    setEditorStatus(`Saved${issueId ? ` with ${assignmentCount} assigned combination(s). Download to see changes.` : ''}.`, 'success');
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }

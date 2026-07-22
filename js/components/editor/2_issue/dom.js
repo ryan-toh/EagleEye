@@ -41,7 +41,7 @@ export function renderIssueOptions(topicId) {
     return;
   }
   
-  issueEditorDom.issuePanelHint.textContent = "Choose an issue";
+  issueEditorDom.issuePanelHint.textContent = "Create or double click on issue to edit";
 
   if (!issues.length) {
     issueEditorDom.issueList.innerHTML = `

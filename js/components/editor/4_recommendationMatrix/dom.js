@@ -38,7 +38,7 @@ export function renderRecommendationOptions(issueId) {
   recomEditorDom.recommSelect.value = '';
   recomEditorDom.recommList.innerHTML = '';
   recomEditorDom.recommPanelHint.textContent = issueId
-    ? 'Choose a recommendation to assign to this issue’s combinations'
+    ? 'Create or double click on recommendation to edit'
     : 'Select an issue first';
 
   if (!issueId) {

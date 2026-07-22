@@ -66,7 +66,7 @@
   margin-bottom: 0;
 }
 
-.editor-panel .editor-card {
+.dialog-panel .editor-card {
   position: relative;
   padding: 16px;
   background: #FAFAFA;
@@ -74,14 +74,14 @@
   border-radius: 6px;
 }
 
-.editor-panel .editor-dialog__close-form {
+.dialog-panel .editor-dialog__close-form {
   position: absolute;
   top: 8px;
   right: 8px;
   margin: 0;
 }
 
-.editor-panel .editor-dialog__close {
+.dialog-panel .editor-dialog__close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -97,21 +97,21 @@
   line-height: 1;
 }
 
-.editor-panel .editor-dialog__close:hover {
+.dialog-panel .editor-dialog__close:hover {
   color: #FFFFFF;
   background: #C42B1C;
 }
 
-.editor-panel .editor-dialog__close:focus-visible {
+.dialog-panel .editor-dialog__close:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px rgba(98, 100, 167, 0.4);
 }
 
-.editor-panel .editor-card label {
+.dialog-panel .editor-card label {
   margin-bottom: 10px;
 }
 
-.editor-panel .button-row {
+.dialog-panel .button-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -161,21 +161,19 @@
 }
 
 .editor-explorer__add-btn {
+  float: right;
   margin-left: auto;
-
   width: 20px;
   height: 20px;
   padding: 0;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
+  vertical-align: middle;
   color: var(--accent);
   background: var(--tint);
   border: 1px solid transparent;
   border-radius: 4px;
-
   font-size: 18px;
   font-weight: 600;
   line-height: 1;

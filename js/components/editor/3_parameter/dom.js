@@ -45,7 +45,7 @@ export function renderParamOptions(issueId) {
     return;
   }
 
-  paramEditorDom.paramPanelHint.textContent = "Choose a parameter";
+  paramEditorDom.paramPanelHint.textContent = "Create or double click on parameter to edit";
 
   if (!params.length) {
     paramEditorDom.paramList.innerHTML = `

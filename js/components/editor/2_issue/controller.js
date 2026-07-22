@@ -19,7 +19,6 @@ async function onIssueClick(event) {
   const issueId = getClickedIssueId(event);
 
   if (!issueId) {
-    setEditorStatus("invalid issue id.", "error");
     return;
   }
 
@@ -32,7 +31,6 @@ function onIssueDblClick(event) {
   const issueId = getClickedIssueId(event);
 
   if (!issueId) {
-    setEditorStatus("invalid issue id.", "error");
     return;
   }
 
@@ -105,14 +103,13 @@ async function onSaveIssue() {
 
     refreshIssuePicker(topic_id);
 
-    selectIssue(issue_id);
-
-    setEditorStatus('Issue saved.', 'success');
+    setEditorStatus('Saved issue. Download to see changes.', 'success');
 
     closeDialog(issueEditorDom.issueDialog);
 
     renderIssueOptions(topic_id);
-    handleIssueSelection(issue_id);
+    setDomIssueValue('');
+    handleIssueSelection('');
     await renderSelectedIssuePreview();
 
 
