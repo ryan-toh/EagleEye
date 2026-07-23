@@ -15,6 +15,7 @@ export const recomEditorDom = {};
 export function initRecomEditorDom() {
   Object.assign(recomEditorDom, {
     createRecommendationBtn: document.getElementById('createRecommendationBtn'),
+    recommSearch: document.getElementById('editorRecommendationSearch'),
     recommSelect: document.getElementById('editorRecommendationSelect'),
     recommList: document.getElementById('editorRecommendationList'),
     recommPanelHint: document.getElementById('editorRecommendationPanelHint'),
@@ -35,25 +36,30 @@ export function setRecommendationSelectedState(recommendationId) {
 }
 
 export function renderRecommendationOptions(issueId) {
-  recomEditorDom.recommSelect.value = '';
   recomEditorDom.recommList.innerHTML = '';
   recomEditorDom.recommPanelHint.textContent = issueId
     ? 'Create or double click on recommendation to edit'
     : 'Select an issue first';
 
   if (!issueId) {
+    recomEditorDom.recommSearch.disabled = true;
     recomEditorDom.recommList.innerHTML = '<div class="decision-explorer__empty">Select an issue first</div>';
     return;
   }
 
+  recomEditorDom.recommSearch.disabled = false;
   const recommendations = getRecommendationsForIssue(issueId);
+  const query = recomEditorDom.recommSearch.value.trim().toLowerCase();
+  const matchingRecommendations = recommendations.filter(recommendation =>
+    str(recommendation.final_decision).toLowerCase().includes(query)
+  );
 
-  if (!recommendations.length) {
-    recomEditorDom.recommList.innerHTML = '<div class="decision-explorer__empty">No recommendations assigned to this issue yet</div>';
+  if (!matchingRecommendations.length) {
+    recomEditorDom.recommList.innerHTML = `<div class="decision-explorer__empty">${recommendations.length ? 'No recommendations match your search' : 'No recommendations assigned to this issue yet'}</div>`;
     return;
   }
 
-  recommendations.forEach(recommendation => {
+  matchingRecommendations.forEach(recommendation => {
     const assignmentCount = issueId
       ? getRecommendationAssignments(issueId, recommendation.recommendation_id).length
       : 0;
@@ -68,6 +74,8 @@ export function renderRecommendationOptions(issueId) {
     });
     recomEditorDom.recommList.appendChild(item);
   });
+
+  setRecommendationSelectedState(recomEditorDom.recommSelect.value);
 }
 
 export function getClickedRecommendationId(event) {

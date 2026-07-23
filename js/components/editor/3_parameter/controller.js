@@ -10,6 +10,7 @@ export function initParamEditor() {
     paramEditorDom.parameterPicker.addEventListener('change', onParamPicked);
     paramEditorDom.saveParameterBtn.addEventListener('click', onSaveParameter);
     paramEditorDom.createParamBtn.addEventListener('click', onCreateParam);
+    paramEditorDom.paramSearch.addEventListener('input', () => renderParamOptions(getSelectedIssue()));
 
     paramEditorDom.paramList.addEventListener('click', onParamClick);
     paramEditorDom.paramList.addEventListener('dblclick', onParamDblClick);

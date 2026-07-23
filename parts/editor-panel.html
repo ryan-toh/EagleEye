@@ -2,8 +2,8 @@
 <section class="panel editor-panel hidden" id="editor-panel">
   <div class="editor-panel__header">
     <div>
-      <h2>Edit or create a decision tree</h2>
-      <p class="helper-text">Create topics, issues, parameters, and reusable recommendations. Assign each recommendation to the combinations where it applies.</p>
+      <h2>Your Knowledge Base</h2>
+      <p class="helper-text">Don't know where to start? Read the guide <a href="/user-guide.html">here</a></p>
     </div>
   </div>
 
@@ -23,7 +23,11 @@
         </button>
       </div>
 
-      <div 
+      <div class="editor-explorer__search">
+        <input id="editorTopicSearch" type="search" placeholder="Search topics" aria-label="Search topics" autocomplete="off">
+      </div>
+
+      <div
         class="decision-explorer__list" 
         id="editorTopicList"
         aria-label="Topics"
@@ -48,7 +52,11 @@
         </button>
       </div>
 
-      <div 
+      <div class="editor-explorer__search">
+        <input id="editorIssueSearch" type="search" placeholder="Search issues" aria-label="Search issues" autocomplete="off" disabled>
+      </div>
+
+      <div
         class="decision-explorer__list" 
         id="editorIssueList"
         aria-label="Issues"
@@ -70,7 +78,11 @@
         </button>
       </div>
 
-      <div 
+      <div class="editor-explorer__search">
+        <input id="editorParamSearch" type="search" placeholder="Search parameters" aria-label="Search parameters" autocomplete="off" disabled>
+      </div>
+
+      <div
         class="decision-explorer__list" 
         id="editorParamList"
         aria-label="Parameters"
@@ -89,7 +101,10 @@
         </p>
         <button id="createRecommendationBtn" class="editor-explorer__add-btn" type="button">+</button>
     </div>
-    <div 
+    <div class="editor-explorer__search">
+      <input id="editorRecommendationSearch" type="search" placeholder="Search final decisions" aria-label="Search recommendations" autocomplete="off" disabled>
+    </div>
+    <div
         class="decision-explorer__list" 
         id="editorRecommendationList"
         aria-label="Recommendations"

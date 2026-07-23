@@ -13,6 +13,7 @@ export function initIssueEditorDom() {
         issueExamples: document.getElementById('editorIssueExamples'),
         saveIssueBtn: document.getElementById('saveIssueBtn'),
         createIssueBtn: document.getElementById('createIssueBtn'),
+        issueSearch: document.getElementById('editorIssueSearch'),
 
         issueSelect: document.getElementById("editorIssueSelect"),
         issueList: document.getElementById("editorIssueList"),
@@ -28,10 +29,10 @@ export function setIssueSelectedState(issueId) {
 export function renderIssueOptions(topicId) {
   const issues = topicId ? getIssuesForTopic(topicId) : [];
 
-  issueEditorDom.issueSelect.value = "";
   issueEditorDom.issueList.innerHTML = "";
 
   if (!topicId) {
+    issueEditorDom.issueSearch.disabled = true;
     issueEditorDom.issuePanelHint.textContent = "Select a topic first";
     issueEditorDom.issueList.innerHTML = `
       <div class="decision-explorer__empty">
@@ -40,19 +41,25 @@ export function renderIssueOptions(topicId) {
     `;
     return;
   }
-  
+
+  issueEditorDom.issueSearch.disabled = false;
   issueEditorDom.issuePanelHint.textContent = "Create or double click on issue to edit";
 
-  if (!issues.length) {
+  const query = issueEditorDom.issueSearch.value.trim().toLowerCase();
+  const matchingIssues = issues.filter(issue =>
+    str(issue.issue_name).toLowerCase().includes(query)
+  );
+
+  if (!matchingIssues.length) {
     issueEditorDom.issueList.innerHTML = `
       <div class="decision-explorer__empty">
-        No issues found for this topic
+        ${issues.length ? 'No issues match your search' : 'No issues found for this topic'}
       </div>
     `;
     return;
   }
 
-  issues.forEach(issue => {
+  matchingIssues.forEach(issue => {
     const item = createExplorerItem({
       id: issue.issue_id,
       title: issue.issue_name,
@@ -63,6 +70,8 @@ export function renderIssueOptions(topicId) {
 
     issueEditorDom.issueList.appendChild(item);
   });
+
+  setIssueSelectedState(issueEditorDom.issueSelect.value);
 }
 
 export function getClickedIssueId(event) {

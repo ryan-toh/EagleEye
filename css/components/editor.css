@@ -47,6 +47,41 @@
   user-select: none;
 }
 
+.editor-panel .decision-explorer__pane-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.editor-panel .decision-explorer__pane-header h3 {
+  grid-column: 1;
+  grid-row: 1;
+  width: auto;
+}
+
+.editor-panel .decision-explorer__pane-header .helper-text {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.editor-panel .decision-explorer__pane-header .editor-explorer__add-btn {
+  grid-column: 2;
+  grid-row: 1;
+  float: none;
+  margin-left: 0;
+}
+
+.editor-explorer__search {
+  padding: 8px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.editor-explorer__search input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .editor-panel .editor-form-pane {
   display: flex;
   flex-direction: column;

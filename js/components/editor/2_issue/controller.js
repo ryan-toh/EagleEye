@@ -10,6 +10,7 @@ export function initIssueEditor() {
     issueEditorDom.issuePicker.addEventListener('change', onIssuePicked);
     issueEditorDom.saveIssueBtn.addEventListener('click', onSaveIssue);
     issueEditorDom.createIssueBtn.addEventListener('click', onCreateIssue);
+    issueEditorDom.issueSearch.addEventListener('input', () => renderIssueOptions(getSelectedTopic()));
 
     issueEditorDom.issueList.addEventListener('click', onIssueClick);
     issueEditorDom.issueList.addEventListener('dblclick', onIssueDblClick);

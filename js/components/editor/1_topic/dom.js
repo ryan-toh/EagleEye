@@ -13,6 +13,7 @@ export function initTopicEditorDom() {
         topicExamples: document.getElementById('editorTopicExamples'),
         saveTopicBtn: document.getElementById('saveTopicBtn'),
         createTopicBtn: document.getElementById('createTopicBtn'),
+        topicSearch: document.getElementById('editorTopicSearch'),
 
         topicSelect: document.getElementById("editorTopicSelect"),
         topicList: document.getElementById("editorTopicList"),
@@ -32,19 +33,22 @@ export function setTopicSelectedState(topicId) {
 }
 
 export function renderTopicOptions() {
-  topicEditorDom.topicSelect.value = "";
   topicEditorDom.topicList.innerHTML = "";
+  const query = topicEditorDom.topicSearch.value.trim().toLowerCase();
+  const topics = appState.topics.filter(topic =>
+    str(topic.topic_name).toLowerCase().includes(query)
+  );
 
-  if (!appState.topics.length) {
+  if (!topics.length) {
     topicEditorDom.topicList.innerHTML = `
       <div class="decision-explorer__empty">
-        Load files first
+        ${appState.topics.length ? 'No topics match your search' : 'Load files first'}
       </div>
     `;
     return;
   }
 
-  appState.topics.forEach(topic => {
+  topics.forEach(topic => {
     const item = createExplorerItem({
       id: topic.topic_id,
       title: topic.topic_name,
@@ -56,6 +60,7 @@ export function renderTopicOptions() {
     topicEditorDom.topicList.appendChild(item)
   });
 
+  setTopicSelectedState(topicEditorDom.topicSelect.value);
 }
 
 export function renderTopicPicker() {

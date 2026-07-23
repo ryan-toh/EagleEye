@@ -9,7 +9,8 @@ export function initTopicEditor() {
     topicEditorDom.topicPicker.addEventListener('change', onTopicPicked);
     topicEditorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
     topicEditorDom.createTopicBtn.addEventListener('click', onCreateTopic);
-    
+    topicEditorDom.topicSearch.addEventListener('input', renderTopicOptions);
+
     topicEditorDom.topicList.addEventListener('click', onTopicClick);
     topicEditorDom.topicList.addEventListener('dblclick', onTopicDblClick);
 }

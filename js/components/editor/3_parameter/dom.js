@@ -16,6 +16,7 @@ export function initParamEditorDom() {
         parameterOrder: document.getElementById('editorParameterOrder'),
         saveParameterBtn: document.getElementById('saveParameterBtn'),
         createParamBtn: document.getElementById('createParamBtn'),
+        paramSearch: document.getElementById('editorParamSearch'),
 
         paramSelect: document.getElementById('editorParamSelect'),
         paramList: document.getElementById('editorParamList'),
@@ -32,10 +33,10 @@ export function setParamSelectedState(paramId) {
 export function renderParamOptions(issueId) {
   const params = issueId ? getIssueParameters(issueId) : [];
 
-  paramEditorDom.paramSelect.value = "";
   paramEditorDom.paramList.innerHTML = "";
 
   if (!issueId) {
+    paramEditorDom.paramSearch.disabled = true;
     paramEditorDom.paramPanelHint.textContent = "Select an issue first";
     paramEditorDom.paramList.innerHTML = `
       <div class="decision-explorer__empty">
@@ -45,18 +46,24 @@ export function renderParamOptions(issueId) {
     return;
   }
 
+  paramEditorDom.paramSearch.disabled = false;
   paramEditorDom.paramPanelHint.textContent = "Create or double click on parameter to edit";
 
-  if (!params.length) {
+  const query = paramEditorDom.paramSearch.value.trim().toLowerCase();
+  const matchingParams = params.filter(param =>
+    str(param.parameter_name).toLowerCase().includes(query)
+  );
+
+  if (!matchingParams.length) {
     paramEditorDom.paramList.innerHTML = `
       <div class="decision-explorer__empty">
-        No parameters found for this issue
+        ${params.length ? 'No parameters match your search' : 'No parameters found for this issue'}
       </div>
     `;
     return;
   }
 
-  params.forEach(param => {
+  matchingParams.forEach(param => {
     const item = createExplorerItem({
       id: param.parameter_id,
       title: param.parameter_name,
@@ -67,6 +74,8 @@ export function renderParamOptions(issueId) {
 
     paramEditorDom.paramList.appendChild(item);
   });
+
+  setParamSelectedState(paramEditorDom.paramSelect.value);
 }
 
 export function getClickedParamId(event) {

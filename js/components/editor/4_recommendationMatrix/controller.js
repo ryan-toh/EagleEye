@@ -16,6 +16,7 @@ import { saveRecommendation, saveRecommendationAssignments } from './service.js'
 export function initRecomEditor() {
   initRecomEditorDom();
   recomEditorDom.createRecommendationBtn.addEventListener('click', onCreateRecommendation);
+  recomEditorDom.recommSearch.addEventListener('input', () => renderRecommendationOptions(getSelectedIssue()));
   recomEditorDom.recommList.addEventListener('click', onRecommendationClick);
   recomEditorDom.recommList.addEventListener('dblclick', onRecommendationDoubleClick);
   recomEditorDom.recommendationPicker.addEventListener('change', onRecommendationPicked);
