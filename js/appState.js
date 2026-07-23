@@ -130,6 +130,43 @@ export function upsertParameter(parameter) {
   return normalized;
 }
 
+export function moveIssueToTopic(issueId, topicId) {
+  const issue = getIssue(issueId);
+  const targetTopic = getTopic(topicId);
+
+  if (!issue) throw new Error(`Cannot move issue: issue_id ${issueId} does not exist.`);
+  if (!targetTopic) throw new Error(`Cannot move issue: topic_id ${topicId} does not exist.`);
+  if (str(issue.topic_id) === str(topicId)) return issue;
+
+  issue.topic_id = str(topicId);
+  return issue;
+}
+
+export function moveParameterToIssue(parameterId, issueId) {
+  const parameter = appState.parameters.find(param => str(param.parameter_id) === str(parameterId));
+  const targetIssue = getIssue(issueId);
+
+  if (!parameter) throw new Error(`Cannot move parameter: parameter_id ${parameterId} does not exist.`);
+  if (!targetIssue) throw new Error(`Cannot move parameter: issue_id ${issueId} does not exist.`);
+  if (str(parameter.issue_id) === str(issueId)) return parameter;
+
+  const rulesToRemove = appState.rules
+    .filter(rule => {
+      try {
+        const conditions = JSON.parse(rule.conditions);
+        return conditions && Object.hasOwn(conditions, str(parameterId));
+      } catch {
+        return false;
+      }
+    })
+    .map(rule => rule.rule_id);
+
+  rulesToRemove.forEach(removeRule);
+  parameter.issue_id = str(issueId);
+  parameter.order = str(nextParameterOrder(issueId));
+  return parameter;
+}
+
 export function upsertRecommendation(recommendation) {
   
   const normalized = {

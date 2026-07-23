@@ -1,6 +1,7 @@
 import { getSelectedTopic } from "../1_topic/controller.js";
+import { topicEditorDom } from "../1_topic/dom.js";
 import { handleIssueSelection } from "../3_parameter/controller.js";
-import { removeIssue, upsertIssue } from "../../../appState.js";
+import { moveIssueToTopic, removeIssue, upsertIssue } from "../../../appState.js";
 import { closeDialog, renderSelectedIssuePreview, setEditorStatus } from "../shared/controller.js";
 import { issueEditorDom, initIssueEditorDom, renderIssueFormFor, renderIssuePickerFor, renderIssueOptions, getClickedIssueId, setIssueSelectedState } from "./dom.js";
 
@@ -14,6 +15,12 @@ export function initIssueEditor() {
 
     issueEditorDom.issueList.addEventListener('click', onIssueClick);
     issueEditorDom.issueList.addEventListener('dblclick', onIssueDblClick);
+    issueEditorDom.issueList.addEventListener('dragstart', onIssueDragStart);
+    issueEditorDom.issueList.addEventListener('dragend', clearDragState);
+
+    topicEditorDom.topicList.addEventListener('dragover', onTopicDragOver);
+    topicEditorDom.topicList.addEventListener('dragleave', onTopicDragLeave);
+    topicEditorDom.topicList.addEventListener('drop', onTopicDrop);
 }
 
 async function onIssueClick(event) {
@@ -150,4 +157,53 @@ function onCreateIssue() {
 function selectIssueForEditing(issueId) {
   selectIssue(issueId);
   renderIssueFormFor(issueId);
+}
+
+function onIssueDragStart(event) {
+  const issueId = getClickedIssueId(event);
+  if (!issueId) return;
+
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('application/x-eagle-eye-issue', issueId);
+  event.target.closest('.decision-explorer__row')?.classList.add('is-dragging');
+}
+
+function onTopicDragOver(event) {
+  const target = event.target.closest('[data-topic-id]');
+  if (!target || !hasDragType(event, 'issue')) return;
+
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  topicEditorDom.topicList.querySelectorAll('.is-drop-target').forEach(row => row.classList.remove('is-drop-target'));
+  target.closest('.decision-explorer__row')?.classList.add('is-drop-target');
+}
+
+function onTopicDragLeave(event) {
+  if (event.currentTarget.contains(event.relatedTarget)) return;
+  clearDragState();
+}
+
+function onTopicDrop(event) {
+  const target = event.target.closest('[data-topic-id]');
+  const draggedIssueId = event.dataTransfer.getData('application/x-eagle-eye-issue');
+  clearDragState();
+  if (!target || !draggedIssueId) return;
+
+  event.preventDefault();
+  try {
+    const movedIssue = moveIssueToTopic(draggedIssueId, target.dataset.topicId);
+    handleTopicSelection(getSelectedTopic());
+    setEditorStatus(`Moved ${movedIssue.issue_name}. Download to save changes.`, 'success');
+  } catch (error) {
+    setEditorStatus(error.message, 'error');
+  }
+}
+
+function hasDragType(event, type) {
+  return type === 'issue' && event.dataTransfer.types.includes('application/x-eagle-eye-issue');
+}
+
+function clearDragState() {
+  document.querySelectorAll('.decision-explorer__row.is-dragging, .decision-explorer__row.is-drop-target')
+    .forEach(row => row.classList.remove('is-dragging', 'is-drop-target'));
 }

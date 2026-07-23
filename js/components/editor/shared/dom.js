@@ -20,6 +20,7 @@ export function createExplorerItem({ id, title, meta, type, icon }) {
 
   button.type = "button";
   button.className = "decision-explorer__item";
+  button.draggable = type === "issue" || type === "param";
   row.className = "decision-explorer__row";
 
   deleteButton.type = "button";

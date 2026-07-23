@@ -119,6 +119,24 @@
   font-weight: 600;
 }
 
+.decision-explorer__item[draggable="true"] {
+  cursor: grab;
+}
+
+.decision-explorer__item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.decision-explorer__row.is-dragging {
+  opacity: 0.45;
+}
+
+.decision-explorer__row.is-drop-target .decision-explorer__item {
+  color: var(--accent-dark);
+  background: var(--tint);
+  border-color: var(--accent);
+}
+
 .decision-explorer__delete {
   flex: 0 0 auto;
   width: 28px;
