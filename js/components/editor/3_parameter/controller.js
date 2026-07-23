@@ -1,7 +1,7 @@
 import { getSelectedIssue } from "../2_issue/controller.js";
 import { initParamEditorDom, paramEditorDom, renderParameterPicker, renderParamFormFor, renderParamOptions, getClickedParamId, setParamSelectedState } from "./dom.js";
-import { upsertParameter } from "../../../appState.js";
-import { setEditorStatus, closeDialog } from "../shared/controller.js";
+import { removeParameter, upsertParameter } from "../../../appState.js";
+import { setEditorStatus, closeDialog, renderSelectedIssuePreview } from "../shared/controller.js";
 import { refreshRecommendations } from "../4_recommendationMatrix/controller.js";
 
 export function initParamEditor() {
@@ -34,10 +34,24 @@ export function onParamClick(event) {
     return;
   }
 
+  if (event.target.closest('.decision-explorer__delete')) {
+    const issueId = getSelectedIssue();
+    removeParameter(paramId);
+    renderParameterPicker(issueId);
+    renderParamOptions(issueId);
+    setDomParamValue('');
+    refreshRecommendations(issueId);
+    void renderSelectedIssuePreview();
+    setEditorStatus('Parameter deleted. Download to save changes.', 'success');
+    return;
+  }
+
   setDomParamValue(paramId);
 }
 
 function onParamDblClick(event) {
+  if (event.target.closest('.decision-explorer__delete')) return;
+
   const paramId = getClickedParamId(event);
 
   if (!paramId) {

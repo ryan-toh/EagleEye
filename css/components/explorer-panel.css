@@ -68,14 +68,22 @@
 /* Explorer rows
    Overrides the global filled button style from styles.css.
 */
+.decision-explorer__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
 .decision-explorer__item {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
 
   padding: 8px 10px;
-  margin-bottom: 4px;
+  margin-bottom: 0;
 
   color: var(--text);
   background: transparent;
@@ -109,6 +117,32 @@
   background: var(--tint);
   border-color: var(--accent);
   font-weight: 600;
+}
+
+.decision-explorer__delete {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--danger);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.decision-explorer__delete:hover,
+.decision-explorer__delete:focus-visible {
+  color: var(--danger);
+  background: #FFFFFF;
+  border-color: var(--border);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+}
+
+.decision-explorer__delete:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(196 43 28 / 25%), 0 1px 4px rgb(0 0 0 / 18%);
 }
 
 /* Row content */

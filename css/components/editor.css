@@ -41,6 +41,12 @@
   min-height: 520px;
 }
 
+.editor-panel .decision-explorer.is-resizing,
+.editor-panel .decision-explorer.is-resizing * {
+  cursor: col-resize !important;
+  user-select: none;
+}
+
 .editor-panel .editor-form-pane {
   display: flex;
   flex-direction: column;

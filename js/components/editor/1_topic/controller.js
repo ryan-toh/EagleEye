@@ -1,7 +1,7 @@
 import { handleTopicSelection } from "../2_issue/controller.js";
 import { setEditorStatus, closeDialog } from "../shared/controller.js";
 import { initTopicEditorDom, topicEditorDom, renderTopicFormFor, renderTopicPicker, getClickedTopicId, setTopicSelectedState, renderTopicOptions } from "./dom.js";
-import { upsertTopic } from "../../../appState.js";
+import { removeTopic, upsertTopic } from "../../../appState.js";
 
 export function initTopicEditor() {
     initTopicEditorDom();
@@ -41,11 +41,23 @@ export function onTopicClick(event) {
     return;
   }
 
+  if (event.target.closest('.decision-explorer__delete')) {
+    removeTopic(topicId);
+    refreshTopicPicker();
+    renderTopicOptions();
+    setDomTopicValue('');
+    handleTopicSelection('');
+    setEditorStatus('Topic deleted. Download to save changes.', 'success');
+    return;
+  }
+
   setDomTopicValue(topicId);
   handleTopicSelection(topicId);
 }
 
 function onTopicDblClick(event) {
+  if (event.target.closest('.decision-explorer__delete')) return;
+
   const topicId = getClickedTopicId(event);
 
   if (!topicId) {

@@ -4,6 +4,7 @@ export function initSharedEditorDom() {
   Object.assign(sharedEditorDom, {
     editorStatus: document.getElementById('editorStatus'),
     saveSheetBtn: document.getElementById('saveSheetBtn'),
+    editorExplorer: document.querySelector('#editor-panel .decision-explorer'),
   });
 }
 
@@ -13,25 +14,38 @@ export function renderEditorStatus(message, type = '') {
 }
 
 export function createExplorerItem({ id, title, meta, type, icon }) {
+  const row = document.createElement("div");
   const button = document.createElement("button");
+  const deleteButton = document.createElement("button");
 
   button.type = "button";
   button.className = "decision-explorer__item";
+  row.className = "decision-explorer__row";
+
+  deleteButton.type = "button";
+  deleteButton.className = "decision-explorer__delete";
+  deleteButton.setAttribute("aria-label", `Delete ${title}`);
+  deleteButton.title = `Delete ${title}`;
+  deleteButton.textContent = "-";
 
   if (type === "topic") {
     button.dataset.topicId = String(id);
+    row.dataset.topicId = String(id);
   }
 
   if (type === "issue") {
     button.dataset.issueId = String(id);
+    row.dataset.issueId = String(id);
   }
 
   if (type === "param") {
     button.dataset.paramId = String(id);
+    row.dataset.paramId = String(id);
   }
 
   if (type === "recommendation") {
     button.dataset.recommendationId = String(id);
+    row.dataset.recommendationId = String(id);
   }
 
   button.innerHTML = `
@@ -56,5 +70,6 @@ export function createExplorerItem({ id, title, meta, type, icon }) {
     metaElement.textContent = meta;
   }
 
-  return button;
+  row.append(button, deleteButton);
+  return row;
 }

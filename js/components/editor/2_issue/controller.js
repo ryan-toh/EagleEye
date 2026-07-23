@@ -1,6 +1,6 @@
 import { getSelectedTopic } from "../1_topic/controller.js";
 import { handleIssueSelection } from "../3_parameter/controller.js";
-import { upsertIssue } from "../../../appState.js";
+import { removeIssue, upsertIssue } from "../../../appState.js";
 import { closeDialog, renderSelectedIssuePreview, setEditorStatus } from "../shared/controller.js";
 import { issueEditorDom, initIssueEditorDom, renderIssueFormFor, renderIssuePickerFor, renderIssueOptions, getClickedIssueId, setIssueSelectedState } from "./dom.js";
 
@@ -22,12 +22,26 @@ async function onIssueClick(event) {
     return;
   }
 
+  if (event.target.closest('.decision-explorer__delete')) {
+    const topicId = getSelectedTopic();
+    removeIssue(issueId);
+    renderIssueOptions(topicId);
+    refreshIssuePicker(topicId);
+    setDomIssueValue('');
+    handleIssueSelection('');
+    await renderSelectedIssuePreview();
+    setEditorStatus('Issue deleted. Download to save changes.', 'success');
+    return;
+  }
+
   selectIssue(issueId);
   handleIssueSelection(issueId);
   await renderSelectedIssuePreview();
 }
 
 function onIssueDblClick(event) {
+  if (event.target.closest('.decision-explorer__delete')) return;
+
   const issueId = getClickedIssueId(event);
 
   if (!issueId) {

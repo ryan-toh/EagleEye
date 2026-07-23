@@ -107,7 +107,7 @@ export function getSampleWorkbookData() {
     rules: [{
       rule_id: "RULE_001",
       issue_id: "ISSUE_001",
-      conditions: "Sample Parameter = Yes",
+      conditions: '{"Sample Parameter" = "Yes"}',
       recommendation_id: "REC_001",
       priority: 1,
     }],

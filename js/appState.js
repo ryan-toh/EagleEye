@@ -170,11 +170,105 @@ export function upsertRule(rule) {
   return normalized;
 }
 
+/*
+Removes a topic from the appState.
+Deletes all issues, parameters, rules & recommendations associated with the topicId
+*/
+export function removeTopic(topicId) {
+  const toRemoveIssues = appState.issues
+    .filter(issue => str(issue.topic_id) === str(topicId))
+    .flatMap(issue => issue.issue_id);
+
+  for (let i = 0; i < toRemoveIssues.length; i++) {
+    removeIssue(toRemoveIssues[i]);
+  }
+
+  const index = appState.topics.findIndex(topic => str(topic.topic_id) === str(topicId));
+
+  if (index >= 0) {
+    appState.topics.splice(index, 1);
+  }
+}
+
+/*
+Removes an issue from the appState.
+Deletes all parameters, rules & recommendations associated with the issueId
+*/
+export function removeIssue(issueId) {
+  const toRemoveParameters = appState.parameters
+    .filter(param => str(param.issue_id) === str(issueId))
+    .flatMap(param => param.parameter_id);
+
+  for (let i = 0; i < toRemoveParameters.length; i++) {
+    removeParameter(toRemoveParameters[i]);
+  }
+  
+  const index = appState.issues.findIndex(issue => str(issue.issue_id) === str(issueId));
+
+  if (index >= 0) {
+    appState.issues.splice(index, 1);
+  }
+}
+
+/*
+Removes a parameter from the appState.
+Deletes all rules & recommendations associated with the paramId
+*/
+export function removeParameter(paramId) {
+  const toRemoveRules = appState.rules
+    .filter(rule => {
+      try {
+        const conditions = JSON.parse(rule.conditions);
+        return conditions && Object.hasOwn(conditions, str(paramId));
+      } catch {
+        return false;
+      }
+    })
+    .flatMap(rule => rule.rule_id);
+
+
+  for (let j = 0; j < toRemoveRules.length; j++) {
+    removeRule(toRemoveRules[j]);
+  }
+
+  const index = appState.parameters.findIndex(param => str(param.parameter_id) === str(paramId));
+
+  if (index >= 0) {
+    appState.parameters.splice(index, 1);
+  }
+
+}
+
+/*
+Removes a rule from the appState.
+Deletes all recommendations associated with the ruleId if no longer used
+*/
 export function removeRule(ruleId) {
   const index = appState.rules.findIndex(rule => str(rule.rule_id) === str(ruleId));
 
   if (index >= 0) {
+    const recommendationId = appState.rules[index].recommendation_id;
+
     appState.rules.splice(index, 1);
+
+    const isStillUsed = appState.rules.some(
+      rule => str(rule.recommendation_id) === str(recommendationId)
+    );
+
+    if (!isStillUsed) {
+      removeRecommendation(recommendationId);
+    }
+  }
+}
+
+/*
+Removes a recommendation from the appState.
+*/
+export function removeRecommendation(recomId) {
+  const index = appState.recommendations.findIndex(recom => str(recom.recommendation_id) == str(recomId));
+
+  if (index >= 0) {
+    appState.recommendations.splice(index, 1);
   }
 }
 

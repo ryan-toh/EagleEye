@@ -1,5 +1,6 @@
 import { getSelectedIssue } from '../2_issue/controller.js';
 import { closeDialog, renderSelectedIssuePreview, setEditorStatus } from '../shared/controller.js';
+import { appState, removeRecommendation, removeRule } from '../../../appState.js';
 import {
   collectRecommendationAssignments,
   getClickedRecommendationId,
@@ -35,13 +36,29 @@ function onCreateRecommendation() {
 
 function onRecommendationClick(event) {
   const recommendationId = getClickedRecommendationId(event);
-  if (recommendationId) {
-    recomEditorDom.recommSelect.value = recommendationId;
-    setRecommendationSelectedState(recommendationId);
+  if (!recommendationId) return;
+
+  if (event.target.closest('.decision-explorer__delete')) {
+    appState.rules
+      .filter(rule => rule.recommendation_id === recommendationId)
+      .map(rule => rule.rule_id)
+      .forEach(removeRule);
+    removeRecommendation(recommendationId);
+    const issueId = getSelectedIssue();
+    renderRecommendationOptions(issueId);
+    setRecommendationSelectedState('');
+    void renderSelectedIssuePreview();
+    setEditorStatus('Recommendation deleted. Download to save changes.', 'success');
+    return;
   }
+
+  recomEditorDom.recommSelect.value = recommendationId;
+  setRecommendationSelectedState(recommendationId);
 }
 
 function onRecommendationDoubleClick(event) {
+  if (event.target.closest('.decision-explorer__delete')) return;
+
   const recommendationId = getClickedRecommendationId(event);
   if (!recommendationId) return;
   recomEditorDom.recommSelect.value = recommendationId;
