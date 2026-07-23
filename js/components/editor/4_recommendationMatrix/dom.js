@@ -5,6 +5,7 @@ import {
   buildParameterCombinations,
   getRecommendationAssignments,
   getRecommendations,
+  getRecommendationsForIssue,
   getRuleForCombination,
   getParametersWithAllowedValues
 } from './service.js';
@@ -37,7 +38,7 @@ export function renderRecommendationOptions(issueId) {
   recomEditorDom.recommSelect.value = '';
   recomEditorDom.recommList.innerHTML = '';
   recomEditorDom.recommPanelHint.textContent = issueId
-    ? 'Choose a recommendation to assign to this issue’s combinations'
+    ? 'Create or double click on recommendation to edit'
     : 'Select an issue first';
 
   if (!issueId) {
@@ -45,10 +46,10 @@ export function renderRecommendationOptions(issueId) {
     return;
   }
 
-  const recommendations = getRecommendations();
+  const recommendations = getRecommendationsForIssue(issueId);
 
   if (!recommendations.length) {
-    recomEditorDom.recommList.innerHTML = '<div class="decision-explorer__empty">No recommendations yet</div>';
+    recomEditorDom.recommList.innerHTML = '<div class="decision-explorer__empty">No recommendations assigned to this issue yet</div>';
     return;
   }
 
@@ -79,7 +80,7 @@ export function renderRecommendationPicker() {
   getRecommendations().forEach(recommendation => {
     const option = document.createElement('option');
     option.value = recommendation.recommendation_id;
-    option.textContent = `${recommendation.final_decision || 'Clarify'} — ${recommendation.recommendation_id}`;
+    option.textContent = `${recommendation.final_decision || 'Clarify'}: ${recommendation.recommendation_id}`;
     recomEditorDom.recommendationPicker.appendChild(option);
   });
 }
@@ -96,7 +97,10 @@ export function renderRecommendationFormFor(recommendationId, issueId) {
 }
 
 export function collectRecommendationAssignments() {
-  return [...recomEditorDom.recommendationAssignments.querySelectorAll('[data-combination]')].map(row => ({
+  const rows = [...recomEditorDom.recommendationAssignments.querySelectorAll('[data-combination]')];
+  if (!rows.length) return null;
+
+  return rows.map(row => ({
     conditions: JSON.parse(row.dataset.combination),
     selected: row.querySelector('.recommendation-assignment__checkbox').checked,
     priority: row.querySelector('.recommendation-assignment__priority').value

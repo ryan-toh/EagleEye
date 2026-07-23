@@ -19,7 +19,6 @@ async function onIssueClick(event) {
   const issueId = getClickedIssueId(event);
 
   if (!issueId) {
-    setEditorStatus("invalid issue id.", "error");
     return;
   }
 
@@ -32,7 +31,6 @@ function onIssueDblClick(event) {
   const issueId = getClickedIssueId(event);
 
   if (!issueId) {
-    setEditorStatus("invalid issue id.", "error");
     return;
   }
 
@@ -50,6 +48,7 @@ export function handleTopicSelection(topicId) {
   clearIssueForm();
   setDomIssueValue('');
   handleIssueSelection('');
+  void renderSelectedIssuePreview();
 }
 
 export function selectIssue(issueId) {
@@ -89,7 +88,7 @@ export function setIssueForm(issueId) {
     renderIssueFormFor(issueId);
 }
 
-function onSaveIssue() {
+async function onSaveIssue() {
   try {
     const topic_id = getSelectedTopic();
     const issue_id = issueEditorDom.issueId.value;
@@ -104,14 +103,14 @@ function onSaveIssue() {
 
     refreshIssuePicker(topic_id);
 
-    selectIssue(issue_id);
-
-    setEditorStatus('Issue saved.', 'success');
+    setEditorStatus('Saved issue. Download to see changes.', 'success');
 
     closeDialog(issueEditorDom.issueDialog);
 
     renderIssueOptions(topic_id);
-    handleIssueSelection(issue_id);
+    setDomIssueValue('');
+    handleIssueSelection('');
+    await renderSelectedIssuePreview();
 
 
   } catch (error) {
@@ -120,7 +119,7 @@ function onSaveIssue() {
 }
 
 export function getSelectedIssue() {
-    return issueEditorDom.issuePicker.value;
+    return issueEditorDom.issueSelect.value;
 }
 
 function onCreateIssue() {

@@ -1,442 +1,226 @@
-# Why are you here?
+# EagleEye
 
-## You would like to create a Chatbot that uses a decision tree, and you want the data to be stored in an easily accessible format, like an Excel sheet.
+> A web application for creating, viewing, editing, validating, and exporting structured decision-support chatbot knowledge bases.
 
-### If this is right, read on.
-
----
-
-# Decision Tree Visualizer
-
-A simple web application for creating, viewing, editing, validating, and exporting structured decision-support chatbot data.
-
-The application helps maintain a rule-based chatbot knowledge base using an Excel workbook. It supports topics, issues, parameters, decision rules, and recommendations, and can visualise selected issues as flowcharts.
+This guide was put together by a human.
 
 ---
 
-## 1. Overview
+# Table of Contents
 
-The Decision Tree Visualizer is designed for structured decision-support chatbots that need to:
+* [Introduction](#introduction)
+* [User Guide](#user-guide)
+
+  * [Getting Started](#getting-started)
+  * [Creating a Chatbot](#creating-a-chatbot)
+  * [Features](#features)
+* [Developer Guide](#developer-guide)
+
+---
+
+# Introduction
+
+## What is EagleEye?
+
+EagleEye is a web application for building and maintaining structured decision-support chatbot knowledge bases.
+
+Instead of manually creating complex decision trees, EagleEye allows you to define chatbot behaviour using a structured Excel workbook consisting of:
+
+* Topics
+* Issues
+* Parameters
+* Decision Rules
+* Recommendations
+
+The workbook becomes the source of truth for a rule-based chatbot.
+
+EagleEye itself is **not** the chatbot. It is an authoring tool used to create and maintain the chatbot's knowledge base.
+
+---
+
+## Who is this guide for?
+
+Choose the section that best matches your needs:
+
+### Users
+
+You're in the right place if you want to:
+
+* Build a structured decision-support chatbot.
+* Create or edit chatbot knowledge bases.
+* Visualise decision flows.
+* Export chatbot data for use with a RAG or rule-based chatbot.
+
+### Developers
+
+The Developer Guide includes:
+
+* Application architecture
+* Workbook schema
+* Data rules
+* Troubleshooting
+* Future improvements
+
+---
+
+# User Guide
+
+## Getting Started
+
+### Option 1: COMET / GSIB Users (Windows)
+
+Installation is not required.
+
+To use EagleEye:
+
+1. Go to https://eagle.cio.sandbox.gov.sg.
+2. Download a template workbook if you're creating a new chatbot.
+3. Assign an appropriate security classification to the template if required.
+4. Upload either:
+
+   * the template workbook, or
+   * an existing decision tree workbook.
+5. Click **Continue**.
+6. Create, edit, explore, or delete decision trees.
+7. When finished, click **Download All Changes** to export the updated workbook.
+
+---
+
+### Option 2: Local Installation
+
+#### Prerequisites
+
+* Python 3
+
+#### Installation
+
+1. Clone this repository.
+2. Open your preferred terminal.
+3. Start a local web server.
+
+**macOS**
+
+```bash
+python3 -m http.server 3000
+```
+
+**Windows**
+
+```bash
+python -m http.server 3000
+```
+
+4. If Python is not installed, install it first.
+
+---
+
+#### Running EagleEye
+
+1. Open:
+
+```
+http://localhost:3000
+```
+
+2. Download a template workbook if creating a new chatbot.
+3. Upload either:
+
+   * the template workbook, or
+   * an existing workbook.
+4. Click **Continue**.
+5. Edit your knowledge base.
+6. Click **Download All Changes** to export the updated workbook.
+
+---
+
+## What Can EagleEye Be Used For?
+
+EagleEye is designed for structured decision-support chatbots that need to:
 
 1. Identify the user's broad topic.
-2. Identify the specific issue under that topic.
-3. Collect all required parameters before giving a recommendation.
-4. Apply decision rules by priority.
-5. Return an approved final response, next steps, and escalation note.
+2. Identify the relevant issue within that topic.
+3. Collect all required information.
+4. Apply decision rules in priority order.
+5. Return an approved recommendation with any required next steps or escalation notes.
 
-The application does **not** replace the chatbot. It helps users create and maintain the source data that the chatbot uses, in the form of an excel sheet.
+Typical use cases include:
 
-## 2. Quick Start
-
-### For COMET/GSIB running Windows
-
-1. Press the "Windows" key. 
-2. Type "Jupyter Notebook". Missing? You may need to approach Technical Services for installation. 
-3. 
-
-
-From the project folder, run:
-
-```bash
-python3 -m http.server 5500
-```
-
-Then open:
-
-```text
-http://localhost:5500
-```
-
-After creating an Excel workbook with this application, add this prompt to any RAG chatbot with the attached Excel file:
-
-```
-You are a structured decision-support chatbot that answers <topic> related enquiries.
-Assume the context is <topic> and do not advise the user on non-<topic> matters.
-
-Use the uploaded CSV files as the source of truth:
-
-1_topics.csv identifies broad query topics.
-2_issues.csv identifies specific issues under each topic.
-3_parameters.csv defines the required information that must be collected for each issue.
-4_decision_rules.csv defines the conditions for possible outcomes.
-5_recommendations.csv defines the approved final recommendation text.
-
-Conversation process:
-
-Identify the most relevant topic from 1_topics.csv based on the user’s query.
-Identify the most relevant issue from 2_issues.csv under that topic.
-Check 3_parameters.csv for all required parameters for the identified issue.
-Before giving any recommendation, confirm that all required parameters are available.
-If any required parameter is missing or unclear, ask the user only for the missing information.
-Once all required parameters are known, compare the user’s information against 4_decision_rules.csv.
-Select the highest-priority matching rule.
-Use 5_recommendations.csv to provide the final recommendation.
-If no rule clearly matches, ask a clarification question or recommend escalation if the issue may be sensitive, urgent, or ambiguous.
-
-Response rules:
-
-Do not invent policies, requirements, procedures, or recommendations that are not supported by the uploaded CSV files.
-Do not answer until all required parameters for the issue have been collected.
-If multiple issues may apply, ask the user to clarify which issue they are referring to.
-If the user provides information out of order, extract and remember the provided parameters, then ask only for the remaining missing ones.
-If the user gives vague information, ask a specific follow-up question.
-Keep responses concise and structured.
-When asking for missing parameters, list them clearly.
-When giving the final recommendation, include:
-Final decision
-Reason based on the matched rule
-Recommended next steps from 5_recommendations.csv
-Escalation note, if provided
-
-Parameter handling:
-
-Treat required = yes in 3_parameters.csv as mandatory.
-Use allowed_values to normalize user responses.
-Use example_values and example_phrases only to understand user intent, not as final policy.
-If a required value does not fit allowed_values, ask the user to choose or clarify.
-If a parameter is optional, use it if provided, but do not block the recommendation if it is missing.
-
-Decision rule handling:
-
-Apply 4_decision_rules.csv only after all required parameters are collected.
-If more than one rule matches, choose the rule with the highest priority.
-If priority is numeric, lower numbers mean higher priority.
-If no rule matches, do not force an answer; ask for clarification or escalate based on the recommendation guidance.
-Do not expose internal rule IDs unless the user asks for the basis of the decision.
-
-Tone:
-
-Be professional, clear, and practical.
-Avoid overly long explanations.
-Make it easy for the user to provide the missing information.
-```
+* Internal policy assistants
+* Claims processing
+* HR decision support
+* Government services
+* Compliance guidance
+* Operational playbooks
 
 ---
 
-## 2. Main Features
+## Creating a Chatbot
 
-Current supported features:
+> **Note**
+>
+> EagleEye creates and maintains the workbook. Your chatbot uses the workbook as its source of truth.
 
-- Upload an Excel workbook containing decision-support data.
-- Validate expected sheets and columns.
-- View topics and issues.
-- Visualise a selected issue as a flowchart.
-- Create or edit topics.
-- Create or edit issues under a selected topic.
-- Create or edit parameters under a selected issue.
-- Generate recommendation/rule rows from valid parameter combinations.
-- Save changes into application state.
-- Export the updated data back to an Excel workbook.
+After exporting a workbook from EagleEye, attach the workbook to your chatbot and provide the following system prompt below.
 
-Deletion is not currently included.
+`You are a structured decision-support chatbot that answers <your topic here> related enquiries. Assume the context is <your topic here> and do not advise the user on non-<your topic here> matters. Use the uploaded XLSX file as the source of truth: 1_topics identifies broad query topics. 2_issues identifies specific issues under each topic. 3_parameters defines the required information that must be collected for each issue. 4_decision_rules defines the conditions for possible outcomes. 5_recommendations defines the approved final recommendation text. Conversation process: Identify the most relevant topic from 1_topics based on the user’s query. Identify the most relevant issue from 2_issues under that topic. Check 3_parameters for all required parameters for the identified issue. Before giving any recommendation, confirm that all required parameters are available. If any required parameter is missing or unclear, ask the user only for the missing information. Once all required parameters are known, compare the user’s information against 4_decision_rules. Select the highest-priority matching rule. Use 5_recommendations to provide the final recommendation. If no rule clearly matches, ask a clarification question or recommend escalation if the issue may be sensitive, urgent, or ambiguous. Response rules: Do not invent policies, requirements, procedures, or recommendations that are not supported by the uploaded XLSX file. Do not answer until all required parameters for the issue have been collected. If multiple issues may apply, ask the user to clarify which issue they are referring to. If the user provides information out of order, extract and remember the provided parameters, then ask only for the remaining missing ones. If the user gives vague information, ask a specific follow-up question. Keep responses concise and structured. When asking for missing parameters, list them clearly. When giving the final recommendation, include: Final decision Reason based on the matched rule Recommended next steps from 5_recommendations Escalation note, if provided Parameter handling: Treat required = yes in 3_parameters as mandatory. Use allowed_values to normalize user responses. Use example_values and example_phrases only to understand user intent, not as final policy. If a required value does not fit allowed_values, ask the user to choose or clarify. If a parameter is optional, use it if provided, but do not block the recommendation if it is missing. Decision rule handling: Apply 4_decision_rules only after all required parameters are collected. If more than one rule matches, choose the rule with the highest priority. If priority is numeric, lower numbers mean higher priority. If no rule matches, do not force an answer; ask for clarification or escalate based on the recommendation guidance. Do not expose internal rule IDs unless the user asks for the basis of the decision. Tone: Be professional, clear, and practical. Avoid overly long explanations. Make it easy for the user to provide the missing information.`
 
 ---
 
-## 3. Data Workbook Structure
+# Features
 
-The application expects one Excel workbook with five sheets:
+## Current Features (v0.7)
 
-```text
-decision_support_knowledge_base.xlsx
-├─ 1_topics
-├─ 2_issues
-├─ 3_parameters
-├─ 4_decision_rules
-└─ 5_recommendations
-```
+### Workbook Management
 
----
+* Upload an Excel workbook.
+* Validate workbook structure.
+* Export updated workbooks.
 
-## 4. Sheet Schemas
+### Knowledge Base Editing
 
-### 4.1 `1_topics`
+* Create and edit Topics.
+* Create and edit Issues.
+* Create and edit Parameters.
+* Generate Decision Rules.
+* Generate Recommendations.
 
-Stores broad categories of user queries.
+### Visualisation
 
-Required columns:
-
-```text
-topic_id, topic_name, description, example_phrases
-```
-
-Example:
-
-| topic_id | topic_name | description | example_phrases |
-|---|---|---|---|
-| T001 | Claims | Questions about claims handling | claim, submit claim, reimbursement |
+* Browse Topics and Issues.
+* Preview decision trees as flowcharts.
+* Automatically regenerate flowcharts when an Issue is selected.
 
 ---
 
-### 4.2 `2_issues`
+## Planned Features
 
-Stores specific issues under each topic.
-
-Required columns:
-
-```text
-issue_id, topic_id, issue_name, issue_description, example_phrases
-```
-
-Each issue must belong to a topic through `topic_id`.
-
-Example:
-
-| issue_id | topic_id | issue_name | issue_description | example_phrases |
-|---|---|---|---|---|
-| I001 | T001 | Claim eligibility | Determines whether a claim may proceed | can I claim, eligible claim |
+* Delete Topics, Issues, Parameters, Rules, and Recommendations.
+* Rule conflict detection.
+* Incomplete decision tree warnings.
+* Import/export version metadata.
+* Click-to-edit flowcharts.
+* Test conversation simulator.
+* TypeScript support.
+* Vite development environment.
 
 ---
 
-### 4.3 `3_parameters`
-
-Stores the information that must be collected before a decision can be made.
-
-Required columns:
-
-```text
-issue_id, parameter_id, question_to_ask, required, allowed_values, example_values, order
-```
-
-Example:
-
-| issue_id | parameter_id | question_to_ask | required | allowed_values | example_values | order |
-|---|---|---|---|---|---|---|
-| I001 | severity | What is the severity? | yes | low, medium, high | minor, urgent | 1 |
-
-Notes:
-
-- `required = yes` means the chatbot must collect the parameter before giving a final recommendation.
-- `allowed_values` should contain the valid values for the parameter.
-- `example_values` are only examples to help interpret user input.
-- `order` controls the preferred question order.
-
----
-
-### 4.4 `4_decision_rules`
-
-Stores the conditions used to select a recommendation.
-
-Required columns:
-
-```text
-rule_id, issue_id, conditions, recommendation_id, priority
-```
-
-Example:
-
-| rule_id | issue_id | conditions | recommendation_id | priority |
-|---|---|---|---|---|
-| R001 | I001 | {"severity":"high"} | REC001 | 1 |
-
-Notes:
-
-- Rules are applied only after all required parameters are known.
-- Lower numeric priority means higher priority.
-- If multiple rules match, the rule with the highest priority should be selected.
-- The `conditions` field should use a consistent structured format, such as JSON.
-
----
-
-### 4.5 `5_recommendations`
-
-Stores approved final responses.
-
-Required columns:
-
-```text
-recommendation_id, final_decision, recommendation_text, next_steps, escalation_note
-```
-
-Example:
-
-| recommendation_id | final_decision | recommendation_text | next_steps | escalation_note |
-|---|---|---|---|---|
-| REC001 | Escalate | This case should be reviewed by a human officer. | Collect supporting documents. | Escalate to the relevant team. |
-
-Recommended final decision values:
-
-```text
-Yes
-No
-Escalate
-Clarify
-```
-
----
-
-## 5. Running the Application
-
-Because the app may use JavaScript modules and HTML partials, it should be run through a local server instead of opening `index.html` directly.
-
-From the project folder, run:
-
-```bash
-python3 -m http.server 5500
-```
-
-Then open:
-
-```text
-http://localhost:5500
-```
-
----
-
-## 6. Loading a Workbook
-
-1. Open the application in the browser.
-2. Go to the upload panel.
-3. Select the Excel workbook.
-4. Click the load button.
-5. The application validates the workbook structure.
-6. If valid, topics and issues are loaded into the app.
-
-If the workbook is invalid, the app should show an error describing the missing sheet or column.
-
----
-
-## 7. Viewing a Decision Tree
-
-To view a decision tree:
-
-1. Select a topic.
-2. Select an issue under that topic.
-3. The app displays the related parameters, rules, and recommendations.
-4. The preview panel renders the selected issue as a flowchart.
-
-The flowchart is generated from the workbook data. It is not the source of truth.
-
-The source of truth is the structured workbook data:
-
-```text
-topics → issues → parameters → decision rules → recommendations
-```
-
----
-
-## 8. Creating or Editing a Topic
-
-To create or edit a topic:
-
-1. Open the editor panel.
-2. Enter a `topic_id`.
-3. Enter the topic name.
-4. Add a description.
-5. Add example phrases if useful.
-6. Save the topic.
-
-Behaviour:
-
-- If the `topic_id` already exists, the existing topic is updated.
-- If the `topic_id` does not exist, a new topic is added.
-
----
-
-## 9. Creating or Editing an Issue
-
-To create or edit an issue:
-
-1. Select the parent topic.
-2. Enter an `issue_id`.
-3. Enter the issue name.
-4. Add an issue description.
-5. Add example phrases if useful.
-6. Save the issue.
-
-Behaviour:
-
-- If the `issue_id` already exists, the existing issue is updated.
-- If the `issue_id` does not exist, a new issue is added.
-- Each issue must be linked to a valid `topic_id`.
-
----
-
-## 10. Creating or Editing Parameters
-
-To create or edit parameters:
-
-1. Select the relevant issue.
-2. Enter a `parameter_id`.
-3. Enter the question that the chatbot should ask.
-4. Set whether the parameter is required.
-5. Enter allowed values if applicable.
-6. Enter example values if useful.
-7. Set the question order.
-8. Save the parameter.
-
-Example allowed values:
-
-```text
-low, medium, high
-```
-
-Behaviour:
-
-- If the `parameter_id` already exists for the selected issue, the parameter is updated.
-- If the `parameter_id` does not exist, a new parameter is added.
-- Required parameters block final recommendations until they are collected.
-
----
-
-## 11. Creating Rules and Recommendations
-
-The editor can generate a recommendation matrix from valid parameter combinations.
-
-Workflow:
-
-1. Select a topic.
-2. Select an issue.
-3. Define the issue parameters.
-4. Ensure relevant parameters have `allowed_values`.
-5. Generate all valid parameter combinations.
-6. For each combination, enter:
-   - Final decision
-   - Recommendation text
-   - Next steps
-   - Escalation note, if applicable
-   - Priority
-7. Save the recommendation matrix.
-
-The app creates or updates:
-
-- Rows in `4_decision_rules`
-- Rows in `5_recommendations`
-
-A generated condition may look like this:
-
-```json
-{"severity":"high","claim_type":"property_damage"}
-```
-
----
-
-## 12. Rule Priority
-
-Rules are evaluated by priority.
-
-```text
-1 = highest priority
-2 = lower priority
-3 = even lower priority
-```
-
-Use priority to place exception cases before general cases.
-
-Example:
-
-```text
-Priority 1: urgent or sensitive cases → Escalate
-Priority 2: all required values valid → Yes
-Priority 3: unclear values → Clarify
-```
-
----
-
-## 13. Saving and Exporting
-
-After editing, export the workbook.
-
-The export function writes the current `appState` into an Excel workbook with the expected five sheets:
+## Typical Workflow
+
+A typical EagleEye workflow is:
+
+1. Create a Topic.
+2. Create one or more Issues.
+3. Define the required Parameters.
+4. Configure allowed values.
+5. Generate parameter combinations.
+6. Create Recommendations.
+7. Generate Decision Rules.
+8. Preview the flowchart.
+9. Export the workbook.
+10. Upload the workbook to your chatbot.
+
+The exported workbook contains five sheets:
 
 ```text
 1_topics
@@ -446,84 +230,504 @@ The export function writes the current `appState` into an Excel workbook with th
 5_recommendations
 ```
 
-Important:
+These sheets form the chatbot's complete decision-support knowledge base.
 
-- Export uses the current application state.
-- If form changes are not saved into `appState`, they will not appear in the exported workbook.
-- The exported workbook can be uploaded again later.
+# Working with Knowledge Bases
+
+## Loading a Workbook
+
+Before you can edit a knowledge base, you must load an Excel workbook.
+
+### Steps
+
+1. Open EagleEye.
+2. Go to the **Upload** panel.
+3. Select an Excel workbook.
+4. Click **Load**.
+5. EagleEye validates the workbook structure.
+6. If validation succeeds, the Topics and Issues are loaded into the application.
+
+> **Validation**
+>
+> If the workbook is missing a required sheet or column, EagleEye displays an error describing the problem before any data is loaded.
 
 ---
 
-## 14. Recommended Editing Workflow
+## Viewing a Decision Tree
 
-Use this workflow when building a new decision tree:
+Decision trees are organised by **Topic** and **Issue**.
 
-1. Create or select a topic.
-2. Create or select an issue under that topic.
-3. Define all required parameters.
-4. Define allowed values for each parameter.
+### Steps
+
+1. Select a **Topic**.
+2. Select an **Issue** under that Topic.
+3. EagleEye displays:
+
+   * Parameters
+   * Decision Rules
+   * Recommendations
+4. The Preview panel automatically generates a flowchart for the selected Issue.
+
+> **Note**
+>
+> The flowchart is a visual representation only.
+>
+> The workbook remains the source of truth.
+
+```text
+topics
+    ↓
+issues
+    ↓
+parameters
+    ↓
+decision rules
+    ↓
+recommendations
+```
+
+---
+
+# Editing the Knowledge Base
+
+## Before You Start
+
+Different items require different selections before they can be created or edited.
+
+| Item           | Required Selection |
+| -------------- | ------------------ |
+| Topic          | None               |
+| Issue          | Topic              |
+| Parameter      | Topic + Issue      |
+| Recommendation | Topic + Issue      |
+
+You can either:
+
+* Click **+** to create a new item.
+* Double-click an existing item to edit it.
+
+---
+
+## Topics
+
+Topics are broad categories of user enquiries.
+
+### Create or Edit a Topic
+
+1. Click the **+** button in the Topics panel, or double-click an existing Topic.
+2. Enter:
+
+   * Topic name
+   * Description
+   * Example phrases (optional)
+3. Save the Topic.
+
+---
+
+## Issues
+
+Issues represent specific problems or requests within a Topic.
+
+### Create or Edit an Issue
+
+1. Select a Topic.
+2. Create a new Issue or open an existing one.
+3. Enter:
+
+   * `issue_id`
+   * Issue name
+   * Issue description
+   * Example phrases (optional)
+4. Save the Issue.
+
+> Every Issue must belong to an existing Topic.
+
+---
+
+## Parameters
+
+Parameters define the information the chatbot must collect before making a decision.
+
+### Create or Edit a Parameter
+
+1. Select a Topic.
+2. Select an Issue.
+3. Create or edit a Parameter.
+4. Enter:
+
+   * `parameter_id`
+   * Question to ask
+   * Required (Yes/No)
+   * Allowed values
+   * Example values
+   * Question order
+5. Save the Parameter.
+
+Example allowed values:
+
+```text
+low, medium, high
+```
+
+> **Required Parameters**
+>
+> Parameters marked **required = yes** must be collected before the chatbot can provide a recommendation.
+
+---
+
+## Recommendations
+
+Recommendations define the chatbot's final response for one or more combinations of parameter values.
+
+### Before Creating Recommendations
+
+Ensure each relevant Parameter has **allowed_values** defined.
+
+Without allowed values, EagleEye cannot generate parameter combinations.
+
+---
+
+### Create or Edit a Recommendation
+
+1. Select a Topic.
+2. Select an Issue.
+3. Create or edit a Recommendation.
+4. Enter:
+
+   * Final decision
+   * Recommendation text
+   * Next steps
+   * Escalation note (optional)
+   * Priority
+   * Applicable parameter combinations
+5. Save the Recommendation.
+
+EagleEye automatically creates or updates:
+
+* `4_decision_rules`
+* `5_recommendations`
+
+Example generated condition:
+
+```json
+{
+  "severity": "high",
+  "claim_type": "property_damage"
+}
+```
+
+---
+
+## Rule Priority
+
+When multiple Decision Rules match, EagleEye evaluates them by priority.
+
+```text
+1 = Highest priority
+2 = Lower priority
+3 = Lowest priority
+```
+
+Lower numbers always take precedence.
+
+Example:
+
+| Priority | Behaviour                          |
+| -------- | ---------------------------------- |
+| 1        | Escalate urgent or sensitive cases |
+| 2        | Return the standard recommendation |
+| 3        | Ask the user for clarification     |
+
+---
+
+# Saving and Exporting
+
+When you've finished editing:
+
+1. Save your changes.
+2. Click **Download All Changes**.
+
+EagleEye exports the current application state into an Excel workbook containing:
+
+```text
+1_topics
+2_issues
+3_parameters
+4_decision_rules
+5_recommendations
+```
+
+> **Important**
+>
+> Export uses the current `appState`.
+>
+> If changes haven't been saved into `appState`, they won't appear in the exported workbook.
+
+The exported workbook can later be uploaded back into EagleEye for further editing or attached to your chatbot.
+
+---
+
+# Recommended Workflow
+
+For a new knowledge base, the recommended workflow is:
+
+1. Create a Topic.
+2. Create an Issue.
+3. Define all required Parameters.
+4. Configure allowed values.
 5. Generate parameter combinations.
-6. Write recommendations for each combination.
-7. Review generated decision rules.
+6. Create Recommendations.
+7. Review the generated Decision Rules.
 8. Preview the flowchart.
 9. Export the workbook.
-10. Test the workbook with the chatbot.
+10. Test the workbook with your chatbot.
+
+Following this workflow helps ensure every Issue has complete parameters, rules, and recommendations before deployment.
+
+# Developer Guide
+
+This section describes how EagleEye is structured, how workbook data is organised, and the rules developers should follow when extending the application.
 
 ---
 
-## 15. Important Data Rules
+# Architecture
 
-When maintaining the decision tree:
-
-- Do not create an issue without a valid topic.
-- Do not create a parameter without a valid issue.
-- Do not create a rule without a valid recommendation.
-- Do not create a recommendation that is not linked from a rule unless intentionally unused.
-- Use stable and unique IDs.
-- Use consistent allowed values.
-- Keep recommendation text approved and policy-based.
-- Use escalation for sensitive, urgent, or ambiguous cases.
-
----
-
-## 16. Application Architecture
-
-Recommended high-level structure:
+## High Level Overview
 
 ```text
 app.js
-= starts the application and initialises components
-
-state.js
-= stores shared workbook data and selected IDs
-
-fileService.js
-= loads, validates, and exports workbook data
-
-schema.js
-= defines expected sheets and columns
-
-editor component
-= handles topic, issue, parameter, rule, and recommendation editing
-
-upload component
-= handles workbook upload
-
-preview component
-= handles flowchart generation and rendering
+│
+├── state.js
+│   Shared application state
+│
+├── fileService.js
+│   Workbook import, validation and export
+│
+├── schema.js
+│   Workbook schemas and validation rules
+│
+├── upload/
+│   Workbook upload UI
+│
+├── editor/
+│   Topic, Issue, Parameter and Recommendation editors
+│
+└── preview/
+    Flowchart generation and rendering
 ```
 
-The editor should update `appState`. The preview should read from `appState` and regenerate the flowchart.
+### Component Responsibilities
+
+| Component        | Responsibility                                          |
+| ---------------- | ------------------------------------------------------- |
+| `app.js`         | Starts the application and initialises components       |
+| `state.js`       | Stores the shared application state                     |
+| `fileService.js` | Loads, validates and exports Excel workbooks            |
+| `schema.js`      | Defines workbook structure and required columns         |
+| `upload`         | Handles workbook upload                                 |
+| `editor`         | Creates and edits workbook data                         |
+| `preview`        | Generates flowcharts from the current application state |
+
+> **Important**
+>
+> The editor should update `appState`.
+>
+> The preview should always render directly from `appState`.
 
 ---
 
-## 17. Troubleshooting
+# Workbook Structure
 
-### `mermaid is not defined`
+EagleEye stores chatbot knowledge in a single Excel workbook.
 
-Make sure Mermaid is loaded before your app script.
+```text
+decision_support_knowledge_base.xlsx
+├── 1_topics
+├── 2_issues
+├── 3_parameters
+├── 4_decision_rules
+└── 5_recommendations
+```
 
-If using CDN scripts:
+These five sheets together form the chatbot's knowledge base.
+
+---
+
+# Sheet Schemas
+
+## 1_topics
+
+Stores the high level categories of user enquiries.
+
+### Required Columns
+
+```text
+topic_id
+topic_name
+description
+example_phrases
+```
+
+Example
+
+| topic_id | topic_name | description                     | example_phrases      |
+| -------- | ---------- | ------------------------------- | -------------------- |
+| T001     | Claims     | Questions about claims handling | claim, reimbursement |
+
+---
+
+## 2_issues
+
+Stores Issues that belong to a Topic.
+
+### Required Columns
+
+```text
+issue_id
+topic_id
+issue_name
+issue_description
+example_phrases
+```
+
+Example
+
+| issue_id | topic_id | issue_name        | issue_description                      | example_phrases |
+| -------- | -------- | ----------------- | -------------------------------------- | --------------- |
+| I001     | T001     | Claim eligibility | Determines whether a claim may proceed | can I claim     |
+
+> Every Issue must reference an existing `topic_id`.
+
+---
+
+## 3_parameters
+
+Stores information the chatbot must collect before making a decision.
+
+### Required Columns
+
+```text
+issue_id
+parameter_id
+question_to_ask
+required
+allowed_values
+example_values
+order
+```
+
+Example
+
+| issue_id | parameter_id | question_to_ask       | required | allowed_values    | example_values | order |
+| -------- | ------------ | --------------------- | -------- | ----------------- | -------------- | ----: |
+| I001     | severity     | What is the severity? | yes      | low, medium, high | urgent         |     1 |
+
+### Notes
+
+* `required = yes` means the chatbot **must** collect the parameter.
+* `allowed_values` defines accepted responses.
+* `example_values` help interpret user input.
+* `order` controls the preferred questioning sequence.
+
+---
+
+## 4_decision_rules
+
+Maps parameter conditions to Recommendations.
+
+### Required Columns
+
+```text
+rule_id
+issue_id
+conditions
+recommendation_id
+priority
+```
+
+Example
+
+| rule_id | issue_id | conditions          | recommendation_id | priority |
+| ------- | -------- | ------------------- | ----------------- | -------: |
+| R001    | I001     | {"severity":"high"} | REC001            |        1 |
+
+### Notes
+
+* Rules are evaluated only after all required parameters are collected.
+* Lower numeric priorities are evaluated first.
+* If multiple rules match, the lowest priority number wins.
+* Conditions should use a consistent structured format such as JSON.
+
+---
+
+## 5_recommendations
+
+Stores approved chatbot responses.
+
+### Required Columns
+
+```text
+recommendation_id
+final_decision
+recommendation_text
+next_steps
+escalation_note
+```
+
+Example
+
+| recommendation_id | final_decision | recommendation_text                 | next_steps                    | escalation_note                |
+| ----------------- | -------------- | ----------------------------------- | ----------------------------- | ------------------------------ |
+| REC001            | Escalate       | Refer this case to a human officer. | Collect supporting documents. | Escalate to the relevant team. |
+
+Recommended values for `final_decision`:
+
+```text
+Answered
+Unanswered
+Clarify
+Escalate
+```
+
+---
+
+# Data Rules
+
+When modifying a knowledge base, follow these rules.
+
+## Relationships
+
+* Every Issue must belong to a Topic.
+* Every Parameter must belong to an Issue.
+* Every Decision Rule must reference a Recommendation.
+* Recommendations should not exist without a corresponding Rule unless intentionally unused.
+
+## IDs
+
+* Keep IDs unique.
+* Keep IDs stable once published.
+* Avoid reusing deleted IDs.
+
+## Parameters
+
+* Use consistent `allowed_values`.
+* Mark mandatory information as `required = yes`.
+
+## Recommendations
+
+* Keep recommendation text policy-based.
+* Avoid embedding business logic inside recommendations.
+* Use escalation for sensitive, urgent or ambiguous cases.
+
+---
+
+# Troubleshooting
+
+## `mermaid is not defined`
+
+Mermaid must be loaded before the application script.
+
+### CDN
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -531,151 +735,106 @@ If using CDN scripts:
 <script type="module" src="js/app.js"></script>
 ```
 
-If using npm, import Mermaid in your JavaScript module.
+### npm
+
+Import Mermaid into your JavaScript module before use.
 
 ---
 
-### `Cannot use import statement outside a module`
+## `Cannot use import statement outside a module`
 
-Your script must be loaded as a module:
+Load the application as an ES module.
 
 ```html
 <script type="module" src="js/app.js"></script>
 ```
 
-Also run the app using a local server instead of opening the file directly.
+Also ensure the application is served through a local web server rather than opening `index.html` directly.
 
 ---
 
-### Element cannot be found after loading partials
+## Elements Cannot Be Found After Loading Partials
 
-This usually means JavaScript tried to access the element before the HTML partial was loaded.
+This usually means JavaScript attempted to access DOM elements before the HTML partials had finished loading.
 
-Make sure the order is:
+Recommended order:
 
 ```text
 1. DOMContentLoaded
 2. await loadParts()
-3. initialise DOM references
-4. bind event listeners
+3. Initialise DOM references
+4. Bind event listeners
 ```
 
-Example:
+Example
 
-```js
+```javascript
 document.addEventListener("DOMContentLoaded", main);
 
 async function main() {
-  await loadParts();
-  initDomElements();
-  bindEvents();
+    await loadParts();
+    initDomElements();
+    bindEvents();
 }
 ```
 
 ---
 
-### `recommendation_id is not defined`
+## `recommendation_id is not defined`
 
-This usually means the code used `recommendation_id` as a variable instead of an object property.
+Incorrect
 
-Wrong:
-
-```js
+```javascript
 rules.push({
-  recommendation_id
+    recommendation_id
 });
 ```
 
-Correct:
+Correct
 
-```js
+```javascript
 rules.push({
-  recommendation_id: recommendationId
+    recommendation_id: recommendationId
 });
 ```
 
 ---
 
-### Workbook exports but changes are missing
+## Workbook Exports Without Recent Changes
 
-Check that the editor saved the form data into `appState` before export.
+Verify that the editor updates `appState` before export.
 
-The export function should write from `appState`, not directly from the form fields.
-
----
-
-### HTML partials do not load
-
-Check that the project is served over `localhost`.
-
-This may not work reliably when opened directly using:
-
-```text
-file:///...
-```
-
-Run:
-
-```bash
-python3 -m http.server 5500
-```
-
-Then open:
-
-```text
-http://localhost:5500
-```
+The export service should always write workbook data from `appState`, not directly from form controls.
 
 ---
 
-## 18. Glossary
+# Glossary
 
-### Topic
-
-A broad category of user queries.
-
-### Issue
-
-A specific problem or request under a topic.
-
-### Parameter
-
-A piece of information the chatbot must collect before making a recommendation.
-
-### Required Parameter
-
-A parameter that must be answered before the chatbot gives a final decision.
-
-### Allowed Values
-
-The accepted set of responses for a parameter.
-
-### Decision Rule
-
-A condition that maps parameter values to a recommendation.
-
-### Recommendation
-
-The final approved response shown to the user.
-
-### Escalation
-
-A case where the chatbot should refer the user to a human or higher-level process.
+| Term               | Description                                                       |
+| ------------------ | ----------------------------------------------------------------- |
+| Topic              | A broad category of user enquiries                                |
+| Issue              | A specific problem within a Topic                                 |
+| Parameter          | Information required before making a decision                     |
+| Required Parameter | Information that must be collected before recommending an outcome |
+| Allowed Values     | Valid responses for a Parameter                                   |
+| Decision Rule      | Conditions that determine which Recommendation is selected        |
+| Recommendation     | The chatbot's approved response                                   |
+| Escalation         | Referral to a human or higher-level process                       |
 
 ---
 
-## 19. Future Improvements
+# Roadmap
 
-Possible future features:
+Planned improvements include:
 
-- Delete topics, issues, parameters, rules, and recommendations.
-- Validate relationship integrity across all sheets.
-- Add duplicate ID warnings.
-- Add rule conflict detection.
-- Add incomplete decision tree warnings.
-- Add import/export version metadata.
-- Add a visual click-to-edit flowchart.
-- Add test conversation simulation.
-- Add TypeScript support.
-- Add Vite-based development setup.
+* Delete Topics, Issues, Parameters, Rules and Recommendations
+* Rule conflict detection
+* Incomplete decision tree warnings
+* Import/export version metadata
+* Interactive click-to-edit flowcharts
+* Test conversation simulator
+* TypeScript support
+* Vite-based development environment
+
+Contributions and suggestions for additional features are welcome.
 

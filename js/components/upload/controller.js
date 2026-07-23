@@ -34,8 +34,8 @@ export async function downloadSheetTemplate() {
   await saveWorkbookData(appState);
 }
 
-export function setStatus(message) {
-  renderStatus(message);
+export function setStatus(message, type = '') {
+  renderStatus(message, type);
 }
 
 

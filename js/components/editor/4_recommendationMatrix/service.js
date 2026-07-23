@@ -3,6 +3,7 @@ import {
   getIssueParameters,
   getIssueRules,
   getRecommendation,
+  getRecommendationsForRules,
   makeUniqueId,
   removeRule,
   upsertRecommendation,
@@ -39,6 +40,12 @@ export function getRecommendations() {
   );
 }
 
+export function getRecommendationsForIssue(issueId) {
+  return getRecommendationsForRules(getIssueRules(issueId)).sort((a, b) =>
+    str(a.recommendation_id).localeCompare(str(b.recommendation_id))
+  );
+}
+
 export function getRecommendationAssignments(issueId, recommendationId) {
   return getIssueRules(issueId).filter(rule => str(rule.recommendation_id) === str(recommendationId));
 }
@@ -64,6 +71,10 @@ export function saveRecommendation({ recommendationId, finalDecision, recommenda
 }
 
 export function saveRecommendationAssignments(issueId, recommendationId, assignments) {
+  if (!Array.isArray(assignments)) {
+    return getRecommendationAssignments(issueId, recommendationId).length;
+  }
+
   const selectedKeys = new Set(assignments.filter(item => item.selected).map(item => stringifyConditions(item.conditions)));
   let savedCount = 0;
 

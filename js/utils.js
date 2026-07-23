@@ -46,5 +46,22 @@ export function validateLibraries() {
 }
 
 export function toHtml(markdown) {
-  return window.marked.parse(markdown)
+  const renderer = new marked.Renderer();
+
+  // to allow site navigation to work
+  renderer.heading = function ({ tokens, depth }) {
+      const text = this.parser.parseInline(tokens);
+
+      const slug = text
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, "")
+          .trim()
+          .replace(/\s+/g, "-");
+
+      return `<h${depth} id="${slug}">${text}</h${depth}>`;
+  };
+
+  marked.use({ renderer });
+
+  return window.marked.parse(markdown);
 }

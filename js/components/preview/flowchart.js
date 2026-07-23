@@ -65,21 +65,29 @@ function appendParameterBranch({
   appendEdge(lines, parentNodeId, edgeLabel, `${parameterNodeId}{"${safeMermaidLabel(label)}"}`);
 
   const candidatesByValue = new Map();
+  const wildcardCandidates = [];
   candidates.forEach(candidate => {
-    const value = Object.prototype.hasOwnProperty.call(candidate.conditions, parameterId)
-      ? candidate.conditions[parameterId]
-      : 'Any value';
+    if (!Object.prototype.hasOwnProperty.call(candidate.conditions, parameterId)) {
+      wildcardCandidates.push(candidate);
+      return;
+    }
+
+    const value = candidate.conditions[parameterId];
     const key = str(value) || 'Blank';
 
     if (!candidatesByValue.has(key)) candidatesByValue.set(key, []);
     candidatesByValue.get(key).push(candidate);
   });
 
+  if (!candidatesByValue.size) {
+    candidatesByValue.set('Any value', []);
+  }
+
   candidatesByValue.forEach((matchingCandidates, value) => {
     appendParameterBranch({
       parentNodeId: parameterNodeId,
       edgeLabel: value,
-      candidates: matchingCandidates,
+      candidates: [...matchingCandidates, ...wildcardCandidates],
       params,
       parameterIndex: parameterIndex + 1,
       recommendationById,
