@@ -14,6 +14,10 @@ export const appState = {
   flow: null
 };
 
+export function notifyDataChanged() {
+  document.dispatchEvent(new Event('eagle-eye:data-changed'));
+}
+
 export function loadState(workbookData) {
   appState.topics = workbookData.topics || [];
   appState.issues = workbookData.issues || [];
@@ -77,6 +81,7 @@ export function upsertTopic(topic) {
 
   requireFields(normalized, ['topic_id', 'topic_name'], 'topic');
   upsertById(appState.topics, 'topic_id', normalized);
+  notifyDataChanged();
   return normalized;
 }
 
@@ -96,6 +101,7 @@ export function upsertIssue(issue) {
   }
 
   upsertById(appState.issues, 'issue_id', normalized);
+  notifyDataChanged();
   return normalized;
 }
 
@@ -127,6 +133,7 @@ export function upsertParameter(parameter) {
     appState.parameters.push(normalized);
   }
 
+  notifyDataChanged();
   return normalized;
 }
 
@@ -139,6 +146,7 @@ export function moveIssueToTopic(issueId, topicId) {
   if (str(issue.topic_id) === str(topicId)) return issue;
 
   issue.topic_id = str(topicId);
+  notifyDataChanged();
   return issue;
 }
 
@@ -164,6 +172,7 @@ export function moveParameterToIssue(parameterId, issueId) {
   rulesToRemove.forEach(removeRule);
   parameter.issue_id = str(issueId);
   parameter.order = str(nextParameterOrder(issueId));
+  notifyDataChanged();
   return parameter;
 }
 
@@ -180,6 +189,7 @@ export function upsertRecommendation(recommendation) {
 
   requireFields(normalized, ['recommendation_id', 'final_decision', 'recommendation_text'], 'recommendation');
   upsertById(appState.recommendations, 'recommendation_id', normalized);
+  notifyDataChanged();
   
   return normalized;
 }
@@ -204,6 +214,7 @@ export function upsertRule(rule) {
   }
 
   upsertById(appState.rules, 'rule_id', normalized);
+  notifyDataChanged();
   return normalized;
 }
 
@@ -224,6 +235,7 @@ export function removeTopic(topicId) {
 
   if (index >= 0) {
     appState.topics.splice(index, 1);
+    notifyDataChanged();
   }
 }
 
@@ -244,6 +256,7 @@ export function removeIssue(issueId) {
 
   if (index >= 0) {
     appState.issues.splice(index, 1);
+    notifyDataChanged();
   }
 }
 
@@ -272,6 +285,7 @@ export function removeParameter(paramId) {
 
   if (index >= 0) {
     appState.parameters.splice(index, 1);
+    notifyDataChanged();
   }
 
 }
@@ -295,6 +309,7 @@ export function removeRule(ruleId) {
     if (!isStillUsed) {
       removeRecommendation(recommendationId);
     }
+    notifyDataChanged();
   }
 }
 
@@ -306,6 +321,7 @@ export function removeRecommendation(recomId) {
 
   if (index >= 0) {
     appState.recommendations.splice(index, 1);
+    notifyDataChanged();
   }
 }
 

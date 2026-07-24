@@ -9,6 +9,7 @@ export function initUploadDomElements() {
             loadStatus: document.getElementById('loadStatus'),
             downloadSheetTemplateBtn: document.getElementById('downloadSheetTemplateBtn'),
             fileInputBtn: document.getElementById('botInputFile'),
+            discardLocalDraftBtn: document.getElementById('discardLocalDraftBtn'),
     })
 
     return uploadDom;

@@ -3,6 +3,8 @@ import { disableLoading } from './components/upload/dom.js';
 import { initEditor } from './components/editor/shared/controller.js';
 import { initUpload } from './components/upload/controller.js';
 import { initPreview } from './components/preview/controller.js';
+import { initDraftAutoSave } from './persistence/draftAutoSave.js';
+import { offerDraftRecovery } from './persistence/draftRecovery.js';
 
 /**
  * Main js entry point.
@@ -12,7 +14,7 @@ document.addEventListener("DOMContentLoaded", main);
 async function main() {
   try {
     await loadParts();
-    initApp();
+    await initApp();
 
   } catch (error) {
     console.error("Failed to initialise app:", error);
@@ -42,7 +44,7 @@ async function loadParts() {
  * Start the application.
  * Ensures that the required third-party libraries are loaded.
  */
-function initApp() {
+async function initApp() {
   // try {
   validateLibraries();
 
@@ -51,6 +53,8 @@ function initApp() {
   initUpload();
   initEditor();
   initPreview();
+  initDraftAutoSave();
+  await offerDraftRecovery();
 
   // } catch (error) {
   //   console.log(`init failed`);

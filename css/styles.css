@@ -44,6 +44,12 @@ h3 {
 h2 { font-size: 16px; }
 h3 { font-size: 14px; }
 
+.secondary-btn {
+  color: var(--text);
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+}
+
 .panel,
 .card {
   margin-bottom: 16px;
