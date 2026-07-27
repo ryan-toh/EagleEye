@@ -32,11 +32,8 @@
    topics | issues | parameters | form/details.
 */
 .editor-panel .decision-explorer {
-  --decision-explorer-columns:
-    minmax(160px, 0.75fr)
-    minmax(180px, 0.85fr)
-    minmax(180px, 0.85fr)
-    minmax(320px, 1.55fr);
+  --decision-explorer-columns: minmax(160px, 0.75fr) minmax(180px, 0.85fr)
+    minmax(180px, 0.85fr) minmax(320px, 1.55fr);
 
   min-height: 520px;
 }
@@ -110,7 +107,7 @@
 .dialog-panel .editor-card {
   position: relative;
   padding: 16px;
-  background: #FAFAFA;
+  background: #fafafa;
   border: 1px solid var(--border);
   border-radius: 6px;
 }
@@ -139,8 +136,8 @@
 }
 
 .dialog-panel .editor-dialog__close:hover {
-  color: #FFFFFF;
-  background: #C42B1C;
+  color: #ffffff;
+  background: #c42b1c;
 }
 
 .dialog-panel .editor-dialog__close:focus-visible {
@@ -221,7 +218,7 @@
 }
 
 .editor-explorer__add-btn:hover:not(:disabled) {
-  color: #FFFFFF;
+  color: #ffffff;
   background: var(--accent);
 }
 
@@ -232,13 +229,13 @@
 }
 
 .editor-explorer__add-btn.is-selected {
-  color: #FFFFFF;
+  color: #ffffff;
   background: var(--accent);
 }
 
 .editor-explorer__add-btn:disabled {
   color: #a0a0a0;
-  background: #EDEBE9;
+  background: #edebe9;
   cursor: not-allowed;
 }
 

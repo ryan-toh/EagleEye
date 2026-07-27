@@ -1,19 +1,21 @@
-import { setStatus } from "./controller.js";
+import { setStatus } from './controller.js';
 
 export const uploadDom = {};
 
 export function initUploadDomElements() {
-    Object.assign(uploadDom, {
-            loadBtn: document.getElementById('loadBtn'),
-            loadLocalBtn: document.getElementById('loadLocalBtn'),
-            loadStatus: document.getElementById('loadStatus'),
-            downloadSheetTemplateBtn: document.getElementById('downloadSheetTemplateBtn'),
-            fileInputBtn: document.getElementById('botInputFile'),
-    })
+  Object.assign(uploadDom, {
+    loadBtn: document.getElementById('loadBtn'),
+    loadLocalBtn: document.getElementById('loadLocalBtn'),
+    loadStatus: document.getElementById('loadStatus'),
+    downloadSheetTemplateBtn: document.getElementById(
+      'downloadSheetTemplateBtn',
+    ),
+    fileInputBtn: document.getElementById('botInputFile'),
+  });
 
-    uploadDom.loadLocalBtn.hidden = !hasLocalSession();
+  uploadDom.loadLocalBtn.hidden = !hasLocalSession();
 
-    return uploadDom;
+  return uploadDom;
 }
 
 export function disableLoading(message) {
@@ -41,4 +43,3 @@ export function renderStatus(message, type = '') {
 export function getFileInput() {
   return uploadDom.fileInputBtn;
 }
-

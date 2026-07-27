@@ -1,16 +1,18 @@
-import { FILE_CONFIG } from "./schema.js";
-import { uploadDom } from "./components/upload/dom.js";
-import { getSampleWorkbookData } from "./schema.js";
+import { FILE_CONFIG } from './schema.js';
+import { getSampleWorkbookData } from './schema.js';
 
 /* Save and Export */
 
-export function saveWorkbookData(workbookData, filename = FILE_CONFIG.filename) {
+export function saveWorkbookData(
+  workbookData,
+  filename = FILE_CONFIG.filename,
+) {
   validateExportData(workbookData);
 
-  console.log("Attempting to save.");
+  console.log('Attempting to save.');
 
   if (!window.XLSX) {
-    throw new Error("XLSX library not loaded.");
+    throw new Error('XLSX library not loaded.');
   }
 
   const dataToExport = isWorkbookDataEmpty(workbookData)
@@ -22,17 +24,17 @@ export function saveWorkbookData(workbookData, filename = FILE_CONFIG.filename) 
   const sheet_config = FILE_CONFIG.sheet;
 
   const sheets = [
-    { key: "topics", config: sheet_config.topics },
-    { key: "issues", config: sheet_config.issues },
-    { key: "parameters", config: sheet_config.parameters },
-    { key: "rules", config: sheet_config.rules },
-    { key: "recommendations", config: sheet_config.recommendations },
+    { key: 'topics', config: sheet_config.topics },
+    { key: 'issues', config: sheet_config.issues },
+    { key: 'parameters', config: sheet_config.parameters },
+    { key: 'rules', config: sheet_config.rules },
+    { key: 'recommendations', config: sheet_config.recommendations },
   ];
 
   for (const { key, config } of sheets) {
     const columns = getExportColumns(key);
     const normalizedRows = dataToExport[key].map((row) =>
-      normalizeRowForExport(row, columns)
+      normalizeRowForExport(row, columns),
     );
 
     const worksheet = window.XLSX.utils.json_to_sheet(normalizedRows, {
@@ -47,7 +49,7 @@ export function saveWorkbookData(workbookData, filename = FILE_CONFIG.filename) 
 
 function isWorkbookDataEmpty(workbookData) {
   return Object.keys(FILE_CONFIG.sheet).every(
-    (key) => !workbookData[key]?.length
+    (key) => !workbookData[key]?.length,
   );
 }
 
@@ -55,14 +57,17 @@ function normalizeRowForExport(row, columns) {
   const normalized = {};
 
   for (const column of columns) {
-    normalized[column] = row[column] ?? "";
+    normalized[column] = row[column] ?? '';
   }
 
   return normalized;
 }
 
 function getExportColumns(key) {
-  return FILE_CONFIG['sheet'][key].exportColumns ?? FILE_CONFIG['sheet'][key].requiredColumns;
+  return (
+    FILE_CONFIG['sheet'][key].exportColumns ??
+    FILE_CONFIG['sheet'][key].requiredColumns
+  );
 }
 
 function validateExportData(workbookData) {
@@ -76,7 +81,9 @@ function validateExportData(workbookData) {
 /* Extract and Import */
 export function validateFilePresent(fileInput) {
   if (!fileInput?.files || fileInput.files.length === 0) {
-    throw new Error(`No file selected. Please upload "${FILE_CONFIG.filename}".`);
+    throw new Error(
+      `No file selected. Please upload "${FILE_CONFIG.filename}".`,
+    );
   }
 }
 
@@ -89,7 +96,11 @@ export async function loadWorkbookData(fileInput) {
 // validate that each sheet has the required columns
 export function validateWorkbookData(workbookData) {
   Object.entries(FILE_CONFIG.sheet).forEach(([key, config]) => {
-    validateRequiredColumns(config.sheetName, workbookData[key], config.requiredColumns);
+    validateRequiredColumns(
+      config.sheetName,
+      workbookData[key],
+      config.requiredColumns,
+    );
   });
 }
 
@@ -98,15 +109,18 @@ function readMultiSheetXlsx(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onload = event => {
+    reader.onload = (event) => {
       try {
         const data = new Uint8Array(event.target.result);
         const workbook = window.XLSX.read(data, { type: 'array' });
 
         // Build a reverse lookup: sheetName → key
         // e.g. { "1_topics": "topics", "2_issues": "issues", ... }
-        const sheetNameToKey = Object.fromEntries(
-          Object.entries(FILE_CONFIG.sheet).map(([key, config]) => [config.sheetName, key])
+        Object.fromEntries(
+          Object.entries(FILE_CONFIG.sheet).map(([key, config]) => [
+            config.sheetName,
+            key,
+          ]),
         );
 
         const result = {};
@@ -117,7 +131,9 @@ function readMultiSheetXlsx(file) {
           if (!sheet) {
             throw new Error(
               `Sheet "${config.sheetName}" not found in "${file.name}". ` +
-              `Expected sheets: ${Object.values(FILE_CONFIG.sheet).map(s => s.sheetName).join(', ')}.`
+                `Expected sheets: ${Object.values(FILE_CONFIG.sheet)
+                  .map((s) => s.sheetName)
+                  .join(', ')}.`,
             );
           }
 
@@ -140,7 +156,8 @@ function normalizeRowKeys(row) {
   const normalized = {};
 
   Object.entries(row).forEach(([key, value]) => {
-    normalized[String(key).trim()] = typeof value === 'string' ? value.trim() : value;
+    normalized[String(key).trim()] =
+      typeof value === 'string' ? value.trim() : value;
   });
 
   return normalized;
@@ -152,9 +169,11 @@ function validateRequiredColumns(sheetName, rows, columns) {
   }
 
   const rowColumns = Object.keys(rows[0]);
-  const missing = columns.filter(col => !rowColumns.includes(col));
+  const missing = columns.filter((col) => !rowColumns.includes(col));
 
   if (missing.length) {
-    throw new Error(`Sheet "${sheetName}" is missing column(s): ${missing.join(', ')}`);
+    throw new Error(
+      `Sheet "${sheetName}" is missing column(s): ${missing.join(', ')}`,
+    );
   }
 }

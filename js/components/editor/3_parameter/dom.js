@@ -1,43 +1,50 @@
-import { appState, getIssueParameters, makeUniqueId } from "../../../appState.js";
-import { isRequired, str } from "../../../utils.js";
-import { createExplorerItem } from "../shared/dom.js";
+import {
+  appState,
+  getIssueParameters,
+  makeUniqueId,
+} from '../../../appState.js';
+import { isRequired, str } from '../../../utils.js';
+import { createExplorerItem } from '../shared/dom.js';
 
 export const paramEditorDom = {};
 
 export function initParamEditorDom() {
-    Object.assign(paramEditorDom, {
-        parameterPicker: document.getElementById('editorParameterPicker'),
-        parameterId: document.getElementById('editorParameterId'),
-        parameterName: document.getElementById('editorParameterName'),
-        parameterQuestion: document.getElementById('editorParameterQuestion'),
-        parameterRequired: document.getElementById('editorParameterRequired'),
-        parameterAllowedValues: document.getElementById('editorParameterAllowedValues'),
-        parameterExampleValues: document.getElementById('editorParameterExampleValues'),
-        parameterOrder: document.getElementById('editorParameterOrder'),
-        saveParameterBtn: document.getElementById('saveParameterBtn'),
-        createParamBtn: document.getElementById('createParamBtn'),
-        paramSearch: document.getElementById('editorParamSearch'),
+  Object.assign(paramEditorDom, {
+    parameterPicker: document.getElementById('editorParameterPicker'),
+    parameterId: document.getElementById('editorParameterId'),
+    parameterName: document.getElementById('editorParameterName'),
+    parameterQuestion: document.getElementById('editorParameterQuestion'),
+    parameterRequired: document.getElementById('editorParameterRequired'),
+    parameterAllowedValues: document.getElementById(
+      'editorParameterAllowedValues',
+    ),
+    parameterExampleValues: document.getElementById(
+      'editorParameterExampleValues',
+    ),
+    parameterOrder: document.getElementById('editorParameterOrder'),
+    saveParameterBtn: document.getElementById('saveParameterBtn'),
+    createParamBtn: document.getElementById('createParamBtn'),
+    paramSearch: document.getElementById('editorParamSearch'),
 
-        paramSelect: document.getElementById('editorParamSelect'),
-        paramList: document.getElementById('editorParamList'),
-        paramPanelHint: document.getElementById('editorParamPanelHint'),
-        paramDialog: document.getElementById('editorParamDialog'),
-
-    });
+    paramSelect: document.getElementById('editorParamSelect'),
+    paramList: document.getElementById('editorParamList'),
+    paramPanelHint: document.getElementById('editorParamPanelHint'),
+    paramDialog: document.getElementById('editorParamDialog'),
+  });
 }
 
 export function setParamSelectedState(paramId) {
-  setSelectedState(paramEditorDom.paramList, "paramId", paramId);
+  setSelectedState(paramEditorDom.paramList, 'paramId', paramId);
 }
 
 export function renderParamOptions(issueId) {
   const params = issueId ? getIssueParameters(issueId) : [];
 
-  paramEditorDom.paramList.innerHTML = "";
+  paramEditorDom.paramList.innerHTML = '';
 
   if (!issueId) {
     paramEditorDom.paramSearch.disabled = true;
-    paramEditorDom.paramPanelHint.textContent = "Select an issue first";
+    paramEditorDom.paramPanelHint.textContent = 'Select an issue first';
     paramEditorDom.paramList.innerHTML = `
       <div class="decision-explorer__empty">
         Select an issue first
@@ -47,11 +54,12 @@ export function renderParamOptions(issueId) {
   }
 
   paramEditorDom.paramSearch.disabled = false;
-  paramEditorDom.paramPanelHint.textContent = "Create or double click on parameter to edit";
+  paramEditorDom.paramPanelHint.textContent =
+    'Create or double click on parameter to edit';
 
   const query = paramEditorDom.paramSearch.value.trim().toLowerCase();
-  const matchingParams = params.filter(param =>
-    str(param.parameter_name).toLowerCase().includes(query)
+  const matchingParams = params.filter((param) =>
+    str(param.parameter_name).toLowerCase().includes(query),
   );
 
   if (!matchingParams.length) {
@@ -63,13 +71,13 @@ export function renderParamOptions(issueId) {
     return;
   }
 
-  matchingParams.forEach(param => {
+  matchingParams.forEach((param) => {
     const item = createExplorerItem({
       id: param.parameter_id,
       title: param.parameter_name,
-      meta: param.question_to_ask || "",
-      type: "param",
-      icon: "✏️",
+      meta: param.question_to_ask || '',
+      type: 'param',
+      icon: '✏️',
     });
 
     paramEditorDom.paramList.appendChild(item);
@@ -79,15 +87,16 @@ export function renderParamOptions(issueId) {
 }
 
 export function getClickedParamId(event) {
-  const item = event.target.closest("[data-param-id]");
-  return item ? item.dataset.paramId : "";
+  const item = event.target.closest('[data-param-id]');
+  return item ? item.dataset.paramId : '';
 }
 
 export function renderParameterPicker(issueId) {
-  paramEditorDom.parameterPicker.innerHTML = '<option value="__new__">+ Create new parameter</option>';
+  paramEditorDom.parameterPicker.innerHTML =
+    '<option value="__new__">+ Create new parameter</option>';
 
   if (issueId) {
-    getIssueParameters(issueId).forEach(parameter => {
+    getIssueParameters(issueId).forEach((parameter) => {
       const option = document.createElement('option');
       option.value = str(parameter.parameter_id);
       option.textContent = `${parameter.parameter_name}`;
@@ -103,28 +112,30 @@ export function renderParameterPicker(issueId) {
 
 export function renderParamFormFor(parameterId, issueId) {
   const parameters = issueId ? getIssueParameters(issueId) : [];
-  const parameter = parameters
-    .find(item => str(item.parameter_id) === str(parameterId));
+  const parameter = parameters.find(
+    (item) => str(item.parameter_id) === str(parameterId),
+  );
 
-  paramEditorDom.parameterId.value = parameter?.parameter_id || makeUniqueId('PARAM', appState.parameters, 'parameter_id');
+  paramEditorDom.parameterId.value =
+    parameter?.parameter_id ||
+    makeUniqueId('PARAM', appState.parameters, 'parameter_id');
   paramEditorDom.parameterName.value = parameter?.parameter_name || '';
   paramEditorDom.parameterQuestion.value = parameter?.question_to_ask || '';
   paramEditorDom.parameterRequired.value =
-    parameter == null || isRequired(parameter.required)
-      ? "yes"
-      : "no";
+    parameter == null || isRequired(parameter.required) ? 'yes' : 'no';
   paramEditorDom.parameterAllowedValues.value = parameter?.allowed_values || '';
   paramEditorDom.parameterExampleValues.value = parameter?.example_values || '';
-  paramEditorDom.parameterOrder.value = parameter?.order || parameters.length + 1;
+  paramEditorDom.parameterOrder.value =
+    parameter?.order || parameters.length + 1;
 }
 
 function setSelectedState(container, datasetKey, selectedId) {
-  const items = container.querySelectorAll(".decision-explorer__item");
+  const items = container.querySelectorAll('.decision-explorer__item');
 
-  items.forEach(item => {
+  items.forEach((item) => {
     item.classList.toggle(
-      "is-selected",
-      item.dataset[datasetKey] === String(selectedId)
+      'is-selected',
+      item.dataset[datasetKey] === String(selectedId),
     );
   });
 }

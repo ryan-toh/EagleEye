@@ -8,13 +8,14 @@ This guide was put together by a human.
 
 # Table of Contents
 
-* [Introduction](#introduction)
-* [User Guide](#user-guide)
+- [Introduction](#introduction)
+- [User Guide](#user-guide)
 
-  * [Getting Started](#getting-started)
-  * [Creating a Chatbot](#creating-a-chatbot)
-  * [Features](#features)
-* [Developer Guide](#developer-guide)
+  - [Getting Started](#getting-started)
+  - [Creating a Chatbot](#creating-a-chatbot)
+  - [Features](#features)
+
+- [Developer Guide](#developer-guide)
 
 ---
 
@@ -26,11 +27,11 @@ EagleEye is a web application for building and maintaining structured decision-s
 
 Instead of manually creating complex decision trees, EagleEye allows you to define chatbot behaviour using a structured Excel workbook consisting of:
 
-* Topics
-* Issues
-* Parameters
-* Decision Rules
-* Recommendations
+- Topics
+- Issues
+- Parameters
+- Decision Rules
+- Recommendations
 
 The workbook becomes the source of truth for a rule-based chatbot.
 
@@ -46,20 +47,20 @@ Choose the section that best matches your needs:
 
 You're in the right place if you want to:
 
-* Build a structured decision-support chatbot.
-* Create or edit chatbot knowledge bases.
-* Visualise decision flows.
-* Export chatbot data for use with a RAG or rule-based chatbot.
+- Build a structured decision-support chatbot.
+- Create or edit chatbot knowledge bases.
+- Visualise decision flows.
+- Export chatbot data for use with a RAG or rule-based chatbot.
 
 ### Developers
 
 The Developer Guide includes:
 
-* Application architecture
-* Workbook schema
-* Data rules
-* Troubleshooting
-* Future improvements
+- Application architecture
+- Workbook schema
+- Data rules
+- Troubleshooting
+- Future improvements
 
 ---
 
@@ -78,8 +79,9 @@ To use EagleEye:
 3. Assign an appropriate security classification to the template if required.
 4. Upload either:
 
-   * the template workbook, or
-   * an existing decision tree workbook.
+   - the template workbook, or
+   - an existing decision tree workbook.
+
 5. Click **Continue**.
 6. Create, edit, explore, or delete decision trees.
 7. When finished, click **Download All Changes** to export the updated workbook.
@@ -90,7 +92,7 @@ To use EagleEye:
 
 #### Prerequisites
 
-* Python 3
+- Python 3
 
 #### Installation
 
@@ -125,8 +127,9 @@ http://localhost:3000
 2. Download a template workbook if creating a new chatbot.
 3. Upload either:
 
-   * the template workbook, or
-   * an existing workbook.
+   - the template workbook, or
+   - an existing workbook.
+
 4. Click **Continue**.
 5. Edit your knowledge base.
 6. Click **Download All Changes** to export the updated workbook.
@@ -145,12 +148,12 @@ EagleEye is designed for structured decision-support chatbots that need to:
 
 Typical use cases include:
 
-* Internal policy assistants
-* Claims processing
-* HR decision support
-* Government services
-* Compliance guidance
-* Operational playbooks
+- Internal policy assistants
+- Claims processing
+- HR decision support
+- Government services
+- Compliance guidance
+- Operational playbooks
 
 ---
 
@@ -172,36 +175,36 @@ After exporting a workbook from EagleEye, attach the workbook to your chatbot an
 
 ### Workbook Management
 
-* Upload an Excel workbook.
-* Validate workbook structure.
-* Export updated workbooks.
+- Upload an Excel workbook.
+- Validate workbook structure.
+- Export updated workbooks.
 
 ### Knowledge Base Editing
 
-* Create and edit Topics.
-* Create and edit Issues.
-* Create and edit Parameters.
-* Generate Decision Rules.
-* Generate Recommendations.
+- Create and edit Topics.
+- Create and edit Issues.
+- Create and edit Parameters.
+- Generate Decision Rules.
+- Generate Recommendations.
 
 ### Visualisation
 
-* Browse Topics and Issues.
-* Preview decision trees as flowcharts.
-* Automatically regenerate flowcharts when an Issue is selected.
+- Browse Topics and Issues.
+- Preview decision trees as flowcharts.
+- Automatically regenerate flowcharts when an Issue is selected.
 
 ---
 
 ## Planned Features
 
-* Delete Topics, Issues, Parameters, Rules, and Recommendations.
-* Rule conflict detection.
-* Incomplete decision tree warnings.
-* Import/export version metadata.
-* Click-to-edit flowcharts.
-* Test conversation simulator.
-* TypeScript support.
-* Vite development environment.
+- Delete Topics, Issues, Parameters, Rules, and Recommendations.
+- Rule conflict detection.
+- Incomplete decision tree warnings.
+- Import/export version metadata.
+- Click-to-edit flowcharts.
+- Test conversation simulator.
+- TypeScript support.
+- Vite development environment.
 
 ---
 
@@ -263,9 +266,10 @@ Decision trees are organised by **Topic** and **Issue**.
 2. Select an **Issue** under that Topic.
 3. EagleEye displays:
 
-   * Parameters
-   * Decision Rules
-   * Recommendations
+   - Parameters
+   - Decision Rules
+   - Recommendations
+
 4. The Preview panel automatically generates a flowchart for the selected Issue.
 
 > **Note**
@@ -303,8 +307,8 @@ Different items require different selections before they can be created or edite
 
 You can either:
 
-* Click **+** to create a new item.
-* Double-click an existing item to edit it.
+- Click **+** to create a new item.
+- Double-click an existing item to edit it.
 
 ---
 
@@ -317,9 +321,10 @@ Topics are broad categories of user enquiries.
 1. Click the **+** button in the Topics panel, or double-click an existing Topic.
 2. Enter:
 
-   * Topic name
-   * Description
-   * Example phrases (optional)
+   - Topic name
+   - Description
+   - Example phrases (optional)
+
 3. Save the Topic.
 
 ---
@@ -334,10 +339,11 @@ Issues represent specific problems or requests within a Topic.
 2. Create a new Issue or open an existing one.
 3. Enter:
 
-   * `issue_id`
-   * Issue name
-   * Issue description
-   * Example phrases (optional)
+   - `issue_id`
+   - Issue name
+   - Issue description
+   - Example phrases (optional)
+
 4. Save the Issue.
 
 > Every Issue must belong to an existing Topic.
@@ -355,12 +361,13 @@ Parameters define the information the chatbot must collect before making a decis
 3. Create or edit a Parameter.
 4. Enter:
 
-   * `parameter_id`
-   * Question to ask
-   * Required (Yes/No)
-   * Allowed values
-   * Example values
-   * Question order
+   - `parameter_id`
+   - Question to ask
+   - Required (Yes/No)
+   - Allowed values
+   - Example values
+   - Question order
+
 5. Save the Parameter.
 
 Example allowed values:
@@ -394,18 +401,19 @@ Without allowed values, EagleEye cannot generate parameter combinations.
 3. Create or edit a Recommendation.
 4. Enter:
 
-   * Final decision
-   * Recommendation text
-   * Next steps
-   * Escalation note (optional)
-   * Priority
-   * Applicable parameter combinations
+   - Final decision
+   - Recommendation text
+   - Next steps
+   - Escalation note (optional)
+   - Priority
+   - Applicable parameter combinations
+
 5. Save the Recommendation.
 
 EagleEye automatically creates or updates:
 
-* `4_decision_rules`
-* `5_recommendations`
+- `4_decision_rules`
+- `5_recommendations`
 
 Example generated condition:
 
@@ -624,10 +632,10 @@ Example
 
 ### Notes
 
-* `required = yes` means the chatbot **must** collect the parameter.
-* `allowed_values` defines accepted responses.
-* `example_values` help interpret user input.
-* `order` controls the preferred questioning sequence.
+- `required = yes` means the chatbot **must** collect the parameter.
+- `allowed_values` defines accepted responses.
+- `example_values` help interpret user input.
+- `order` controls the preferred questioning sequence.
 
 ---
 
@@ -653,10 +661,10 @@ Example
 
 ### Notes
 
-* Rules are evaluated only after all required parameters are collected.
-* Lower numeric priorities are evaluated first.
-* If multiple rules match, the lowest priority number wins.
-* Conditions should use a consistent structured format such as JSON.
+- Rules are evaluated only after all required parameters are collected.
+- Lower numeric priorities are evaluated first.
+- If multiple rules match, the lowest priority number wins.
+- Conditions should use a consistent structured format such as JSON.
 
 ---
 
@@ -697,27 +705,27 @@ When modifying a knowledge base, follow these rules.
 
 ## Relationships
 
-* Every Issue must belong to a Topic.
-* Every Parameter must belong to an Issue.
-* Every Decision Rule must reference a Recommendation.
-* Recommendations should not exist without a corresponding Rule unless intentionally unused.
+- Every Issue must belong to a Topic.
+- Every Parameter must belong to an Issue.
+- Every Decision Rule must reference a Recommendation.
+- Recommendations should not exist without a corresponding Rule unless intentionally unused.
 
 ## IDs
 
-* Keep IDs unique.
-* Keep IDs stable once published.
-* Avoid reusing deleted IDs.
+- Keep IDs unique.
+- Keep IDs stable once published.
+- Avoid reusing deleted IDs.
 
 ## Parameters
 
-* Use consistent `allowed_values`.
-* Mark mandatory information as `required = yes`.
+- Use consistent `allowed_values`.
+- Mark mandatory information as `required = yes`.
 
 ## Recommendations
 
-* Keep recommendation text policy-based.
-* Avoid embedding business logic inside recommendations.
-* Use escalation for sensitive, urgent or ambiguous cases.
+- Keep recommendation text policy-based.
+- Avoid embedding business logic inside recommendations.
+- Use escalation for sensitive, urgent or ambiguous cases.
 
 ---
 
@@ -769,12 +777,12 @@ Recommended order:
 Example
 
 ```javascript
-document.addEventListener("DOMContentLoaded", main);
+document.addEventListener('DOMContentLoaded', main);
 
 async function main() {
-    await loadParts();
-    initDomElements();
-    bindEvents();
+  await loadParts();
+  initDomElements();
+  bindEvents();
 }
 ```
 
@@ -786,7 +794,7 @@ Incorrect
 
 ```javascript
 rules.push({
-    recommendation_id
+  recommendation_id,
 });
 ```
 
@@ -794,7 +802,7 @@ Correct
 
 ```javascript
 rules.push({
-    recommendation_id: recommendationId
+  recommendation_id: recommendationId,
 });
 ```
 
@@ -827,14 +835,13 @@ The export service should always write workbook data from `appState`, not direct
 
 Planned improvements include:
 
-* Delete Topics, Issues, Parameters, Rules and Recommendations
-* Rule conflict detection
-* Incomplete decision tree warnings
-* Import/export version metadata
-* Interactive click-to-edit flowcharts
-* Test conversation simulator
-* TypeScript support
-* Vite-based development environment
+- Delete Topics, Issues, Parameters, Rules and Recommendations
+- Rule conflict detection
+- Incomplete decision tree warnings
+- Import/export version metadata
+- Interactive click-to-edit flowcharts
+- Test conversation simulator
+- TypeScript support
+- Vite-based development environment
 
 Contributions and suggestions for additional features are welcome.
-

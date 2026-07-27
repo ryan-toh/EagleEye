@@ -3,16 +3,16 @@
    ============================================================ */
 
 :root {
-  --bg:          #F5F5F5;
-  --panel:       #FFFFFF;
-  --text:        #242424;
-  --muted:       #616161;
-  --border:      #D1D1D1;
-  --accent:      #6264A7;
+  --bg: #f5f5f5;
+  --panel: #ffffff;
+  --text: #242424;
+  --muted: #616161;
+  --border: #d1d1d1;
+  --accent: #6264a7;
   --accent-dark: #464775;
-  --danger:      #C4314B;
-  --ok:          #237B4B;
-  --tint:        #E8EBFA;
+  --danger: #c4314b;
+  --ok: #237b4b;
+  --tint: #e8ebfa;
 }
 
 * {
@@ -25,7 +25,11 @@ body {
   margin: auto;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -41,8 +45,12 @@ h3 {
   color: var(--text);
 }
 
-h2 { font-size: 16px; }
-h3 { font-size: 14px; }
+h2 {
+  font-size: 16px;
+}
+h3 {
+  font-size: 14px;
+}
 
 .panel,
 .card {
@@ -88,10 +96,12 @@ textarea {
   width: 100%;
   padding: 8px 10px;
   color: var(--text);
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 4px;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 
 select:focus,
@@ -108,7 +118,7 @@ button {
   border-radius: 4px;
   padding: 8px 16px;
   background: var(--accent);
-  color: #FFFFFF;
+  color: #ffffff;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
@@ -120,8 +130,8 @@ button:hover:not(:disabled) {
 }
 
 button:disabled {
-  background: #C8C8C8;
-  color: #A0A0A0;
+  background: #c8c8c8;
+  color: #a0a0a0;
   cursor: not-allowed;
 }
 
@@ -131,21 +141,25 @@ button:disabled {
   font-size: 12px;
 }
 
-.status.error { color: var(--danger); }
-.status.success { color: var(--ok); }
+.status.error {
+  color: var(--danger);
+}
+.status.success {
+  color: var(--ok);
+}
 
 .badge {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 999px;
-  background: #EDEBE9;
+  background: #edebe9;
   color: #323130;
   font-size: 11px;
   font-weight: 600;
 }
 
 .badge.required {
-  background: #FCE4E8;
+  background: #fce4e8;
   color: var(--danger);
 }
 

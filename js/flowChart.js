@@ -1,5 +1,4 @@
 import { appState } from './appState.js';
-import { isRequired, safeMermaidLabel, str } from './utils.js';
 
 export async function renderMermaid(targetElement, graphDefinition) {
   appState.lastMermaid = graphDefinition;
@@ -7,7 +6,10 @@ export async function renderMermaid(targetElement, graphDefinition) {
   targetElement.innerHTML = '<div class="mermaid"></div>';
 
   try {
-    const { svg } = await window.mermaid.render(`tree-${Date.now()}`, graphDefinition);
+    const { svg } = await window.mermaid.render(
+      `tree-${Date.now()}`,
+      graphDefinition,
+    );
     targetElement.querySelector('.mermaid').innerHTML = svg;
     return { ok: true };
   } catch (error) {

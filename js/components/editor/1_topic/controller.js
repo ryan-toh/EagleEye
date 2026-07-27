@@ -1,18 +1,26 @@
-import { handleTopicSelection } from "../2_issue/controller.js";
-import { setEditorStatus, closeDialog } from "../shared/controller.js";
-import { initTopicEditorDom, topicEditorDom, renderTopicFormFor, renderTopicPicker, getClickedTopicId, setTopicSelectedState, renderTopicOptions } from "./dom.js";
-import { removeTopic, upsertTopic } from "../../../appState.js";
+import { handleTopicSelection } from '../2_issue/controller.js';
+import { setEditorStatus, closeDialog } from '../shared/controller.js';
+import {
+  initTopicEditorDom,
+  topicEditorDom,
+  renderTopicFormFor,
+  renderTopicPicker,
+  getClickedTopicId,
+  setTopicSelectedState,
+  renderTopicOptions,
+} from './dom.js';
+import { removeTopic, upsertTopic } from '../../../appState.js';
 
 export function initTopicEditor() {
-    initTopicEditorDom();
+  initTopicEditorDom();
 
-    topicEditorDom.topicPicker.addEventListener('change', onTopicPicked);
-    topicEditorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
-    topicEditorDom.createTopicBtn.addEventListener('click', onCreateTopic);
-    topicEditorDom.topicSearch.addEventListener('input', renderTopicOptions);
+  topicEditorDom.topicPicker.addEventListener('change', onTopicPicked);
+  topicEditorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
+  topicEditorDom.createTopicBtn.addEventListener('click', onCreateTopic);
+  topicEditorDom.topicSearch.addEventListener('input', renderTopicOptions);
 
-    topicEditorDom.topicList.addEventListener('click', onTopicClick);
-    topicEditorDom.topicList.addEventListener('dblclick', onTopicDblClick);
+  topicEditorDom.topicList.addEventListener('click', onTopicClick);
+  topicEditorDom.topicList.addEventListener('dblclick', onTopicDblClick);
 }
 
 export function refreshTopicPicker() {
@@ -28,11 +36,11 @@ export function clearTopicForm() {
 }
 
 export function onTopicPicked() {
-    const topicId = topicEditorDom.topicPicker.value;
+  const topicId = topicEditorDom.topicPicker.value;
 
-    renderTopicFormFor(topicId);
-    setDomTopicValue(topicId === '__new__' ? '' : topicId);
-    handleTopicSelection(topicId === '__new__' ? '' : topicId);
+  renderTopicFormFor(topicId);
+  setDomTopicValue(topicId === '__new__' ? '' : topicId);
+  handleTopicSelection(topicId === '__new__' ? '' : topicId);
 }
 
 export function onTopicClick(event) {
@@ -79,13 +87,12 @@ export function setDomTopicValue(value) {
   setTopicSelectedState(value);
 }
 
-
 export function getSelectedTopic() {
-    return topicEditorDom.topicSelect.value;
+  return topicEditorDom.topicSelect.value;
 }
 
 export function setTopicForm(topicId) {
-    renderTopicFormFor(topicId);
+  renderTopicFormFor(topicId);
 }
 
 function onCreateTopic() {
@@ -102,11 +109,11 @@ function onSaveTopic() {
   try {
     const topic_id = topicEditorDom.topicId.value;
 
-    const topic = upsertTopic({
+    upsertTopic({
       topic_id: topic_id,
       topic_name: topicEditorDom.topicName.value,
       description: topicEditorDom.topicDescription.value,
-      example_phrases: topicEditorDom.topicExamples.value
+      example_phrases: topicEditorDom.topicExamples.value,
     });
 
     refreshTopicPicker();
@@ -117,7 +124,6 @@ function onSaveTopic() {
     renderTopicOptions();
     setDomTopicValue('');
     handleTopicSelection('');
-    
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }

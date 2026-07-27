@@ -119,11 +119,11 @@
   font-weight: 600;
 }
 
-.decision-explorer__item[draggable="true"] {
+.decision-explorer__item[draggable='true'] {
   cursor: grab;
 }
 
-.decision-explorer__item[draggable="true"]:active {
+.decision-explorer__item[draggable='true']:active {
   cursor: grabbing;
 }
 
@@ -153,14 +153,16 @@
 .decision-explorer__delete:hover,
 .decision-explorer__delete:focus-visible {
   color: var(--danger);
-  background: #FFFFFF;
+  background: #ffffff;
   border-color: var(--border);
   box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
 }
 
 .decision-explorer__delete:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgb(196 43 28 / 25%), 0 1px 4px rgb(0 0 0 / 18%);
+  box-shadow:
+    0 0 0 2px rgb(196 43 28 / 25%),
+    0 1px 4px rgb(0 0 0 / 18%);
 }
 
 /* Row content */

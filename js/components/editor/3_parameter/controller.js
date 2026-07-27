@@ -1,30 +1,48 @@
-import { getSelectedIssue } from "../2_issue/controller.js";
-import { issueEditorDom } from "../2_issue/dom.js";
-import { initParamEditorDom, paramEditorDom, renderParameterPicker, renderParamFormFor, renderParamOptions, getClickedParamId, setParamSelectedState } from "./dom.js";
-import { moveParameterToIssue, removeParameter, upsertParameter } from "../../../appState.js";
-import { setEditorStatus, closeDialog, renderSelectedIssuePreview } from "../shared/controller.js";
-import { refreshRecommendations } from "../4_recommendationMatrix/controller.js";
+import { getSelectedIssue } from '../2_issue/controller.js';
+import { issueEditorDom } from '../2_issue/dom.js';
+import {
+  initParamEditorDom,
+  paramEditorDom,
+  renderParameterPicker,
+  renderParamFormFor,
+  renderParamOptions,
+  getClickedParamId,
+  setParamSelectedState,
+} from './dom.js';
+import {
+  moveParameterToIssue,
+  removeParameter,
+  upsertParameter,
+} from '../../../appState.js';
+import {
+  setEditorStatus,
+  closeDialog,
+  renderSelectedIssuePreview,
+} from '../shared/controller.js';
+import { refreshRecommendations } from '../4_recommendationMatrix/controller.js';
 
 export function initParamEditor() {
-    initParamEditorDom();
+  initParamEditorDom();
 
-    paramEditorDom.parameterPicker.addEventListener('change', onParamPicked);
-    paramEditorDom.saveParameterBtn.addEventListener('click', onSaveParameter);
-    paramEditorDom.createParamBtn.addEventListener('click', onCreateParam);
-    paramEditorDom.paramSearch.addEventListener('input', () => renderParamOptions(getSelectedIssue()));
+  paramEditorDom.parameterPicker.addEventListener('change', onParamPicked);
+  paramEditorDom.saveParameterBtn.addEventListener('click', onSaveParameter);
+  paramEditorDom.createParamBtn.addEventListener('click', onCreateParam);
+  paramEditorDom.paramSearch.addEventListener('input', () =>
+    renderParamOptions(getSelectedIssue()),
+  );
 
-    paramEditorDom.paramList.addEventListener('click', onParamClick);
-    paramEditorDom.paramList.addEventListener('dblclick', onParamDblClick);
-    paramEditorDom.paramList.addEventListener('dragstart', onParamDragStart);
-    paramEditorDom.paramList.addEventListener('dragend', clearDragState);
+  paramEditorDom.paramList.addEventListener('click', onParamClick);
+  paramEditorDom.paramList.addEventListener('dblclick', onParamDblClick);
+  paramEditorDom.paramList.addEventListener('dragstart', onParamDragStart);
+  paramEditorDom.paramList.addEventListener('dragend', clearDragState);
 
-    issueEditorDom.issueList.addEventListener('dragover', onIssueDragOver);
-    issueEditorDom.issueList.addEventListener('dragleave', onIssueDragLeave);
-    issueEditorDom.issueList.addEventListener('drop', onIssueDrop);
+  issueEditorDom.issueList.addEventListener('dragover', onIssueDragOver);
+  issueEditorDom.issueList.addEventListener('dragleave', onIssueDragLeave);
+  issueEditorDom.issueList.addEventListener('drop', onIssueDrop);
 }
 
 export function refreshParamPicker(issueId) {
-    renderParameterPicker(issueId);
+  renderParameterPicker(issueId);
 }
 
 export function refreshParam(issueId) {
@@ -93,14 +111,14 @@ export function setParamOptions(issueId) {
 }
 
 export function onParamPicked() {
-    const paramId = paramEditorDom.parameterPicker.value;
+  const paramId = paramEditorDom.parameterPicker.value;
 
-    renderParamFormFor(paramId, getSelectedIssue());
-    setDomParamValue(paramId === '__new__' ? '' : paramId);
+  renderParamFormFor(paramId, getSelectedIssue());
+  setDomParamValue(paramId === '__new__' ? '' : paramId);
 }
 
 export function setParamForm(paramId) {
-    renderParamFormFor(paramId, getSelectedIssue());
+  renderParamFormFor(paramId, getSelectedIssue());
 }
 
 function onSaveParameter() {
@@ -116,7 +134,7 @@ function onSaveParameter() {
       required: paramEditorDom.parameterRequired.value,
       allowed_values: paramEditorDom.parameterAllowedValues.value,
       example_values: paramEditorDom.parameterExampleValues.value,
-      order: paramEditorDom.parameterOrder.value
+      order: paramEditorDom.parameterOrder.value,
     });
 
     renderParameterPicker(issue_id);
@@ -161,7 +179,9 @@ function onIssueDragOver(event) {
 
   event.preventDefault();
   event.dataTransfer.dropEffect = 'move';
-  issueEditorDom.issueList.querySelectorAll('.is-drop-target').forEach(row => row.classList.remove('is-drop-target'));
+  issueEditorDom.issueList
+    .querySelectorAll('.is-drop-target')
+    .forEach((row) => row.classList.remove('is-drop-target'));
   target.closest('.decision-explorer__row')?.classList.add('is-drop-target');
 }
 
@@ -172,26 +192,39 @@ function onIssueDragLeave(event) {
 
 function onIssueDrop(event) {
   const target = event.target.closest('[data-issue-id]');
-  const draggedParameterId = event.dataTransfer.getData('application/x-eagle-eye-parameter');
+  const draggedParameterId = event.dataTransfer.getData(
+    'application/x-eagle-eye-parameter',
+  );
   clearDragState();
   if (!target || !draggedParameterId) return;
 
   event.preventDefault();
   try {
-    const movedParameter = moveParameterToIssue(draggedParameterId, target.dataset.issueId);
+    const movedParameter = moveParameterToIssue(
+      draggedParameterId,
+      target.dataset.issueId,
+    );
     handleIssueSelection(getSelectedIssue());
-    setEditorStatus(`Moved ${movedParameter.parameter_name}. Rules using this parameter were removed. Download to save changes.`, 'success');
+    setEditorStatus(
+      `Moved ${movedParameter.parameter_name}. Rules using this parameter were removed. Download to save changes.`,
+      'success',
+    );
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }
 }
 
 function hasDragType(event, type) {
-  return type === 'parameter' && event.dataTransfer.types.includes('application/x-eagle-eye-parameter');
+  return (
+    type === 'parameter' &&
+    event.dataTransfer.types.includes('application/x-eagle-eye-parameter')
+  );
 }
 
 function clearDragState() {
-  document.querySelectorAll('.decision-explorer__row.is-dragging, .decision-explorer__row.is-drop-target')
-    .forEach(row => row.classList.remove('is-dragging', 'is-drop-target'));
+  document
+    .querySelectorAll(
+      '.decision-explorer__row.is-dragging, .decision-explorer__row.is-drop-target',
+    )
+    .forEach((row) => row.classList.remove('is-dragging', 'is-drop-target'));
 }
-

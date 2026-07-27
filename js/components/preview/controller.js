@@ -1,11 +1,16 @@
-import { previewDom, initPreviewDomElements, renderIssueSummary, renderEmptyIssueView } from "./dom.js";
-import { renderMermaid } from "../../flowchart.js";
-import { appState } from "../../appState.js";
+import {
+  previewDom,
+  initPreviewDomElements,
+  renderIssueSummary,
+  renderEmptyIssueView,
+} from './dom.js';
+import { renderMermaid } from '../../flowchart.js';
+import { appState } from '../../appState.js';
 
 export function initPreview() {
-    initPreviewDomElements();
+  initPreviewDomElements();
 
-    previewDom.copyMermaidBtn.addEventListener('click', copyGraph);
+  previewDom.copyMermaidBtn.addEventListener('click', copyGraph);
 }
 
 export async function copyGraph() {
@@ -23,7 +28,10 @@ export async function copyGraph() {
     previewDom.copyMermaidBtn.textContent = 'Copy unavailable';
   }
 
-  setTimeout(() => (previewDom.copyMermaidBtn.textContent = 'Copy Mermaid'), 1200);
+  setTimeout(
+    () => (previewDom.copyMermaidBtn.textContent = 'Copy Mermaid'),
+    1200,
+  );
 }
 
 export async function setGraph(graphDefinition) {

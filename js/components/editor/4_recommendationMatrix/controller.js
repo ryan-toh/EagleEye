@@ -1,6 +1,14 @@
 import { getSelectedIssue } from '../2_issue/controller.js';
-import { closeDialog, renderSelectedIssuePreview, setEditorStatus } from '../shared/controller.js';
-import { appState, removeRecommendation, removeRule } from '../../../appState.js';
+import {
+  closeDialog,
+  renderSelectedIssuePreview,
+  setEditorStatus,
+} from '../shared/controller.js';
+import {
+  appState,
+  removeRecommendation,
+  removeRule,
+} from '../../../appState.js';
 import {
   collectRecommendationAssignments,
   getClickedRecommendationId,
@@ -9,18 +17,35 @@ import {
   renderRecommendationFormFor,
   renderRecommendationOptions,
   renderRecommendationPicker,
-  setRecommendationSelectedState
+  setRecommendationSelectedState,
 } from './dom.js';
-import { saveRecommendation, saveRecommendationAssignments } from './service.js';
+import {
+  saveRecommendation,
+  saveRecommendationAssignments,
+} from './service.js';
 
 export function initRecomEditor() {
   initRecomEditorDom();
-  recomEditorDom.createRecommendationBtn.addEventListener('click', onCreateRecommendation);
-  recomEditorDom.recommSearch.addEventListener('input', () => renderRecommendationOptions(getSelectedIssue()));
+  recomEditorDom.createRecommendationBtn.addEventListener(
+    'click',
+    onCreateRecommendation,
+  );
+  recomEditorDom.recommSearch.addEventListener('input', () =>
+    renderRecommendationOptions(getSelectedIssue()),
+  );
   recomEditorDom.recommList.addEventListener('click', onRecommendationClick);
-  recomEditorDom.recommList.addEventListener('dblclick', onRecommendationDoubleClick);
-  recomEditorDom.recommendationPicker.addEventListener('change', onRecommendationPicked);
-  recomEditorDom.saveRecommendationBtn.addEventListener('click', onSaveRecommendation);
+  recomEditorDom.recommList.addEventListener(
+    'dblclick',
+    onRecommendationDoubleClick,
+  );
+  recomEditorDom.recommendationPicker.addEventListener(
+    'change',
+    onRecommendationPicked,
+  );
+  recomEditorDom.saveRecommendationBtn.addEventListener(
+    'click',
+    onSaveRecommendation,
+  );
   renderRecommendationOptions('');
 }
 
@@ -41,15 +66,18 @@ function onRecommendationClick(event) {
 
   if (event.target.closest('.decision-explorer__delete')) {
     appState.rules
-      .filter(rule => rule.recommendation_id === recommendationId)
-      .map(rule => rule.rule_id)
+      .filter((rule) => rule.recommendation_id === recommendationId)
+      .map((rule) => rule.rule_id)
       .forEach(removeRule);
     removeRecommendation(recommendationId);
     const issueId = getSelectedIssue();
     renderRecommendationOptions(issueId);
     setRecommendationSelectedState('');
     void renderSelectedIssuePreview();
-    setEditorStatus('Recommendation deleted. Download to save changes.', 'success');
+    setEditorStatus(
+      'Recommendation deleted. Download to save changes.',
+      'success',
+    );
     return;
   }
 
@@ -70,7 +98,10 @@ function onRecommendationDoubleClick(event) {
 }
 
 function onRecommendationPicked() {
-  renderRecommendationFormFor(recomEditorDom.recommendationPicker.value, getSelectedIssue());
+  renderRecommendationFormFor(
+    recomEditorDom.recommendationPicker.value,
+    getSelectedIssue(),
+  );
 }
 
 async function onSaveRecommendation() {
@@ -80,11 +111,15 @@ async function onSaveRecommendation() {
       finalDecision: recomEditorDom.recommendationDecision.value,
       recommendationText: recomEditorDom.recommendationText.value,
       nextSteps: recomEditorDom.recommendationNextSteps.value,
-      escalationNote: recomEditorDom.recommendationEscalationNote.value
+      escalationNote: recomEditorDom.recommendationEscalationNote.value,
     });
     const issueId = getSelectedIssue();
     const assignmentCount = issueId
-      ? saveRecommendationAssignments(issueId, recommendation.recommendation_id, collectRecommendationAssignments())
+      ? saveRecommendationAssignments(
+          issueId,
+          recommendation.recommendation_id,
+          collectRecommendationAssignments(),
+        )
       : 0;
 
     renderRecommendationOptions(issueId);
@@ -92,7 +127,10 @@ async function onSaveRecommendation() {
     setRecommendationSelectedState('');
     closeDialog(recomEditorDom.recommDialog);
     await renderSelectedIssuePreview();
-    setEditorStatus(`Saved${issueId ? ` with ${assignmentCount} assigned combination(s). Download to see changes.` : ''}.`, 'success');
+    setEditorStatus(
+      `Saved${issueId ? ` with ${assignmentCount} assigned combination(s). Download to see changes.` : ''}.`,
+      'success',
+    );
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }

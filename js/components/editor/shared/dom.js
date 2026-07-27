@@ -14,37 +14,37 @@ export function renderEditorStatus(message, type = '') {
 }
 
 export function createExplorerItem({ id, title, meta, type, icon }) {
-  const row = document.createElement("div");
-  const button = document.createElement("button");
-  const deleteButton = document.createElement("button");
+  const row = document.createElement('div');
+  const button = document.createElement('button');
+  const deleteButton = document.createElement('button');
 
-  button.type = "button";
-  button.className = "decision-explorer__item";
-  button.draggable = type === "issue" || type === "param";
-  row.className = "decision-explorer__row";
+  button.type = 'button';
+  button.className = 'decision-explorer__item';
+  button.draggable = type === 'issue' || type === 'param';
+  row.className = 'decision-explorer__row';
 
-  deleteButton.type = "button";
-  deleteButton.className = "decision-explorer__delete";
-  deleteButton.setAttribute("aria-label", `Delete ${title}`);
+  deleteButton.type = 'button';
+  deleteButton.className = 'decision-explorer__delete';
+  deleteButton.setAttribute('aria-label', `Delete ${title}`);
   deleteButton.title = `Delete ${title}`;
-  deleteButton.textContent = "-";
+  deleteButton.textContent = '-';
 
-  if (type === "topic") {
+  if (type === 'topic') {
     button.dataset.topicId = String(id);
     row.dataset.topicId = String(id);
   }
 
-  if (type === "issue") {
+  if (type === 'issue') {
     button.dataset.issueId = String(id);
     row.dataset.issueId = String(id);
   }
 
-  if (type === "param") {
+  if (type === 'param') {
     button.dataset.paramId = String(id);
     row.dataset.paramId = String(id);
   }
 
-  if (type === "recommendation") {
+  if (type === 'recommendation') {
     button.dataset.recommendationId = String(id);
     row.dataset.recommendationId = String(id);
   }
@@ -55,17 +55,13 @@ export function createExplorerItem({ id, title, meta, type, icon }) {
     </span>
     <span class="decision-explorer__item-main">
       <span class="decision-explorer__item-title"></span>
-      ${
-        meta
-          ? '<span class="decision-explorer__item-meta"></span>'
-          : ""
-      }
+      ${meta ? '<span class="decision-explorer__item-meta"></span>' : ''}
     </span>
   `;
 
-  button.querySelector(".decision-explorer__item-title").textContent = title;
+  button.querySelector('.decision-explorer__item-title').textContent = title;
 
-  const metaElement = button.querySelector(".decision-explorer__item-meta");
+  const metaElement = button.querySelector('.decision-explorer__item-meta');
 
   if (metaElement) {
     metaElement.textContent = meta;

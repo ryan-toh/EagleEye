@@ -1,26 +1,44 @@
-import { getSelectedTopic } from "../1_topic/controller.js";
-import { topicEditorDom } from "../1_topic/dom.js";
-import { handleIssueSelection } from "../3_parameter/controller.js";
-import { moveIssueToTopic, removeIssue, upsertIssue } from "../../../appState.js";
-import { closeDialog, renderSelectedIssuePreview, setEditorStatus } from "../shared/controller.js";
-import { issueEditorDom, initIssueEditorDom, renderIssueFormFor, renderIssuePickerFor, renderIssueOptions, getClickedIssueId, setIssueSelectedState } from "./dom.js";
+import { getSelectedTopic } from '../1_topic/controller.js';
+import { topicEditorDom } from '../1_topic/dom.js';
+import { handleIssueSelection } from '../3_parameter/controller.js';
+import {
+  moveIssueToTopic,
+  removeIssue,
+  upsertIssue,
+} from '../../../appState.js';
+import {
+  closeDialog,
+  renderSelectedIssuePreview,
+  setEditorStatus,
+} from '../shared/controller.js';
+import {
+  issueEditorDom,
+  initIssueEditorDom,
+  renderIssueFormFor,
+  renderIssuePickerFor,
+  renderIssueOptions,
+  getClickedIssueId,
+  setIssueSelectedState,
+} from './dom.js';
 
 export function initIssueEditor() {
-    initIssueEditorDom();
+  initIssueEditorDom();
 
-    issueEditorDom.issuePicker.addEventListener('change', onIssuePicked);
-    issueEditorDom.saveIssueBtn.addEventListener('click', onSaveIssue);
-    issueEditorDom.createIssueBtn.addEventListener('click', onCreateIssue);
-    issueEditorDom.issueSearch.addEventListener('input', () => renderIssueOptions(getSelectedTopic()));
+  issueEditorDom.issuePicker.addEventListener('change', onIssuePicked);
+  issueEditorDom.saveIssueBtn.addEventListener('click', onSaveIssue);
+  issueEditorDom.createIssueBtn.addEventListener('click', onCreateIssue);
+  issueEditorDom.issueSearch.addEventListener('input', () =>
+    renderIssueOptions(getSelectedTopic()),
+  );
 
-    issueEditorDom.issueList.addEventListener('click', onIssueClick);
-    issueEditorDom.issueList.addEventListener('dblclick', onIssueDblClick);
-    issueEditorDom.issueList.addEventListener('dragstart', onIssueDragStart);
-    issueEditorDom.issueList.addEventListener('dragend', clearDragState);
+  issueEditorDom.issueList.addEventListener('click', onIssueClick);
+  issueEditorDom.issueList.addEventListener('dblclick', onIssueDblClick);
+  issueEditorDom.issueList.addEventListener('dragstart', onIssueDragStart);
+  issueEditorDom.issueList.addEventListener('dragend', clearDragState);
 
-    topicEditorDom.topicList.addEventListener('dragover', onTopicDragOver);
-    topicEditorDom.topicList.addEventListener('dragleave', onTopicDragLeave);
-    topicEditorDom.topicList.addEventListener('drop', onTopicDrop);
+  topicEditorDom.topicList.addEventListener('dragover', onTopicDragOver);
+  topicEditorDom.topicList.addEventListener('dragleave', onTopicDragLeave);
+  topicEditorDom.topicList.addEventListener('drop', onTopicDrop);
 }
 
 async function onIssueClick(event) {
@@ -87,7 +105,7 @@ export function refreshIssue(topicId) {
 }
 
 export function refreshIssuePicker(topicId) {
-    renderIssuePickerFor(topicId);
+  renderIssuePickerFor(topicId);
 }
 
 export function clearIssueForm() {
@@ -102,12 +120,12 @@ export async function onIssuePicked() {
   setDomIssueValue(issueId === '__new__' ? '' : issueId);
   handleIssueSelection(issueId === '__new__' ? '' : issueId);
 
-  // Automatically load graph, token required 
+  // Automatically load graph, token required
   await renderSelectedIssuePreview();
 }
 
 export function setIssueForm(issueId) {
-    renderIssueFormFor(issueId);
+  renderIssueFormFor(issueId);
 }
 
 async function onSaveIssue() {
@@ -115,12 +133,12 @@ async function onSaveIssue() {
     const topic_id = getSelectedTopic();
     const issue_id = issueEditorDom.issueId.value;
 
-    const issue = upsertIssue({
+    upsertIssue({
       issue_id: issue_id,
       topic_id: topic_id,
       issue_name: issueEditorDom.issueName.value,
       issue_description: issueEditorDom.issueDescription.value,
-      example_phrases: issueEditorDom.issueExamples.value
+      example_phrases: issueEditorDom.issueExamples.value,
     });
 
     refreshIssuePicker(topic_id);
@@ -133,15 +151,13 @@ async function onSaveIssue() {
     setDomIssueValue('');
     handleIssueSelection('');
     await renderSelectedIssuePreview();
-
-
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }
 }
 
 export function getSelectedIssue() {
-    return issueEditorDom.issueSelect.value;
+  return issueEditorDom.issueSelect.value;
 }
 
 function onCreateIssue() {
@@ -174,7 +190,9 @@ function onTopicDragOver(event) {
 
   event.preventDefault();
   event.dataTransfer.dropEffect = 'move';
-  topicEditorDom.topicList.querySelectorAll('.is-drop-target').forEach(row => row.classList.remove('is-drop-target'));
+  topicEditorDom.topicList
+    .querySelectorAll('.is-drop-target')
+    .forEach((row) => row.classList.remove('is-drop-target'));
   target.closest('.decision-explorer__row')?.classList.add('is-drop-target');
 }
 
@@ -185,7 +203,9 @@ function onTopicDragLeave(event) {
 
 function onTopicDrop(event) {
   const target = event.target.closest('[data-topic-id]');
-  const draggedIssueId = event.dataTransfer.getData('application/x-eagle-eye-issue');
+  const draggedIssueId = event.dataTransfer.getData(
+    'application/x-eagle-eye-issue',
+  );
   clearDragState();
   if (!target || !draggedIssueId) return;
 
@@ -193,17 +213,26 @@ function onTopicDrop(event) {
   try {
     const movedIssue = moveIssueToTopic(draggedIssueId, target.dataset.topicId);
     handleTopicSelection(getSelectedTopic());
-    setEditorStatus(`Moved ${movedIssue.issue_name}. Download to save changes.`, 'success');
+    setEditorStatus(
+      `Moved ${movedIssue.issue_name}. Download to save changes.`,
+      'success',
+    );
   } catch (error) {
     setEditorStatus(error.message, 'error');
   }
 }
 
 function hasDragType(event, type) {
-  return type === 'issue' && event.dataTransfer.types.includes('application/x-eagle-eye-issue');
+  return (
+    type === 'issue' &&
+    event.dataTransfer.types.includes('application/x-eagle-eye-issue')
+  );
 }
 
 function clearDragState() {
-  document.querySelectorAll('.decision-explorer__row.is-dragging, .decision-explorer__row.is-drop-target')
-    .forEach(row => row.classList.remove('is-dragging', 'is-drop-target'));
+  document
+    .querySelectorAll(
+      '.decision-explorer__row.is-dragging, .decision-explorer__row.is-drop-target',
+    )
+    .forEach((row) => row.classList.remove('is-dragging', 'is-drop-target'));
 }

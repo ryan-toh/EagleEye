@@ -23,45 +23,53 @@ export function safeMermaidLabel(value) {
 }
 
 export function isRequired(value) {
-  return ['yes', 'y', 'true', 'required', '1'].includes(str(value).toLowerCase());
+  return ['yes', 'y', 'true', 'required', '1'].includes(
+    str(value).toLowerCase(),
+  );
 }
 
 export function toList(items, renderer) {
   if (!items.length) return '<p class="empty">None found for this issue.</p>';
-  return `<ul>${items.map(item => `<li>${renderer(item)}</li>`).join('')}</ul>`;
+  return `<ul>${items.map((item) => `<li>${renderer(item)}</li>`).join('')}</ul>`;
 }
 
 export function validateLibraries() {
   if (!window.XLSX) {
-    throw new Error('XLSX library not loaded. Check the script tag in index.html.');
+    throw new Error(
+      'XLSX library not loaded. Check the script tag in index.html.',
+    );
   }
 
   if (!window.mermaid) {
-    throw new Error('Mermaid library not loaded. Check the script tag in index.html.');
+    throw new Error(
+      'Mermaid library not loaded. Check the script tag in index.html.',
+    );
   }
 
   if (!window.marked) {
-    throw new Error(`Marked library not loaded. Check the script tag in index.html.`);
+    throw new Error(
+      `Marked library not loaded. Check the script tag in index.html.`,
+    );
   }
 }
 
 export function toHtml(markdown) {
-  const renderer = new marked.Renderer();
+  const renderer = new window.marked.Renderer();
 
   // to allow site navigation to work
   renderer.heading = function ({ tokens, depth }) {
-      const text = this.parser.parseInline(tokens);
+    const text = this.parser.parseInline(tokens);
 
-      const slug = text
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, "")
-          .trim()
-          .replace(/\s+/g, "-");
+    const slug = text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-');
 
-      return `<h${depth} id="${slug}">${text}</h${depth}>`;
+    return `<h${depth} id="${slug}">${text}</h${depth}>`;
   };
 
-  marked.use({ renderer });
+  window.marked.use({ renderer });
 
   return window.marked.parse(markdown);
 }

@@ -1,69 +1,84 @@
-
 <section class="panel editor-panel hidden" id="editor-panel">
   <div class="editor-panel__header">
     <div>
       <h2>Your Knowledge Base</h2>
-      <p class="helper-text">Don't know where to start? Read the guide <a href="/user-guide.html">here</a></p>
+      <p class="helper-text">
+        Don't know where to start? Read the guide
+        <a href="/user-guide.html">here</a>
+      </p>
     </div>
   </div>
 
   <!-- Hidden values keep the existing controller-style getter/setter API working -->
-  <input type="hidden" id="editorTopicSelect" value="">
-  <input type="hidden" id="editorIssueSelect" value="">
-  <input type="hidden" id="editorParamSelect" value="">
-  <input type="hidden" id="editorRecommendationSelect" value="">
+  <input type="hidden" id="editorTopicSelect" value="" />
+  <input type="hidden" id="editorIssueSelect" value="" />
+  <input type="hidden" id="editorParamSelect" value="" />
+  <input type="hidden" id="editorRecommendationSelect" value="" />
 
   <div class="decision-explorer">
     <section class="decision-explorer__pane decision-explorer__pane--topics">
       <div class="decision-explorer__pane-header">
         <h3>Topics</h3>
         <p class="helper-text">Double click to edit</p>
-        <button id="createTopicBtn", class="editor-explorer__add-btn" type="button">
+        <button
+          id="createTopicBtn"
+          ,
+          class="editor-explorer__add-btn"
+          type="button"
+        >
           +
         </button>
       </div>
 
       <div class="editor-explorer__search">
-        <input id="editorTopicSearch" type="search" placeholder="Search topics" aria-label="Search topics" autocomplete="off">
+        <input
+          id="editorTopicSearch"
+          type="search"
+          placeholder="Search topics"
+          aria-label="Search topics"
+          autocomplete="off"
+        />
       </div>
 
       <div
-        class="decision-explorer__list" 
+        class="decision-explorer__list"
         id="editorTopicList"
         aria-label="Topics"
       >
-        <div class="decision-explorer__empty">
-          Load files first
-        </div>
+        <div class="decision-explorer__empty">Load files first</div>
       </div>
     </section>
 
     <section class="decision-explorer__pane decision-explorer__pane--issues">
-
       <div class="decision-explorer__pane-header">
-        <h3>
-          Issues
-        </h3>
-        <p class="helper-text" id="editorIssuePaneHint">
-          Select a topic first
-        </p>
-        <button id="createIssueBtn" class="editor-explorer__add-btn" type="button">
+        <h3>Issues</h3>
+        <p class="helper-text" id="editorIssuePaneHint">Select a topic first</p>
+        <button
+          id="createIssueBtn"
+          class="editor-explorer__add-btn"
+          type="button"
+        >
           +
         </button>
       </div>
 
       <div class="editor-explorer__search">
-        <input id="editorIssueSearch" type="search" placeholder="Search issues" aria-label="Search issues" autocomplete="off" disabled>
+        <input
+          id="editorIssueSearch"
+          type="search"
+          placeholder="Search issues"
+          aria-label="Search issues"
+          autocomplete="off"
+          disabled
+        />
       </div>
 
       <div
-        class="decision-explorer__list" 
+        class="decision-explorer__list"
         id="editorIssueList"
         aria-label="Issues"
       >
-        <div class="decision-explorer__empty">
-          Select a topic first
-        </div>
+        <div class="decision-explorer__empty">Select a topic first</div>
       </div>
     </section>
 
@@ -73,51 +88,70 @@
         <p class="helper-text" id="editorParamPanelHint">
           Select an issue first
         </p>
-        <button id="createParamBtn", class="editor-explorer__add-btn" type="button">
+        <button
+          id="createParamBtn"
+          ,
+          class="editor-explorer__add-btn"
+          type="button"
+        >
           +
         </button>
       </div>
 
       <div class="editor-explorer__search">
-        <input id="editorParamSearch" type="search" placeholder="Search parameters" aria-label="Search parameters" autocomplete="off" disabled>
+        <input
+          id="editorParamSearch"
+          type="search"
+          placeholder="Search parameters"
+          aria-label="Search parameters"
+          autocomplete="off"
+          disabled
+        />
       </div>
 
       <div
-        class="decision-explorer__list" 
+        class="decision-explorer__list"
         id="editorParamList"
         aria-label="Parameters"
       >
-        <div class="decision-explorer__empty">
-          Select an issue first
-        </div>
+        <div class="decision-explorer__empty">Select an issue first</div>
       </div>
     </section>
 
     <section class="decision-explorer__pane editor-form-pane">
-    <div class="decision-explorer__pane-header">
+      <div class="decision-explorer__pane-header">
         <h3>Recommendations</h3>
         <p class="helper-text" id="editorRecommendationPanelHint">
-            Select an issue to assign combinations.
+          Select an issue to assign combinations.
         </p>
-        <button id="createRecommendationBtn" class="editor-explorer__add-btn" type="button">+</button>
-    </div>
-    <div class="editor-explorer__search">
-      <input id="editorRecommendationSearch" type="search" placeholder="Search final decisions" aria-label="Search recommendations" autocomplete="off" disabled>
-    </div>
-    <div
-        class="decision-explorer__list" 
+        <button
+          id="createRecommendationBtn"
+          class="editor-explorer__add-btn"
+          type="button"
+        >
+          +
+        </button>
+      </div>
+      <div class="editor-explorer__search">
+        <input
+          id="editorRecommendationSearch"
+          type="search"
+          placeholder="Search final decisions"
+          aria-label="Search recommendations"
+          autocomplete="off"
+          disabled
+        />
+      </div>
+      <div
+        class="decision-explorer__list"
         id="editorRecommendationList"
         aria-label="Recommendations"
       >
-      <div class="decision-explorer__empty">
-        Select an issue first
+        <div class="decision-explorer__empty">Select an issue first</div>
       </div>
-    </div>
     </section>
   </div>
 
   <p id="editorStatus" class="status"></p>
-  <button id="saveSheetBtn">
-      Download all changes
-  </button>
+  <button id="saveSheetBtn">Download all changes</button>
 </section>
