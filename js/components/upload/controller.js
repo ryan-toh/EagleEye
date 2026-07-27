@@ -1,14 +1,26 @@
 import { initUploadDomElements, uploadDom, renderStatus, getFileInput } from "./dom.js";
 import { saveWorkbookData, loadWorkbookData, validateWorkbookData } from "../../fileService.js";
-import { loadState, appState, renderStep } from "../../appState.js";
+import { loadState, appState, renderStep, saveToLocalState, loadLocalState } from "../../appState.js";
 import { setEditorTopicOptions } from "../editor/shared/controller.js";
 
 export function initUpload() {
     initUploadDomElements();
 
     uploadDom.loadBtn.addEventListener('click', onLoadFiles);
+    uploadDom.loadLocalBtn.addEventListener('click', onLoadLocal);
     uploadDom.downloadSheetTemplateBtn.addEventListener('click', downloadSheetTemplate);
     
+}
+
+// called only if a cached version of appState exists in local storage
+function onLoadLocal() {
+  loadLocalState();
+
+  setEditorTopicOptions();
+  appState.step = 2;
+  renderStep();
+
+  setStatus('Previous Session loaded successfully.', 'success');
 }
 
 async function onLoadFiles() {
@@ -20,6 +32,7 @@ async function onLoadFiles() {
     loadState(workbookData);
     setEditorTopicOptions();
     setStatus('Files loaded successfully.', 'success');
+    saveToLocalState();
 
     appState.step = 2;
     renderStep();

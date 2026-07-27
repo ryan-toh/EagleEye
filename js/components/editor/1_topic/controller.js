@@ -110,7 +110,6 @@ function onSaveTopic() {
     });
 
     refreshTopicPicker();
-
     setEditorStatus('Saved topic. Download to see changes.', 'success');
 
     closeDialog(topicEditorDom.topicDialog);

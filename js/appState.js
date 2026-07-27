@@ -1,4 +1,5 @@
 import { topicEditorDom } from './components/editor/1_topic/dom.js';
+import { saveRecommendation } from './components/editor/4_recommendationMatrix/service.js';
 import { str } from './utils.js';
 
 
@@ -11,7 +12,6 @@ export const appState = {
   recommendations: [],
   lastMermaid: '',
   step: 1,
-  flow: null
 };
 
 export function loadState(workbookData) {
@@ -23,6 +23,53 @@ export function loadState(workbookData) {
   appState.lastMermaid = '';
 
   validateStateRelationships(appState);
+}
+
+export function loadLocalState() {
+  appState.topics = JSON.parse(localStorage.getItem('topics')) || [];
+  appState.issues = JSON.parse(localStorage.getItem('issues')) || [];
+  appState.parameters = JSON.parse(localStorage.getItem('parameters')) || [];
+  appState.rules = JSON.parse(localStorage.getItem('rules')) || [];
+  appState.recommendations = JSON.parse(localStorage.getItem('rules')) || [];
+  appState.lastMermaid = localStorage.getItem('lastMermaid') || '';
+  appState.step = parseInt(JSON.parse(localStorage.getItem('rules'))) || 1;
+}
+
+export function saveToLocalState() {
+  saveTopicsToLocalState();
+  saveIssuesToLocalState();
+  saveParametersToLocalState();
+  saveRulesToLocalState();
+  saveRecommendationsToLocalState();
+  saveMermaidToLocalState();
+}
+
+export function saveMermaidToLocalState() {
+  localStorage.setItem('lastMermaid', appState.lastMermaid);
+}
+
+export function saveStepToLocalState() {
+  localStorage.setItem('step', String(appState.step));
+}
+
+export function saveTopicsToLocalState() {
+  localStorage.setItem('topics', JSON.stringify(appState.topics));
+}
+
+export function saveIssuesToLocalState() {
+  localStorage.setItem('issues', JSON.stringify(appState.issues));
+}
+
+export function saveParametersToLocalState() {
+  localStorage.setItem('parameters', JSON.stringify(appState.parameters))
+}
+
+export function saveRulesToLocalState() {
+  localStorage.setItem('rules', JSON.stringify(appState.rules));
+}
+
+export function saveRecommendationsToLocalState() {
+  localStorage.setItem('recommendations', JSON.stringify(appState.recommendations));
 }
 
 export function getIssuesForTopic(topicId) {
@@ -77,6 +124,8 @@ export function upsertTopic(topic) {
 
   requireFields(normalized, ['topic_id', 'topic_name'], 'topic');
   upsertById(appState.topics, 'topic_id', normalized);
+  saveTopicsToLocalState();
+  console.log("saved topics");
   return normalized;
 }
 
@@ -96,6 +145,7 @@ export function upsertIssue(issue) {
   }
 
   upsertById(appState.issues, 'issue_id', normalized);
+  saveIssuesToLocalState();
   return normalized;
 }
 
@@ -127,6 +177,7 @@ export function upsertParameter(parameter) {
     appState.parameters.push(normalized);
   }
 
+  saveParametersToLocalState();
   return normalized;
 }
 
@@ -139,6 +190,8 @@ export function moveIssueToTopic(issueId, topicId) {
   if (str(issue.topic_id) === str(topicId)) return issue;
 
   issue.topic_id = str(topicId);
+
+  saveIssuesToLocalState();
   return issue;
 }
 
@@ -164,6 +217,8 @@ export function moveParameterToIssue(parameterId, issueId) {
   rulesToRemove.forEach(removeRule);
   parameter.issue_id = str(issueId);
   parameter.order = str(nextParameterOrder(issueId));
+
+  saveParametersToLocalState();
   return parameter;
 }
 
@@ -181,6 +236,7 @@ export function upsertRecommendation(recommendation) {
   requireFields(normalized, ['recommendation_id', 'final_decision', 'recommendation_text'], 'recommendation');
   upsertById(appState.recommendations, 'recommendation_id', normalized);
   
+  saveRecommendationsToLocalState();
   return normalized;
 }
 
@@ -204,6 +260,8 @@ export function upsertRule(rule) {
   }
 
   upsertById(appState.rules, 'rule_id', normalized);
+
+  saveRulesToLocalState();
   return normalized;
 }
 
@@ -225,6 +283,8 @@ export function removeTopic(topicId) {
   if (index >= 0) {
     appState.topics.splice(index, 1);
   }
+
+  saveTopicsToLocalState();
 }
 
 /*
@@ -245,6 +305,8 @@ export function removeIssue(issueId) {
   if (index >= 0) {
     appState.issues.splice(index, 1);
   }
+
+  saveIssuesToLocalState();
 }
 
 /*
@@ -274,6 +336,7 @@ export function removeParameter(paramId) {
     appState.parameters.splice(index, 1);
   }
 
+  saveParametersToLocalState();
 }
 
 /*
@@ -296,6 +359,8 @@ export function removeRule(ruleId) {
       removeRecommendation(recommendationId);
     }
   }
+
+  saveRulesToLocalState();
 }
 
 /*
@@ -307,6 +372,8 @@ export function removeRecommendation(recomId) {
   if (index >= 0) {
     appState.recommendations.splice(index, 1);
   }
+
+  saveRecommendationsToLocalState();
 }
 
 export function makeUniqueId(prefix, rows, idKey) {
