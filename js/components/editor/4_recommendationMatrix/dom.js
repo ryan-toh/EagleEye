@@ -1,5 +1,6 @@
 import {
   appState,
+  getIssueParameters,
   makeUniqueId,
 } from '../../../appState.js';
 import { escapeHtml, str } from '../../../utils.js';
@@ -157,6 +158,11 @@ function renderAssignmentChoices(issueId, recommendationId) {
   const parameters = getParametersWithAllowedValues(issueId);
   const combinations = buildParameterCombinations(issueId);
   if (!parameters.length) {
+    if (!getIssueParameters(issueId).length) {
+      renderDirectAssignmentChoice(issueId, recommendationId);
+      return;
+    }
+
     recomEditorDom.recommendationAssignments.innerHTML =
       '<p class="helper-text">Add allowed values to parameters before assigning combinations.</p>';
     return;
@@ -185,6 +191,20 @@ function renderAssignmentChoices(issueId, recommendationId) {
       </label>`;
     })
     .join('');
+}
+
+function renderDirectAssignmentChoice(issueId, recommendationId) {
+  const conditions = {};
+  const rule = getRuleForCombination(issueId, conditions);
+  const selected =
+    rule && str(rule.recommendation_id) === str(recommendationId);
+
+  recomEditorDom.recommendationAssignments.innerHTML = `
+    <label class="recommendation-assignment" data-combination="{}">
+      <input class="recommendation-assignment__checkbox" type="checkbox" ${selected ? 'checked' : ''} />
+      <span class="recommendation-assignment__summary">Apply directly to this issue</span>
+      <span class="recommendation-assignment__priority-wrap">Priority <input class="recommendation-assignment__priority" type="number" min="1" value="${escapeHtml(rule?.priority || 1)}" /></span>
+    </label>`;
 }
 
 function setSelectedState(container, datasetKey, selectedId) {

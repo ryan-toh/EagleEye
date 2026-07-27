@@ -1,6 +1,8 @@
 import { FILE_CONFIG } from './schema.js';
 import { getSampleWorkbookData } from './schema.js';
 
+const SHEET_HEADERS_KEY = '__sheetHeaders';
+
 /* Save and Export */
 
 export function saveWorkbookData(
@@ -98,7 +100,8 @@ export function validateWorkbookData(workbookData) {
   Object.entries(FILE_CONFIG.sheet).forEach(([key, config]) => {
     validateRequiredColumns(
       config.sheetName,
-      workbookData[key],
+      workbookData[SHEET_HEADERS_KEY]?.[key] ??
+        Object.keys(workbookData[key]?.[0] || {}),
       config.requiredColumns,
     );
   });
@@ -123,7 +126,7 @@ function readMultiSheetXlsx(file) {
           ]),
         );
 
-        const result = {};
+        const result = { [SHEET_HEADERS_KEY]: {} };
 
         for (const [key, config] of Object.entries(FILE_CONFIG.sheet)) {
           const sheet = workbook.Sheets[config.sheetName];
@@ -138,6 +141,14 @@ function readMultiSheetXlsx(file) {
           }
 
           const rows = window.XLSX.utils.sheet_to_json(sheet, { defval: '' });
+          const [headerRow = []] = window.XLSX.utils.sheet_to_json(sheet, {
+            header: 1,
+            defval: '',
+          });
+
+          result[SHEET_HEADERS_KEY][key] = headerRow
+            .map((header) => String(header).trim())
+            .filter(Boolean);
           result[key] = rows.map(normalizeRowKeys);
         }
 
@@ -163,13 +174,8 @@ function normalizeRowKeys(row) {
   return normalized;
 }
 
-function validateRequiredColumns(sheetName, rows, columns) {
-  if (!rows?.length) {
-    throw new Error(`Sheet "${sheetName}" has no data rows.`);
-  }
-
-  const rowColumns = Object.keys(rows[0]);
-  const missing = columns.filter((col) => !rowColumns.includes(col));
+function validateRequiredColumns(sheetName, headers, columns) {
+  const missing = columns.filter((col) => !headers.includes(col));
 
   if (missing.length) {
     throw new Error(

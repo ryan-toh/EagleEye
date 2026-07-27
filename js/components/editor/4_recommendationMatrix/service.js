@@ -4,6 +4,7 @@ import {
   getIssueRules,
   getRecommendationsForRules,
   makeUniqueId,
+  removeRecommendation,
   removeRule,
   upsertRecommendation,
   upsertRule,
@@ -101,6 +102,7 @@ export function saveRecommendationAssignments(
       .filter((item) => item.selected)
       .map((item) => stringifyConditions(item.conditions)),
   );
+  const directRecommendationIds = new Set(getDirectRecommendationIds(issueId));
   let savedCount = 0;
 
   assignments
@@ -124,6 +126,14 @@ export function saveRecommendationAssignments(
       savedCount += 1;
     });
 
+  const directRule = assignments.find(
+    (assignment) =>
+      assignment.selected && Object.keys(assignment.conditions).length === 0,
+  );
+  if (directRule) {
+    keepOnlyDirectRule(issueId, recommendationId, directRecommendationIds);
+  }
+
   getRecommendationAssignments(issueId, recommendationId).forEach((rule) => {
     const parsed = parseConditions(rule.conditions);
     if (parsed && !selectedKeys.has(stringifyConditions(parsed)))
@@ -131,6 +141,45 @@ export function saveRecommendationAssignments(
   });
 
   return savedCount;
+}
+
+function keepOnlyDirectRule(
+  issueId,
+  recommendationId,
+  previousRecommendationIds,
+) {
+  const directRules = getIssueRules(issueId).filter((rule) => {
+    const conditions = parseConditions(rule.conditions);
+    return conditions && Object.keys(conditions).length === 0;
+  });
+  const retainedRule = directRules.find(
+    (rule) => str(rule.recommendation_id) === str(recommendationId),
+  );
+
+  directRules.forEach((rule) => {
+    if (rule.rule_id !== retainedRule?.rule_id) {
+      removeRule(rule.rule_id);
+    }
+  });
+
+  [...previousRecommendationIds]
+    .filter((previousId) => previousId !== str(recommendationId))
+    .filter(
+      (previousId) =>
+        !appState.rules.some(
+          (rule) => str(rule.recommendation_id) === previousId,
+        ),
+    )
+    .forEach((previousId) => removeRecommendation(previousId));
+}
+
+function getDirectRecommendationIds(issueId) {
+  return getIssueRules(issueId)
+    .filter((rule) => {
+      const conditions = parseConditions(rule.conditions);
+      return conditions && Object.keys(conditions).length === 0;
+    })
+    .map((rule) => str(rule.recommendation_id));
 }
 
 export function stringifyConditions(conditions) {
