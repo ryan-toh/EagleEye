@@ -24,6 +24,10 @@
   margin-bottom: 4px;
 }
 
+.editor-panel__back {
+  margin-bottom: 12px;
+}
+
 .editor-panel__header .helper-text {
   margin: 0;
 }

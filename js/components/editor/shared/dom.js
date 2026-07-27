@@ -3,6 +3,7 @@ export const sharedEditorDom = {};
 export function initSharedEditorDom() {
   Object.assign(sharedEditorDom, {
     editorStatus: document.getElementById('editorStatus'),
+    backToUploadsBtn: document.getElementById('backToUploadsBtn'),
     saveSheetBtn: document.getElementById('saveSheetBtn'),
     editorExplorer: document.querySelector('#editor-panel .decision-explorer'),
   });

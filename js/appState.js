@@ -533,8 +533,11 @@ function uniqueValues(rows, key) {
  * Updates the visibility of major UI components based on uiState
  */
 export function renderStep() {
+  const uploadPanel = document.getElementById('upload-panel');
   const editorPanel = document.getElementById('editor-panel');
   const previewPanel = document.getElementById('preview-panel');
+
+  uploadPanel.classList.toggle('hidden', appState.step >= 2);
 
   // Toggle Editor Panel visibility
   editorPanel.classList.toggle('hidden', appState.step < 2);

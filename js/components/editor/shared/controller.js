@@ -40,6 +40,10 @@ export function initEditor() {
 export function initSharedEditor() {
   initSharedEditorDom();
 
+  sharedEditorDom.backToUploadsBtn.addEventListener('click', () => {
+    appState.step = 1;
+    renderStep();
+  });
   sharedEditorDom.saveSheetBtn.addEventListener('click', saveSheet);
   initResizableEditorColumns();
 }
