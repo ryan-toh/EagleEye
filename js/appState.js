@@ -27,9 +27,10 @@ export function loadLocalState() {
   appState.issues = JSON.parse(localStorage.getItem('issues')) || [];
   appState.parameters = JSON.parse(localStorage.getItem('parameters')) || [];
   appState.rules = JSON.parse(localStorage.getItem('rules')) || [];
-  appState.recommendations = JSON.parse(localStorage.getItem('rules')) || [];
+  appState.recommendations =
+    JSON.parse(localStorage.getItem('recommendations')) || [];
   appState.lastMermaid = localStorage.getItem('lastMermaid') || '';
-  appState.step = parseInt(JSON.parse(localStorage.getItem('rules'))) || 1;
+  appState.step = Number.parseInt(localStorage.getItem('step'), 10) || 1;
 }
 
 export function saveToLocalState() {
@@ -39,6 +40,7 @@ export function saveToLocalState() {
   saveRulesToLocalState();
   saveRecommendationsToLocalState();
   saveMermaidToLocalState();
+  saveStepToLocalState();
 }
 
 export function saveMermaidToLocalState() {
