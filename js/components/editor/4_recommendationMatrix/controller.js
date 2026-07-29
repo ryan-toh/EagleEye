@@ -55,6 +55,11 @@ export function refreshRecommendations(issueId) {
 }
 
 function onCreateRecommendation() {
+  if (recomEditorDom.recommendationPicker.disabled || !getSelectedIssue()) {
+    setEditorStatus('Select an issue before creating a recommendation.', 'error');
+    return;
+  }
+
   renderRecommendationPicker();
   renderRecommendationFormFor('__new__', getSelectedIssue());
   recomEditorDom.recommDialog.showModal();
