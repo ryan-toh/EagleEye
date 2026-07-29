@@ -226,7 +226,7 @@ Response rules:
 
 # Features
 
-## Current Features (v0.7)
+## Current Features (v0.9)
 
 ### Workbook Management
 
@@ -239,7 +239,6 @@ Response rules:
 - Create and edit Topics.
 - Create and edit Issues.
 - Create and edit Parameters.
-- Generate Decision Rules.
 - Generate Recommendations.
 
 ### Visualisation
@@ -252,12 +251,10 @@ Response rules:
 
 ## Planned Features
 
-- Delete Topics, Issues, Parameters, Rules, and Recommendations.
 - Rule conflict detection.
 - Incomplete decision tree warnings.
 - Import/export version metadata.
 - Click-to-edit flowcharts.
-- Test conversation simulator.
 - TypeScript support.
 - Vite development environment.
 
@@ -308,6 +305,21 @@ Before you can edit a knowledge base, you must load an Excel workbook.
 > **Validation**
 >
 > If the workbook is missing a required sheet or column, EagleEye displays an error describing the problem before any data is loaded.
+
+## Restoring from a Previous Session
+
+Alternatively, you may restore the file you were editing previously.
+
+### Steps
+
+1. Open EagleEye.
+2. Click **Restore Previous Session**.
+3. EagleEye loads the previous Topics and Issues you were editing.
+
+> **Saving Behaviour**
+>
+> EagleEye saves all data up to the last time you clicked **Save** on each topic, issue, parameter or recommendation.
+
 
 ---
 
@@ -394,8 +406,7 @@ Issues represent specific problems or requests within a Topic.
 2. Create a new Issue or open an existing one.
 3. Enter:
 
-   - `issue_id`
-   - Issue name
+   - **Issue name**
    - Issue description
    - Example phrases (optional)
 
@@ -416,11 +427,10 @@ Parameters define the information the chatbot must collect before making a decis
 3. Create or edit a Parameter.
 4. Enter:
 
-   - `parameter_id`
-   - Question to ask
+   - **Question to ask**
    - Required (Yes/No)
-   - Allowed values
-   - Example values
+   - Allowed values 
+   - Example values (optional)
    - Question order
 
 5. Save the Parameter.
@@ -461,7 +471,11 @@ Without allowed values, EagleEye cannot generate parameter combinations.
    - Next steps
    - Escalation note (optional)
    - Priority
-   - Applicable parameter combinations
+   - Applicable parameter combinations 
+
+> **No Parameter Recommendations**
+>
+> You may assign a recommendation directly to an issue if you do not have any parameters.
 
 5. Save the Recommendation.
 
@@ -519,12 +533,6 @@ EagleEye exports the current application state into an Excel workbook containing
 4_decision_rules
 5_recommendations
 ```
-
-> **Important**
->
-> Export uses the current `appState`.
->
-> If changes haven't been saved into `appState`, they won't appear in the exported workbook.
 
 The exported workbook can later be uploaded back into EagleEye for further editing or attached to your chatbot.
 
@@ -790,13 +798,6 @@ When modifying a knowledge base, follow these rules.
 
 Mermaid must be loaded before the application script.
 
-### CDN
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script type="module" src="js/app.js"></script>
-```
 
 ### npm
 
