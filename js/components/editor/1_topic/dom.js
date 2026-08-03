@@ -6,7 +6,6 @@ export const topicEditorDom = {};
 
 export function initTopicEditorDom() {
   Object.assign(topicEditorDom, {
-    topicPicker: document.getElementById('editorTopicPicker'),
     topicId: document.getElementById('editorTopicId'),
     topicName: document.getElementById('editorTopicName'),
     topicDescription: document.getElementById('editorTopicDescription'),
@@ -19,8 +18,6 @@ export function initTopicEditorDom() {
     topicList: document.getElementById('editorTopicList'),
     topicDialog: document.getElementById('editorTopicDialog'),
   });
-
-  renderTopicPicker();
 }
 
 export function getClickedTopicId(event) {
@@ -61,18 +58,6 @@ export function renderTopicOptions() {
   });
 
   setTopicSelectedState(topicEditorDom.topicSelect.value);
-}
-
-export function renderTopicPicker() {
-  topicEditorDom.topicPicker.innerHTML =
-    '<option value="__new__">+ Create new topic</option>';
-
-  appState.topics.forEach((topic) => {
-    const option = document.createElement('option');
-    option.value = str(topic.topic_id);
-    option.textContent = `${topic.topic_name}`;
-    topicEditorDom.topicPicker.appendChild(option);
-  });
 }
 
 export function renderTopicFormFor(topicId) {

@@ -24,7 +24,6 @@ export function initRecomEditorDom() {
     recommList: document.getElementById('editorRecommendationList'),
     recommPanelHint: document.getElementById('editorRecommendationPanelHint'),
     recommDialog: document.getElementById('editorRecommendationDialog'),
-    recommendationPicker: document.getElementById('editorRecommendationPicker'),
     recommendationId: document.getElementById('editorRecommendationId'),
     recommendationDecision: document.getElementById(
       'editorRecommendationDecision',
@@ -101,17 +100,6 @@ export function getClickedRecommendationId(event) {
   return item ? item.dataset.recommendationId : '';
 }
 
-export function renderRecommendationPicker() {
-  recomEditorDom.recommendationPicker.innerHTML =
-    '<option value="__new__">+ Create new recommendation</option>';
-  getRecommendations().forEach((recommendation) => {
-    const option = document.createElement('option');
-    option.value = recommendation.recommendation_id;
-    option.textContent = `${recommendation.final_decision || 'Clarify'}: ${recommendation.recommendation_id}`;
-    recomEditorDom.recommendationPicker.appendChild(option);
-  });
-}
-
 export function renderRecommendationFormFor(recommendationId, issueId) {
   const recommendation = getRecommendations().find(
     (item) => str(item.recommendation_id) === str(recommendationId),
@@ -127,9 +115,6 @@ export function renderRecommendationFormFor(recommendationId, issueId) {
     recommendation?.next_steps || '';
   recomEditorDom.recommendationEscalationNote.value =
     recommendation?.escalation_note || '';
-  recomEditorDom.recommendationPicker.value = recommendation
-    ? recommendation.recommendation_id
-    : '__new__';
   renderAssignmentChoices(issueId, recommendation?.recommendation_id);
 }
 

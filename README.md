@@ -112,6 +112,12 @@ python3 -m http.server 3000
 python -m http.server 3000
 ```
 
+> **Note** \
+> If port 3000 is in use, try running on another port (e.g. 5050).
+> ```bash
+> python -m http.server 5050
+> ```
+
 4. If Python is not installed, install it first.
 
 ---

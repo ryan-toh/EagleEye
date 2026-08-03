@@ -15,7 +15,6 @@ import {
   issueEditorDom,
   initIssueEditorDom,
   renderIssueFormFor,
-  renderIssuePickerFor,
   renderIssueOptions,
   getClickedIssueId,
   setIssueSelectedState,
@@ -24,7 +23,6 @@ import {
 export function initIssueEditor() {
   initIssueEditorDom();
 
-  issueEditorDom.issuePicker.addEventListener('change', onIssuePicked);
   issueEditorDom.saveIssueBtn.addEventListener('click', onSaveIssue);
   issueEditorDom.createIssueBtn.addEventListener('click', onCreateIssue);
   issueEditorDom.issueSearch.addEventListener('input', () =>
@@ -52,7 +50,6 @@ async function onIssueClick(event) {
     const topicId = getSelectedTopic();
     removeIssue(issueId);
     renderIssueOptions(topicId);
-    refreshIssuePicker(topicId);
     setDomIssueValue('');
     handleIssueSelection('');
     await renderSelectedIssuePreview();
@@ -84,7 +81,6 @@ export function setDomIssueValue(value) {
 
 export function handleTopicSelection(topicId) {
   renderIssueOptions(topicId);
-  renderIssuePickerFor(topicId);
   clearIssueForm();
   setDomIssueValue('');
   handleIssueSelection('');
@@ -92,7 +88,6 @@ export function handleTopicSelection(topicId) {
 }
 
 export function selectIssue(issueId) {
-  issueEditorDom.issuePicker.value = issueId;
   setDomIssueValue(issueId);
 }
 
@@ -104,24 +99,8 @@ export function refreshIssue(topicId) {
   handleTopicSelection(topicId);
 }
 
-export function refreshIssuePicker(topicId) {
-  renderIssuePickerFor(topicId);
-}
-
 export function clearIssueForm() {
   renderIssueFormFor('__new__');
-}
-
-export async function onIssuePicked() {
-  const issueId = issueEditorDom.issuePicker.value;
-
-  renderIssueFormFor(issueId);
-
-  setDomIssueValue(issueId === '__new__' ? '' : issueId);
-  handleIssueSelection(issueId === '__new__' ? '' : issueId);
-
-  // Automatically load graph, token required
-  await renderSelectedIssuePreview();
 }
 
 export function setIssueForm(issueId) {
@@ -141,8 +120,6 @@ async function onSaveIssue() {
       example_phrases: issueEditorDom.issueExamples.value,
     });
 
-    refreshIssuePicker(topic_id);
-
     setEditorStatus('Saved issue. Download to see changes.', 'success');
 
     closeDialog(issueEditorDom.issueDialog);
@@ -161,7 +138,7 @@ export function getSelectedIssue() {
 }
 
 function onCreateIssue() {
-  if (issueEditorDom.issuePicker.disabled) {
+  if (!getSelectedTopic()) {
     setEditorStatus('Select a topic before creating an issue.', 'error');
     return;
   }

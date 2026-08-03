@@ -1,7 +1,6 @@
 import {
   clearTopicForm,
   initTopicEditor,
-  refreshTopicPicker,
   setTopicOptions,
 } from '../1_topic/controller.js';
 import {
@@ -49,7 +48,6 @@ export function initSharedEditor() {
 }
 
 export function setEditorTopicOptions() {
-  refreshTopicPicker();
   clearTopicForm();
 
   setTopicOptions();

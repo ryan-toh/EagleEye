@@ -16,7 +16,6 @@ import {
   recomEditorDom,
   renderRecommendationFormFor,
   renderRecommendationOptions,
-  renderRecommendationPicker,
   setRecommendationSelectedState,
 } from './dom.js';
 import {
@@ -38,10 +37,6 @@ export function initRecomEditor() {
     'dblclick',
     onRecommendationDoubleClick,
   );
-  recomEditorDom.recommendationPicker.addEventListener(
-    'change',
-    onRecommendationPicked,
-  );
   recomEditorDom.saveRecommendationBtn.addEventListener(
     'click',
     onSaveRecommendation,
@@ -55,12 +50,6 @@ export function refreshRecommendations(issueId) {
 }
 
 function onCreateRecommendation() {
-  if (recomEditorDom.recommendationPicker.disabled || !getSelectedIssue()) {
-    setEditorStatus('Select an issue before creating a recommendation.', 'error');
-    return;
-  }
-
-  renderRecommendationPicker();
   renderRecommendationFormFor('__new__', getSelectedIssue());
   recomEditorDom.recommDialog.showModal();
 }
@@ -97,16 +86,8 @@ function onRecommendationDoubleClick(event) {
   if (!recommendationId) return;
   recomEditorDom.recommSelect.value = recommendationId;
   setRecommendationSelectedState(recommendationId);
-  renderRecommendationPicker();
   renderRecommendationFormFor(recommendationId, getSelectedIssue());
   recomEditorDom.recommDialog.showModal();
-}
-
-function onRecommendationPicked() {
-  renderRecommendationFormFor(
-    recomEditorDom.recommendationPicker.value,
-    getSelectedIssue(),
-  );
 }
 
 async function onSaveRecommendation() {

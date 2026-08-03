@@ -4,7 +4,6 @@ import {
   initTopicEditorDom,
   topicEditorDom,
   renderTopicFormFor,
-  renderTopicPicker,
   getClickedTopicId,
   setTopicSelectedState,
   renderTopicOptions,
@@ -14,7 +13,6 @@ import { removeTopic, upsertTopic } from '../../../appState.js';
 export function initTopicEditor() {
   initTopicEditorDom();
 
-  topicEditorDom.topicPicker.addEventListener('change', onTopicPicked);
   topicEditorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
   topicEditorDom.createTopicBtn.addEventListener('click', onCreateTopic);
   topicEditorDom.topicSearch.addEventListener('input', renderTopicOptions);
@@ -23,24 +21,12 @@ export function initTopicEditor() {
   topicEditorDom.topicList.addEventListener('dblclick', onTopicDblClick);
 }
 
-export function refreshTopicPicker() {
-  renderTopicPicker();
-}
-
 export function refreshTopic() {
   clearTopicForm();
 }
 
 export function clearTopicForm() {
   renderTopicFormFor('__new__');
-}
-
-export function onTopicPicked() {
-  const topicId = topicEditorDom.topicPicker.value;
-
-  renderTopicFormFor(topicId);
-  setDomTopicValue(topicId === '__new__' ? '' : topicId);
-  handleTopicSelection(topicId === '__new__' ? '' : topicId);
 }
 
 export function onTopicClick(event) {
@@ -52,7 +38,6 @@ export function onTopicClick(event) {
 
   if (event.target.closest('.decision-explorer__delete')) {
     removeTopic(topicId);
-    refreshTopicPicker();
     renderTopicOptions();
     setDomTopicValue('');
     handleTopicSelection('');
@@ -83,7 +68,6 @@ export function setTopicOptions() {
 
 export function setDomTopicValue(value) {
   topicEditorDom.topicSelect.value = value;
-  topicEditorDom.topicPicker.value = value || '__new__';
   setTopicSelectedState(value);
 }
 
@@ -116,7 +100,6 @@ function onSaveTopic() {
       example_phrases: topicEditorDom.topicExamples.value,
     });
 
-    refreshTopicPicker();
     setEditorStatus('Saved topic. Download to see changes.', 'success');
 
     closeDialog(topicEditorDom.topicDialog);

@@ -10,7 +10,6 @@ export const paramEditorDom = {};
 
 export function initParamEditorDom() {
   Object.assign(paramEditorDom, {
-    parameterPicker: document.getElementById('editorParameterPicker'),
     parameterId: document.getElementById('editorParameterId'),
     parameterName: document.getElementById('editorParameterName'),
     parameterQuestion: document.getElementById('editorParameterQuestion'),
@@ -89,25 +88,6 @@ export function renderParamOptions(issueId) {
 export function getClickedParamId(event) {
   const item = event.target.closest('[data-param-id]');
   return item ? item.dataset.paramId : '';
-}
-
-export function renderParameterPicker(issueId) {
-  paramEditorDom.parameterPicker.innerHTML =
-    '<option value="__new__">+ Create new parameter</option>';
-
-  if (issueId) {
-    getIssueParameters(issueId).forEach((parameter) => {
-      const option = document.createElement('option');
-      option.value = str(parameter.parameter_id);
-      option.textContent = `${parameter.parameter_name}`;
-      paramEditorDom.parameterPicker.appendChild(option);
-    });
-  }
-
-  const disabled = !issueId;
-  paramEditorDom.saveParameterBtn.disabled = disabled;
-  paramEditorDom.parameterPicker.disabled = disabled;
-  paramEditorDom.parameterPicker.value = '__new__';
 }
 
 export function renderParamFormFor(parameterId, issueId) {
