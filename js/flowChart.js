@@ -11,12 +11,23 @@ export async function renderMermaid(targetElement, graphDefinition) {
       graphDefinition,
     );
     targetElement.querySelector('.mermaid').innerHTML = svg;
+    centerFlowchartViewport(targetElement);
     return { ok: true };
   } catch (error) {
     console.error(error);
     targetElement.innerHTML = `<pre>${escapeGraph(graphDefinition)}</pre><p class="status error">Mermaid could not render this chart. The raw Mermaid definition is shown above.</p>`;
     return { ok: false, error };
   }
+}
+
+function centerFlowchartViewport(targetElement) {
+  requestAnimationFrame(() => {
+    targetElement.scrollTop = 0;
+    targetElement.scrollLeft = Math.max(
+      0,
+      (targetElement.scrollWidth - targetElement.clientWidth) / 2,
+    );
+  });
 }
 
 function escapeGraph(value) {

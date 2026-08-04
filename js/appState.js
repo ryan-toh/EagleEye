@@ -542,6 +542,6 @@ export function renderStep() {
   // Toggle Editor Panel visibility
   editorPanel.classList.toggle('hidden', appState.step < 2);
 
-  // Toggle Preview Panel visibility
-  previewPanel.classList.toggle('hidden', appState.step < 3);
+  // Keep the preview visible throughout the editor workflow.
+  previewPanel.classList.toggle('hidden', appState.step < 2);
 }

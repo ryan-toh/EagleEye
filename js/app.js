@@ -43,7 +43,12 @@ function initApp() {
   // try {
   validateLibraries();
 
-  window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+  window.mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'loose',
+    flowchart: { useMaxWidth: false },
+    themeVariables: { fontSize: '14px' },
+  });
 
   initUpload();
   initEditor();

@@ -108,7 +108,7 @@ export function renderRecommendationFormFor(recommendationId, issueId) {
     recommendation?.recommendation_id ||
     makeUniqueId('REC', appState.recommendations, 'recommendation_id');
   recomEditorDom.recommendationDecision.value =
-    recommendation?.final_decision || 'Clarify';
+    recommendation?.final_decision || 'Answered';
   recomEditorDom.recommendationText.value =
     recommendation?.recommendation_text || '';
   recomEditorDom.recommendationNextSteps.value =

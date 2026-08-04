@@ -1,28 +1,71 @@
 <section class="preview-panel hidden" id="preview-panel">
-  <section class="preview-grid panel">
-    <h2>Issue Summary</h2>
-    <div class="preview-card">
-      <h3>Required parameters</h3>
-      <div id="parametersList" class="empty">No issue selected.</div>
-    </div>
-    <div class="preview-card">
-      <h3>Matching rules</h3>
-      <div id="rulesList" class="empty">No issue selected.</div>
-    </div>
-    <div class="preview-card">
-      <h3>Recommendations</h3>
-      <div id="recommendationsList" class="empty">No issue selected.</div>
-    </div>
-  </section>
-
-  <section class="panel">
+  <section id="flowchartPanel" class="panel flowchart-panel">
     <div class="flowchart-header">
       <h2>Generated Flowchart</h2>
-      <button id="copyMermaidBtn" disabled="">Copy Mermaid</button>
+      <div class="flowchart-actions">
+        <button id="copyMermaidBtn" disabled="">Copy Mermaid</button>
+        <button
+          id="fullscreenFlowchartBtn"
+          class="fullscreen-flowchart-btn"
+          type="button"
+          aria-label="Enter fullscreen"
+          aria-pressed="false"
+          title="Enter fullscreen"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
+          </svg>
+        </button>
+      </div>
     </div>
     <br />
     <div id="flowchart" class="flowchart empty">
       Load files and select an issue.
+    </div>
+  </section>
+
+  <section class="issue-summary panel">
+    <header class="issue-summary__header">
+      <div>
+        <h2 id="issueSummaryName">No issue selected</h2>
+        <p id="issueSummaryDescription" class="issue-summary__description">
+          Select an issue to review its decision setup.
+        </p>
+      </div>
+      <div class="issue-summary__counts" aria-label="Issue totals">
+        <span id="parameterCount" class="issue-summary__count"
+          >0 parameters</span
+        >
+        <span id="ruleCount" class="issue-summary__count">0 rules</span>
+        <span id="recommendationCount" class="issue-summary__count"
+          >0 recommendations</span
+        >
+      </div>
+    </header>
+    <div class="preview-grid">
+      <article class="preview-card">
+        <header class="preview-card__header">
+          <h3>Parameters</h3>
+          <span id="parameterCardCount" class="preview-card__count">0</span>
+        </header>
+        <div id="parametersList" class="empty">No issue selected.</div>
+      </article>
+      <article class="preview-card">
+        <header class="preview-card__header">
+          <h3>Matching rules</h3>
+          <span id="ruleCardCount" class="preview-card__count">0</span>
+        </header>
+        <div id="rulesList" class="empty">No issue selected.</div>
+      </article>
+      <article class="preview-card">
+        <header class="preview-card__header">
+          <h3>Recommendations</h3>
+          <span id="recommendationCardCount" class="preview-card__count"
+            >0</span
+          >
+        </header>
+        <div id="recommendationsList" class="empty">No issue selected.</div>
+      </article>
     </div>
   </section>
 </section>
