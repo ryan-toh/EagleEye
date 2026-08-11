@@ -235,7 +235,9 @@
   border: 1px dashed var(--border);
   border-radius: 6px;
   cursor: grab;
-  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: pan-x pan-y;
 }
 
 .flowchart-actions {

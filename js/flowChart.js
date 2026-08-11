@@ -34,6 +34,7 @@ function enableFlowchartPinchZoom(targetElement) {
     baseHeight: 0,
     pinchDistance: 0,
     pinchScale: 1,
+    gestureScale: 1,
     panStart: null,
   };
   flowchartZoomStates.set(targetElement, state);
@@ -107,6 +108,40 @@ function enableFlowchartPinchZoom(targetElement) {
         getMaximumFlowchartZoom(targetElement, state),
       );
       zoomFlowchartAt(targetElement, state, scale, event);
+    },
+    { passive: false },
+  );
+
+  targetElement.addEventListener('touchstart', preventNativePinch, {
+    passive: false,
+  });
+  targetElement.addEventListener('touchmove', preventNativePinch, {
+    passive: false,
+  });
+
+  targetElement.addEventListener(
+    'gesturestart',
+    (event) => {
+      event.preventDefault();
+      state.gestureScale = state.scale;
+    },
+    { passive: false },
+  );
+  targetElement.addEventListener(
+    'gesturechange',
+    (event) => {
+      event.preventDefault();
+      const scale = clamp(
+        state.gestureScale * event.scale,
+        getMinimumFlowchartZoom(targetElement, state),
+        getMaximumFlowchartZoom(targetElement, state),
+      );
+      zoomFlowchartAt(
+        targetElement,
+        state,
+        scale,
+        getEventCenter(event, targetElement),
+      );
     },
     { passive: false },
   );
@@ -204,6 +239,22 @@ function getPointerCenter(first, second) {
   return {
     x: (first.clientX + second.clientX) / 2,
     y: (first.clientY + second.clientY) / 2,
+  };
+}
+
+function preventNativePinch(event) {
+  if (event.touches.length > 1) event.preventDefault();
+}
+
+function getEventCenter(event, targetElement) {
+  if (Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  const bounds = targetElement.getBoundingClientRect();
+  return {
+    x: bounds.left + bounds.width / 2,
+    y: bounds.top + bounds.height / 2,
   };
 }
 
