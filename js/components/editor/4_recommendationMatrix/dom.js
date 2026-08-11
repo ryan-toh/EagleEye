@@ -6,12 +6,12 @@ import {
 import { escapeHtml, str } from '../../../utils.js';
 import { createExplorerItem } from '../shared/dom.js';
 import {
-  buildParameterCombinations,
   getRecommendationAssignments,
   getRecommendations,
   getRecommendationsForIssue,
-  getRuleForCombination,
   getParametersWithAllowedValues,
+  parseAllowedValues,
+  parseConditions,
 } from './service.js';
 
 export const recomEditorDom = {};
@@ -37,6 +37,9 @@ export function initRecomEditorDom() {
     ),
     recommendationAssignments: document.getElementById(
       'editorRecommendationAssignments',
+    ),
+    addRecommendationAssignmentBtn: document.getElementById(
+      'addRecommendationAssignmentBtn',
     ),
     saveRecommendationBtn: document.getElementById('saveRecommendationBtn'),
   });
@@ -84,7 +87,7 @@ export function renderRecommendationOptions(issueId) {
       id: recommendation.recommendation_id,
       title: recommendation.final_decision || 'Clarify',
       meta: issueId
-        ? `${assignmentCount} assigned combination${assignmentCount === 1 ? '' : 's'} · ${recommendation.recommendation_text || 'No response text'}`
+        ? `${assignmentCount} assignment${assignmentCount === 1 ? '' : 's'} · ${recommendation.recommendation_text || 'No response text'}`
         : recommendation.recommendation_text || 'No response text',
       type: 'recommendation',
       icon: '✦',
@@ -119,77 +122,216 @@ export function renderRecommendationFormFor(recommendationId, issueId) {
 }
 
 export function collectRecommendationAssignments() {
-  const rows = [
+  const assignments = [
     ...recomEditorDom.recommendationAssignments.querySelectorAll(
-      '[data-combination]',
+      '[data-recommendation-assignment]',
     ),
   ];
-  if (!rows.length) return null;
+  return assignments.map((assignment) => {
+    const conditions = {};
+    assignment
+      .querySelectorAll('.recommendation-assignment__condition')
+      .forEach((condition) => {
+        const parameterId = condition.querySelector(
+          '.recommendation-assignment__parameter',
+        ).value;
+        const value = condition.querySelector(
+          '.recommendation-assignment__value',
+        ).value;
+        if (!parameterId || !value) {
+          throw new Error(
+            'Choose a parameter and response for every condition.',
+          );
+        }
+        if (Object.hasOwn(conditions, parameterId)) {
+          throw new Error(
+            'Each parameter can only be used once in an assignment.',
+          );
+        }
+        conditions[parameterId] = value;
+      });
 
-  return rows.map((row) => ({
-    conditions: JSON.parse(row.dataset.combination),
-    selected: row.querySelector('.recommendation-assignment__checkbox').checked,
-    priority: row.querySelector('.recommendation-assignment__priority').value,
-  }));
+    return {
+      conditions,
+      priority: assignment.querySelector('.recommendation-assignment__priority')
+        .value,
+    };
+  });
 }
+
+export function addRecommendationAssignment() {
+  if (!assignmentParameters.length) return;
+  recomEditorDom.recommendationAssignments.insertAdjacentHTML(
+    'beforeend',
+    renderAssignmentCard(),
+  );
+}
+
+export function handleRecommendationAssignmentClick(event) {
+  const assignment = event.target.closest('[data-recommendation-assignment]');
+  if (!assignment) return;
+
+  if (event.target.closest('[data-remove-assignment]')) {
+    assignment.remove();
+    return;
+  }
+
+  if (event.target.closest('[data-add-condition]')) {
+    assignment
+      .querySelector('.recommendation-assignment__conditions')
+      .insertAdjacentHTML('beforeend', renderCondition());
+    if (assignment.dataset.autoPriority === 'true') {
+      assignment.querySelector('.recommendation-assignment__priority').value =
+        1;
+    }
+    return;
+  }
+
+  if (event.target.closest('[data-remove-condition]')) {
+    const conditions = assignment.querySelectorAll(
+      '.recommendation-assignment__condition',
+    );
+    if (conditions.length === 1) {
+      assignment.remove();
+    } else {
+      event.target.closest('.recommendation-assignment__condition').remove();
+    }
+  }
+}
+
+export function handleRecommendationAssignmentChange(event) {
+  if (event.target.matches('.recommendation-assignment__priority')) {
+    event.target.closest(
+      '[data-recommendation-assignment]',
+    ).dataset.autoPriority = 'false';
+    return;
+  }
+
+  const parameterSelect = event.target.closest(
+    '.recommendation-assignment__parameter',
+  );
+  if (!parameterSelect) return;
+
+  const valueSelect = parameterSelect
+    .closest('.recommendation-assignment__condition')
+    .querySelector('.recommendation-assignment__value');
+  valueSelect.innerHTML = renderValueOptions(parameterSelect.value);
+}
+
+let assignmentParameters = [];
 
 function renderAssignmentChoices(issueId, recommendationId) {
   if (!issueId) {
     recomEditorDom.recommendationAssignments.innerHTML =
-      '<p class="helper-text">Save the recommendation now; select an issue before assigning combinations.</p>';
+      '<p class="helper-text">Save the recommendation now; select an issue before adding assignments.</p>';
+    recomEditorDom.addRecommendationAssignmentBtn.disabled = true;
     return;
   }
 
-  const parameters = getParametersWithAllowedValues(issueId);
-  const combinations = buildParameterCombinations(issueId);
-  if (!parameters.length) {
-    if (!getIssueParameters(issueId).length) {
-      renderDirectAssignmentChoice(issueId, recommendationId);
-      return;
-    }
-
-    recomEditorDom.recommendationAssignments.innerHTML =
-      '<p class="helper-text">Add allowed values to parameters before assigning combinations.</p>';
+  assignmentParameters = getParametersWithAllowedValues(issueId);
+  recomEditorDom.addRecommendationAssignmentBtn.disabled =
+    !assignmentParameters.length;
+  if (!assignmentParameters.length) {
+    const assignments = recommendationId
+      ? getRecommendationAssignments(issueId, recommendationId)
+      : [];
+    const hasParameters = getIssueParameters(issueId).length > 0;
+    recomEditorDom.recommendationAssignments.innerHTML = assignments.length
+      ? assignments
+          .map((rule) => renderDirectAssignmentCard(rule.priority))
+          .join('')
+      : hasParameters
+        ? '<p class="helper-text">Add allowed values to parameters before adding an assignment.</p>'
+        : renderDirectAssignmentCard();
     return;
   }
-  if (combinations.length > 200) {
-    recomEditorDom.recommendationAssignments.innerHTML = `<p class="status error">This issue has ${combinations.length} combinations. Reduce allowed values before assigning them.</p>`;
-    return;
-  }
-
-  recomEditorDom.recommendationAssignments.innerHTML = combinations
-    .map((combination, index) => {
-      const rule = getRuleForCombination(issueId, combination);
-      const selected =
-        rule && str(rule.recommendation_id) === str(recommendationId);
-      const summary = parameters
-        .map(
-          (param) =>
-            `${param.parameter_name}: ${combination[param.parameter_id]}`,
+  const assignments = recommendationId
+    ? getRecommendationAssignments(issueId, recommendationId)
+    : [];
+  recomEditorDom.recommendationAssignments.innerHTML = assignments.length
+    ? assignments
+        .map((rule) =>
+          (() => {
+            const conditions = parseConditions(rule.conditions) || {};
+            return Object.keys(conditions).length
+              ? renderAssignmentCard(conditions, rule.priority)
+              : renderDirectAssignmentCard(rule.priority);
+          })(),
         )
-        .join(' · ');
-      return `
-      <label class="recommendation-assignment" data-combination='${escapeHtml(JSON.stringify(combination))}'>
-        <input class="recommendation-assignment__checkbox" type="checkbox" ${selected ? 'checked' : ''} />
-        <span class="recommendation-assignment__summary">${escapeHtml(summary)}</span>
-        <span class="recommendation-assignment__priority-wrap">Priority <input class="recommendation-assignment__priority" type="number" min="1" value="${escapeHtml(rule?.priority || index + 1)}" /></span>
-      </label>`;
-    })
-    .join('');
+        .join('')
+    : '<p class="helper-text">No assignments yet. Add one to define when this recommendation should be used.</p>';
 }
 
-function renderDirectAssignmentChoice(issueId, recommendationId) {
-  const conditions = {};
-  const rule = getRuleForCombination(issueId, conditions);
-  const selected =
-    rule && str(rule.recommendation_id) === str(recommendationId);
+function renderAssignmentCard(conditions = {}, priority) {
+  const entries = Object.entries(conditions);
+  const conditionRows = (entries.length ? entries : [['', '']])
+    .map(([parameterId, value]) => renderCondition(parameterId, value))
+    .join('');
+  const defaultPriority = 1;
 
-  recomEditorDom.recommendationAssignments.innerHTML = `
-    <label class="recommendation-assignment" data-combination="{}">
-      <input class="recommendation-assignment__checkbox" type="checkbox" ${selected ? 'checked' : ''} />
-      <span class="recommendation-assignment__summary">Apply directly to this issue</span>
-      <span class="recommendation-assignment__priority-wrap">Priority <input class="recommendation-assignment__priority" type="number" min="1" value="${escapeHtml(rule?.priority || 1)}" /></span>
-    </label>`;
+  return `
+    <section class="recommendation-assignment" data-recommendation-assignment data-auto-priority="${priority ? 'false' : 'true'}">
+      <div class="recommendation-assignment__header">
+        <strong>Use this recommendation when</strong>
+        <button class="recommendation-assignment__remove" type="button" data-remove-assignment>Remove</button>
+      </div>
+      <div class="recommendation-assignment__conditions">${conditionRows}</div>
+      <div class="recommendation-assignment__footer">
+        <button type="button" data-add-condition>Add another condition</button>
+        <span class="helper-text">Other parameters are not needed.</span>
+        <details>
+          <summary>Advanced</summary>
+          <label>Rule priority <input class="recommendation-assignment__priority" type="number" min="1" value="${escapeHtml(priority || defaultPriority)}" /></label>
+        </details>
+      </div>
+    </section>`;
+}
+
+function renderDirectAssignmentCard(priority) {
+  return `
+    <section class="recommendation-assignment" data-recommendation-assignment>
+      <div class="recommendation-assignment__header">
+        <strong>Use this recommendation directly</strong>
+        <button class="recommendation-assignment__remove" type="button" data-remove-assignment>Remove</button>
+      </div>
+      <p class="helper-text">This issue has no parameters, so the recommendation is applied directly.</p>
+      <details>
+        <summary>Advanced</summary>
+        <label>Rule priority <input class="recommendation-assignment__priority" type="number" min="1" value="${escapeHtml(priority || 1)}" /></label>
+      </details>
+    </section>`;
+}
+
+function renderCondition(selectedParameterId = '', selectedValue = '') {
+  return `
+    <div class="recommendation-assignment__condition">
+      <span class="recommendation-assignment__condition-label">Parameter</span>
+      <select class="recommendation-assignment__parameter">
+        <option value="">Choose a question</option>
+        ${assignmentParameters
+          .map(
+            (param) =>
+              `<option value="${escapeHtml(param.parameter_id)}" ${str(param.parameter_id) === str(selectedParameterId) ? 'selected' : ''}>${escapeHtml(param.question_to_ask || param.parameter_name)}</option>`,
+          )
+          .join('')}
+      </select>
+      <span class="recommendation-assignment__condition-label">Response</span>
+      <select class="recommendation-assignment__value">${renderValueOptions(selectedParameterId, selectedValue)}</select>
+      <button class="recommendation-assignment__remove-condition" type="button" data-remove-condition aria-label="Remove condition">×</button>
+    </div>`;
+}
+
+function renderValueOptions(parameterId, selectedValue = '') {
+  const parameter = assignmentParameters.find(
+    (item) => str(item.parameter_id) === str(parameterId),
+  );
+  const values = parameter ? parseAllowedValues(parameter.allowed_values) : [];
+  return `<option value="">Choose a response</option>${values
+    .map(
+      (value) =>
+        `<option value="${escapeHtml(value)}" ${str(value) === str(selectedValue) ? 'selected' : ''}>${escapeHtml(value)}</option>`,
+    )
+    .join('')}`;
 }
 
 function setSelectedState(container, datasetKey, selectedId) {

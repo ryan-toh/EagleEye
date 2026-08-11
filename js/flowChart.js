@@ -38,6 +38,11 @@ function enableFlowchartPinchZoom(targetElement) {
   };
   flowchartZoomStates.set(targetElement, state);
 
+  const resizeObserver = new ResizeObserver(() => {
+    enforceMinimumFlowchartZoom(targetElement, state);
+  });
+  resizeObserver.observe(targetElement);
+
   targetElement.addEventListener('pointerdown', (event) => {
     if (event.pointerType !== 'touch') return;
 
@@ -83,8 +88,8 @@ function enableFlowchartPinchZoom(targetElement) {
     const scale = clamp(
       state.pinchScale *
         (getPointerDistance(first, second) / state.pinchDistance),
-      0.5,
-      3,
+      getMinimumFlowchartZoom(targetElement, state),
+      getMaximumFlowchartZoom(targetElement, state),
     );
     const center = getPointerCenter(first, second);
     zoomFlowchartAt(targetElement, state, scale, center);
@@ -96,7 +101,11 @@ function enableFlowchartPinchZoom(targetElement) {
       if (!event.ctrlKey) return;
 
       event.preventDefault();
-      const scale = clamp(state.scale * Math.exp(-event.deltaY * 0.01), 0.5, 3);
+      const scale = clamp(
+        state.scale * Math.exp(-event.deltaY * 0.01),
+        getMinimumFlowchartZoom(targetElement, state),
+        getMaximumFlowchartZoom(targetElement, state),
+      );
       zoomFlowchartAt(targetElement, state, scale, event);
     },
     { passive: false },
@@ -128,11 +137,10 @@ function resetFlowchartZoom(targetElement) {
   if (!state || !svg) return;
 
   const viewBox = svg.viewBox.baseVal;
-  state.scale = 1;
   state.baseWidth = viewBox.width || svg.getBoundingClientRect().width;
   state.baseHeight = viewBox.height || svg.getBoundingClientRect().height;
-  svg.style.width = `${state.baseWidth}px`;
-  svg.style.height = `${state.baseHeight}px`;
+  state.scale = getMinimumFlowchartZoom(targetElement, state);
+  setFlowchartScale(svg, state, state.scale);
 }
 
 function zoomFlowchartAt(targetElement, state, scale, center) {
@@ -146,10 +154,43 @@ function zoomFlowchartAt(targetElement, state, scale, center) {
   const pointY = (targetElement.scrollTop + offsetY) / state.scale;
 
   state.scale = scale;
-  svg.style.width = `${state.baseWidth * scale}px`;
-  svg.style.height = `${state.baseHeight * scale}px`;
+  setFlowchartScale(svg, state, scale);
   targetElement.scrollLeft = pointX * scale - offsetX;
   targetElement.scrollTop = pointY * scale - offsetY;
+}
+
+function enforceMinimumFlowchartZoom(targetElement, state) {
+  const minimumScale = getMinimumFlowchartZoom(targetElement, state);
+  if (!state.baseWidth || !state.baseHeight || state.scale >= minimumScale)
+    return;
+
+  const bounds = targetElement.getBoundingClientRect();
+  zoomFlowchartAt(targetElement, state, minimumScale, {
+    x: bounds.left + bounds.width / 2,
+    y: bounds.top + bounds.height / 2,
+  });
+}
+
+function getMinimumFlowchartZoom(targetElement, state) {
+  if (!state.baseWidth || !state.baseHeight) return 0.5;
+
+  return Math.max(
+    Math.min(
+      targetElement.clientWidth / state.baseWidth,
+      targetElement.clientHeight / state.baseHeight,
+    ),
+    0.1,
+  );
+}
+
+function getMaximumFlowchartZoom(targetElement, state) {
+  const minimumScale = getMinimumFlowchartZoom(targetElement, state);
+  return Math.max(3, minimumScale * 3);
+}
+
+function setFlowchartScale(svg, state, scale) {
+  svg.style.width = `${state.baseWidth * scale}px`;
+  svg.style.height = `${state.baseHeight * scale}px`;
 }
 
 function getPointerDistance(first, second) {

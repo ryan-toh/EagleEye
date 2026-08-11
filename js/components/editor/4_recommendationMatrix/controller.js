@@ -10,8 +10,11 @@ import {
   removeRule,
 } from '../../../appState.js';
 import {
+  addRecommendationAssignment,
   collectRecommendationAssignments,
   getClickedRecommendationId,
+  handleRecommendationAssignmentChange,
+  handleRecommendationAssignmentClick,
   initRecomEditorDom,
   recomEditorDom,
   renderRecommendationFormFor,
@@ -40,6 +43,18 @@ export function initRecomEditor() {
   recomEditorDom.saveRecommendationBtn.addEventListener(
     'click',
     onSaveRecommendation,
+  );
+  recomEditorDom.addRecommendationAssignmentBtn.addEventListener(
+    'click',
+    addRecommendationAssignment,
+  );
+  recomEditorDom.recommendationAssignments.addEventListener(
+    'click',
+    handleRecommendationAssignmentClick,
+  );
+  recomEditorDom.recommendationAssignments.addEventListener(
+    'change',
+    handleRecommendationAssignmentChange,
   );
   renderRecommendationOptions('');
 }
@@ -114,7 +129,7 @@ async function onSaveRecommendation() {
     closeDialog(recomEditorDom.recommDialog);
     await renderSelectedIssuePreview();
     setEditorStatus(
-      `Saved${issueId ? ` with ${assignmentCount} assigned combination(s). Download to see changes.` : ''}.`,
+      `Saved${issueId ? ` with ${assignmentCount} assignment(s). Download to see changes.` : ''}.`,
       'success',
     );
   } catch (error) {
