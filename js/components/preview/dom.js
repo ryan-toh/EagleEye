@@ -34,11 +34,8 @@ export function renderIssueSummary(issueId) {
   const issueParameters = getIssueParameters(issueId);
   const issueRules = getIssueRules(issueId);
   const issueRecommendations = getRecommendationsForRules(issueRules);
-  const parameterNameById = new Map(
-    issueParameters.map((param) => [
-      str(param.parameter_id),
-      param.parameter_name,
-    ]),
+  const parameterById = new Map(
+    issueParameters.map((param) => [str(param.parameter_id), param]),
   );
 
   if (previewDom.issueSummaryName) {
@@ -79,7 +76,7 @@ export function renderIssueSummary(issueId) {
       <span class="priority-badge">Priority ${escapeHtml(rule.priority)}</span>
       <span class="summary-row__id">${escapeHtml(rule.recommendation_id)}</span>
     </div>
-    ${renderRuleConditions(rule.conditions, parameterNameById)}
+    ${renderRuleConditions(rule.conditions, parameterById)}
   `,
   );
 
@@ -157,7 +154,7 @@ function renderSummaryList(items, renderer) {
     .join('')}</div>`;
 }
 
-function renderRuleConditions(conditions, parameterNameById) {
+function renderRuleConditions(conditions, parameterById) {
   const parsedConditions = parseRuleConditions(conditions);
 
   if (!parsedConditions) {
@@ -166,11 +163,13 @@ function renderRuleConditions(conditions, parameterNameById) {
 
   const items = Object.entries(parsedConditions)
     .map(([parameterId, value]) => {
-      const parameterName =
-        parameterNameById.get(str(parameterId)) || parameterId;
+      const parameter = parameterById.get(str(parameterId));
+      const question = parameter?.question_to_ask || parameterId;
       return `
       <li class="rule-conditions__item">
-        <span class="rule-conditions__name">${escapeHtml(parameterName)}</span>
+        <span class="rule-conditions__label">Parameter:</span>
+        <span class="rule-conditions__name">${escapeHtml(question)}</span>
+        <span class="rule-conditions__label">Response:</span>
         <span class="rule-conditions__value">${escapeHtml(value)}</span>
       </li>
     `;

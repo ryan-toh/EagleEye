@@ -75,7 +75,9 @@ function appendParameterBranch({
   const parameterId = str(parameter.parameter_id);
   const parameterNodeId = `parameter${nodeIds.parameter++}`;
   const required = isRequired(parameter.required);
-  const label = `${required ? 'Required' : 'Optional'}: ${parameter.parameter_name}\n${parameter.question_to_ask}`;
+  const label = wrapFlowchartLabel(
+    `${required ? 'Required' : 'Optional'}: ${parameter.parameter_name}\n${parameter.question_to_ask}`,
+  );
 
   appendEdge(
     lines,
@@ -137,7 +139,9 @@ function appendRuleLeaves({
       ? recommendation.recommendation_text
       : `Missing recommendation ${rule.recommendation_id}`;
     const ruleNodeId = `rule${nodeIds.rule++}`;
-    const label = `Priority ${rule.priority}\n${decision}\n${response}`;
+    const label = wrapFlowchartLabel(
+      `Priority ${rule.priority}\n${decision}\n${response}`,
+    );
     const labelForEdge =
       candidates.length === 1 ? edgeLabel : `${edgeLabel} (rule ${index + 1})`;
 
@@ -153,6 +157,39 @@ function appendRuleLeaves({
 function appendEdge(lines, from, label, to) {
   const edge = label ? ` -- ${safeMermaidLabel(label)} --> ` : ' --> ';
   lines.push(`  ${from}${edge}${to}`);
+}
+
+function wrapFlowchartLabel(label, maximumLineLength = 28) {
+  return str(label)
+    .split('\n')
+    .flatMap((line) => wrapLine(line, maximumLineLength))
+    .join('\n');
+}
+
+function wrapLine(line, maximumLineLength) {
+  const words = str(line).split(/\s+/).filter(Boolean);
+  if (!words.length) return [''];
+
+  const lines = [];
+  let currentLine = '';
+
+  words.forEach((word) => {
+    const segments = word.match(new RegExp(`.{1,${maximumLineLength}}`, 'g'));
+
+    segments.forEach((segment) => {
+      const nextLine = currentLine ? `${currentLine} ${segment}` : segment;
+      if (nextLine.length <= maximumLineLength) {
+        currentLine = nextLine;
+        return;
+      }
+
+      lines.push(currentLine);
+      currentLine = segment;
+    });
+  });
+
+  if (currentLine) lines.push(currentLine);
+  return lines;
 }
 
 function parseConditions(value) {

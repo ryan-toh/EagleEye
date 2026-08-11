@@ -114,15 +114,29 @@ export function getSampleWorkbookData() {
       {
         rule_id: 'RULE_001',
         issue_id: 'ISSUE_001',
-        conditions: '{"Sample Parameter" = "Yes"}',
+        conditions: '{"PARAM_001" = "Yes"}',
         recommendation_id: 'REC_001',
+        priority: 1,
+      },
+      {
+        rule_id: 'RULE_002',
+        issue_id: 'ISSUE_001',
+        conditions: '{"PARAM_001" = "No"}',
+        recommendation_id: 'REC_002',
         priority: 1,
       },
     ],
     recommendations: [
       {
         recommendation_id: 'REC_001',
-        final_decision: 'Sample Decision',
+        final_decision: 'Sample Decision 1',
+        recommendation_text: 'Example recommendation text.',
+        next_steps: 'Example next steps.',
+        escalation_note: '',
+      },
+      {
+        recommendation_id: 'REC_002',
+        final_decision: 'Sample Decision 2',
         recommendation_text: 'Example recommendation text.',
         next_steps: 'Example next steps.',
         escalation_note: '',

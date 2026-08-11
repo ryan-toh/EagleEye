@@ -13,7 +13,7 @@ export function initPreview() {
   window.mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'loose',
-    flowchart: { useMaxWidth: false },
+    flowchart: { useMaxWidth: false, wrappingWidth: 100 },
     themeVariables: { fontSize: '14px' },
   });
 
