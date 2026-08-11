@@ -114,6 +114,7 @@ python -m http.server 3000
 
 > **Note** \
 > If port 3000 is in use, try running on another port (e.g. 5050).
+>
 > ```bash
 > python -m http.server 5050
 > ```
@@ -148,7 +149,7 @@ EagleEye is designed for structured decision-support chatbots that need to:
 
 1. Identify the user's broad topic.
 2. Identify the relevant issue within that topic.
-3. Collect all required information.
+3. Collect only the information needed to match a decision rule.
 4. Apply decision rules in priority order.
 5. Return an approved recommendation with any required next steps or escalation notes.
 
@@ -189,8 +190,8 @@ Conversation process:
 3. If multiple issues may apply, ask the user to clarify which issue they mean.
 4. Extract any parameter information already provided by the user.
 5. Check `3_parameters` for the selected issue. Ask only for required parameters that are missing, unclear, or outside their allowed values.
-6. Once all required parameters are known, compare the information against `4_decision_rules` for the selected issue.
-7. Select the matching rule with the highest priority. When priority is numeric, lower numbers have higher priority.
+6. After each parameter response, compare the information available so far against `4_decision_rules` for the selected issue. A rule may intentionally use only some parameters.
+7. If a rule is fully matched, select the matching rule with the highest priority and provide its recommendation without asking for parameters that are not part of that rule. When priority is numeric, lower numbers have higher priority.
 8. Use only the recommendation referenced by that selected rule. A recommendation belongs to an issue only when it is assigned through a decision rule for that issue.
 9. Do not use recommendations assigned to another issue, and do not provide a recommendation that is not supported by a matching decision rule.
 
@@ -205,7 +206,7 @@ Parameter handling:
 
 Decision handling:
 
-- Apply decision rules only after all required parameters are collected.
+- Evaluate decision rules after each parameter response. A matching rule may be conclusive before every parameter is collected when its conditions do not require those parameters.
 - If multiple rules match, select the highest-priority rule.
 - If no rule matches, do not force an answer. Ask a targeted clarification question or recommend escalation when the matter is sensitive, urgent, or ambiguous.
 - Do not expose internal topic, issue, rule, or recommendation IDs unless the user asks for the decision basis.
@@ -268,7 +269,7 @@ A typical EagleEye workflow is:
 2. Create one or more Issues.
 3. Define the required Parameters.
 4. Configure allowed values.
-5. Generate parameter combinations.
+5. Create recommendation assignments for the relevant answers.
 6. Create Recommendations.
 7. Generate Decision Rules.
 8. Preview the flowchart.
@@ -443,19 +444,19 @@ low, medium, high
 
 > **Required Parameters**
 >
-> Parameters marked **required = yes** must be collected before the chatbot can provide a recommendation.
+> Parameters marked **required = yes** should be collected unless a fully matching decision rule can already provide a recommendation without them.
 
 ---
 
 ## Recommendations
 
-Recommendations define the chatbot's final response for one or more combinations of parameter values.
+Recommendations define the chatbot's final response for one or more sets of parameter answers.
 
 ### Before Creating Recommendations
 
 Ensure each relevant Parameter has **allowed_values** defined.
 
-Without allowed values, EagleEye cannot generate parameter combinations.
+Allowed values provide the selectable responses used when defining assignments.
 
 ---
 
@@ -470,8 +471,8 @@ Without allowed values, EagleEye cannot generate parameter combinations.
    - Recommendation text
    - Next steps
    - Escalation note (optional)
-   - Priority
-   - Applicable parameter combinations 
+   - One or more assignments, each containing only the relevant parameter responses
+   - Optional advanced priority
 
 > **No Parameter Recommendations**
 >
@@ -544,9 +545,9 @@ For a new knowledge base, the recommended workflow is:
 
 1. Create a Topic.
 2. Create an Issue.
-3. Define all required Parameters.
+3. Define the Parameters that may be needed.
 4. Configure allowed values.
-5. Generate parameter combinations.
+5. Create recommendation assignments for the relevant answers.
 6. Create Recommendations.
 7. Review the generated Decision Rules.
 8. Preview the flowchart.
@@ -724,7 +725,7 @@ Example
 
 ### Notes
 
-- Rules are evaluated only after all required parameters are collected.
+- Rules are evaluated after each parameter response; a rule can match without every parameter when those parameters are not in its conditions.
 - Lower numeric priorities are evaluated first.
 - If multiple rules match, the lowest priority number wins.
 - Conditions should use a consistent structured format such as JSON.

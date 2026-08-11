@@ -138,13 +138,15 @@
       <textarea id="editorRecommendationEscalationNote" rows="2"></textarea>
     </label>
     <fieldset class="recommendation-assignments-fieldset">
-      <legend>Assign to combinations</legend>
+      <legend>Assign when</legend>
       <p class="helper-text">
-        Check every combination that should use this recommendation. Saving an
-        edited recommendation removes its unchecked assignments for the selected
-        issue.
+        Add only the answers needed to give this recommendation. Any parameter
+        not included here is not needed for this answer.
       </p>
       <div id="editorRecommendationAssignments"></div>
+      <button id="addRecommendationAssignmentBtn" type="button">
+        Add assignment
+      </button>
     </fieldset>
     <button id="saveRecommendationBtn" type="button">
       Save recommendation
