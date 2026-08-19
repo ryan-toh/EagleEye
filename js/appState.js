@@ -1,4 +1,13 @@
 import { str } from './utils.js';
+import { validateStateRelationships } from './domain/validation.js';
+import {
+  referencesParameter,
+  validateRuleConditions,
+} from './domain/conditions.js';
+import {
+  readLocalState,
+  saveDecisionTreeState as persistState,
+} from './persistence/localState.js';
 
 // core appState
 export const appState = {
@@ -7,71 +16,51 @@ export const appState = {
   parameters: [],
   rules: [],
   recommendations: [],
-  lastMermaid: '',
-  step: 1,
 };
 
-export function loadState(workbookData) {
-  appState.topics = workbookData.topics || [];
-  appState.issues = workbookData.issues || [];
-  appState.parameters = workbookData.parameters || [];
-  appState.rules = workbookData.rules || [];
-  appState.recommendations = workbookData.recommendations || [];
-  appState.lastMermaid = '';
+let transactionDepth = 0;
+let hasPendingPersistence = false;
+let transactionFailed = false;
 
-  validateStateRelationships(appState);
+/** Batches related synchronous mutations into one validated state snapshot. */
+export function transaction(action) {
+  transactionDepth += 1;
+
+  try {
+    return action();
+  } catch (error) {
+    transactionFailed = true;
+    throw error;
+  } finally {
+    transactionDepth -= 1;
+    if (transactionDepth === 0) {
+      if (!transactionFailed) flushPersistence();
+      hasPendingPersistence = false;
+      transactionFailed = false;
+    }
+  }
+}
+
+export function loadState(workbookData) {
+  const candidate = createStateSnapshot(workbookData);
+  validateStateRelationships(candidate);
+  Object.assign(appState, candidate);
 }
 
 export function loadLocalState() {
-  appState.topics = JSON.parse(localStorage.getItem('topics')) || [];
-  appState.issues = JSON.parse(localStorage.getItem('issues')) || [];
-  appState.parameters = JSON.parse(localStorage.getItem('parameters')) || [];
-  appState.rules = JSON.parse(localStorage.getItem('rules')) || [];
-  appState.recommendations =
-    JSON.parse(localStorage.getItem('recommendations')) || [];
-  appState.lastMermaid = localStorage.getItem('lastMermaid') || '';
-  appState.step = Number.parseInt(localStorage.getItem('step'), 10) || 1;
+  const savedState = readLocalState();
+  const candidate = createStateSnapshot(savedState);
+  validateStateRelationships(candidate);
+  Object.assign(appState, candidate);
 }
 
 export function saveToLocalState() {
-  saveTopicsToLocalState();
-  saveIssuesToLocalState();
-  saveParametersToLocalState();
-  saveRulesToLocalState();
-  saveRecommendationsToLocalState();
-  saveMermaidToLocalState();
-  saveStepToLocalState();
+  persistState(appState);
 }
 
-export function saveMermaidToLocalState() {
-  localStorage.setItem('lastMermaid', appState.lastMermaid);
-}
-
-export function saveStepToLocalState() {
-  localStorage.setItem('step', String(appState.step));
-}
-
-export function saveTopicsToLocalState() {
-  localStorage.setItem('topics', JSON.stringify(appState.topics));
-}
-
-export function saveIssuesToLocalState() {
-  localStorage.setItem('issues', JSON.stringify(appState.issues));
-}
-
-export function saveParametersToLocalState() {
-  localStorage.setItem('parameters', JSON.stringify(appState.parameters));
-}
-
-export function saveRulesToLocalState() {
-  localStorage.setItem('rules', JSON.stringify(appState.rules));
-}
-
-export function saveRecommendationsToLocalState() {
-  localStorage.setItem(
-    'recommendations',
-    JSON.stringify(appState.recommendations),
-  );
+export function getWorkbookData() {
+  const { topics, issues, parameters, rules, recommendations } = appState;
+  return { topics, issues, parameters, rules, recommendations };
 }
 
 export function getIssuesForTopic(topicId) {
@@ -109,7 +98,7 @@ export function getIssueRules(issueId) {
     );
 }
 
-export function getRecommendation(recommendationId) {
+function getRecommendation(recommendationId) {
   return appState.recommendations.find(
     (rec) => str(rec.recommendation_id) === str(recommendationId),
   );
@@ -138,7 +127,7 @@ export function upsertTopic(topic) {
 
   requireFields(normalized, ['topic_id', 'topic_name'], 'topic');
   upsertById(appState.topics, 'topic_id', normalized);
-  saveTopicsToLocalState();
+  requestPersistence();
   console.log('saved topics');
   return normalized;
 }
@@ -161,7 +150,7 @@ export function upsertIssue(issue) {
   }
 
   upsertById(appState.issues, 'issue_id', normalized);
-  saveIssuesToLocalState();
+  requestPersistence();
   return normalized;
 }
 
@@ -211,7 +200,7 @@ export function upsertParameter(parameter) {
     appState.parameters.push(normalized);
   }
 
-  saveParametersToLocalState();
+  requestPersistence();
   return normalized;
 }
 
@@ -227,43 +216,36 @@ export function moveIssueToTopic(issueId, topicId) {
 
   issue.topic_id = str(topicId);
 
-  saveIssuesToLocalState();
+  requestPersistence();
   return issue;
 }
 
 export function moveParameterToIssue(parameterId, issueId) {
-  const parameter = appState.parameters.find(
-    (param) => str(param.parameter_id) === str(parameterId),
-  );
-  const targetIssue = getIssue(issueId);
-
-  if (!parameter)
-    throw new Error(
-      `Cannot move parameter: parameter_id ${parameterId} does not exist.`,
+  return transaction(() => {
+    const parameter = appState.parameters.find(
+      (param) => str(param.parameter_id) === str(parameterId),
     );
-  if (!targetIssue)
-    throw new Error(
-      `Cannot move parameter: issue_id ${issueId} does not exist.`,
-    );
-  if (str(parameter.issue_id) === str(issueId)) return parameter;
+    const targetIssue = getIssue(issueId);
 
-  const rulesToRemove = appState.rules
-    .filter((rule) => {
-      try {
-        const conditions = JSON.parse(rule.conditions);
-        return conditions && Object.hasOwn(conditions, str(parameterId));
-      } catch {
-        return false;
-      }
-    })
-    .map((rule) => rule.rule_id);
+    if (!parameter)
+      throw new Error(
+        `Cannot move parameter: parameter_id ${parameterId} does not exist.`,
+      );
+    if (!targetIssue)
+      throw new Error(
+        `Cannot move parameter: issue_id ${issueId} does not exist.`,
+      );
+    if (str(parameter.issue_id) === str(issueId)) return parameter;
 
-  rulesToRemove.forEach(removeRule);
-  parameter.issue_id = str(issueId);
-  parameter.order = str(nextParameterOrder(issueId));
-
-  saveParametersToLocalState();
-  return parameter;
+    appState.rules
+      .filter((rule) => referencesParameter(rule.conditions, parameterId))
+      .map((rule) => rule.rule_id)
+      .forEach(removeRule);
+    parameter.issue_id = str(issueId);
+    parameter.order = str(nextParameterOrder(issueId));
+    requestPersistence();
+    return parameter;
+  });
 }
 
 export function upsertRecommendation(recommendation) {
@@ -282,7 +264,7 @@ export function upsertRecommendation(recommendation) {
   );
   upsertById(appState.recommendations, 'recommendation_id', normalized);
 
-  saveRecommendationsToLocalState();
+  requestPersistence();
   return normalized;
 }
 
@@ -313,9 +295,15 @@ export function upsertRule(rule) {
     );
   }
 
+  validateRuleConditions(
+    normalized.conditions,
+    normalized.issue_id,
+    appState.parameters,
+  );
+
   upsertById(appState.rules, 'rule_id', normalized);
 
-  saveRulesToLocalState();
+  requestPersistence();
   return normalized;
 }
 
@@ -324,23 +312,14 @@ Removes a topic from the appState.
 Deletes all issues, parameters, rules & recommendations associated with the topicId
 */
 export function removeTopic(topicId) {
-  const toRemoveIssues = appState.issues
-    .filter((issue) => str(issue.topic_id) === str(topicId))
-    .flatMap((issue) => issue.issue_id);
-
-  for (let i = 0; i < toRemoveIssues.length; i++) {
-    removeIssue(toRemoveIssues[i]);
-  }
-
-  const index = appState.topics.findIndex(
-    (topic) => str(topic.topic_id) === str(topicId),
-  );
-
-  if (index >= 0) {
-    appState.topics.splice(index, 1);
-  }
-
-  saveTopicsToLocalState();
+  transaction(() => {
+    appState.issues
+      .filter((issue) => str(issue.topic_id) === str(topicId))
+      .map((issue) => issue.issue_id)
+      .forEach(removeIssue);
+    removeById(appState.topics, 'topic_id', topicId);
+    requestPersistence();
+  });
 }
 
 /*
@@ -348,23 +327,14 @@ Removes an issue from the appState.
 Deletes all parameters, rules & recommendations associated with the issueId
 */
 export function removeIssue(issueId) {
-  const toRemoveParameters = appState.parameters
-    .filter((param) => str(param.issue_id) === str(issueId))
-    .flatMap((param) => param.parameter_id);
-
-  for (let i = 0; i < toRemoveParameters.length; i++) {
-    removeParameter(toRemoveParameters[i]);
-  }
-
-  const index = appState.issues.findIndex(
-    (issue) => str(issue.issue_id) === str(issueId),
-  );
-
-  if (index >= 0) {
-    appState.issues.splice(index, 1);
-  }
-
-  saveIssuesToLocalState();
+  transaction(() => {
+    appState.parameters
+      .filter((param) => str(param.issue_id) === str(issueId))
+      .map((param) => param.parameter_id)
+      .forEach(removeParameter);
+    removeById(appState.issues, 'issue_id', issueId);
+    requestPersistence();
+  });
 }
 
 /*
@@ -372,30 +342,14 @@ Removes a parameter from the appState.
 Deletes all rules & recommendations associated with the paramId
 */
 export function removeParameter(paramId) {
-  const toRemoveRules = appState.rules
-    .filter((rule) => {
-      try {
-        const conditions = JSON.parse(rule.conditions);
-        return conditions && Object.hasOwn(conditions, str(paramId));
-      } catch {
-        return false;
-      }
-    })
-    .flatMap((rule) => rule.rule_id);
-
-  for (let j = 0; j < toRemoveRules.length; j++) {
-    removeRule(toRemoveRules[j]);
-  }
-
-  const index = appState.parameters.findIndex(
-    (param) => str(param.parameter_id) === str(paramId),
-  );
-
-  if (index >= 0) {
-    appState.parameters.splice(index, 1);
-  }
-
-  saveParametersToLocalState();
+  transaction(() => {
+    appState.rules
+      .filter((rule) => referencesParameter(rule.conditions, paramId))
+      .map((rule) => rule.rule_id)
+      .forEach(removeRule);
+    removeById(appState.parameters, 'parameter_id', paramId);
+    requestPersistence();
+  });
 }
 
 /*
@@ -403,40 +357,40 @@ Removes a rule from the appState.
 Deletes all recommendations associated with the ruleId if no longer used
 */
 export function removeRule(ruleId) {
-  const index = appState.rules.findIndex(
-    (rule) => str(rule.rule_id) === str(ruleId),
-  );
-
-  if (index >= 0) {
-    const recommendationId = appState.rules[index].recommendation_id;
-
-    appState.rules.splice(index, 1);
-
-    const isStillUsed = appState.rules.some(
-      (rule) => str(rule.recommendation_id) === str(recommendationId),
+  transaction(() => {
+    const rule = appState.rules.find(
+      (item) => str(item.rule_id) === str(ruleId),
     );
-
-    if (!isStillUsed) {
-      removeRecommendation(recommendationId);
+    if (!rule) return;
+    removeById(appState.rules, 'rule_id', ruleId);
+    if (
+      !appState.rules.some(
+        (item) => str(item.recommendation_id) === str(rule.recommendation_id),
+      )
+    ) {
+      removeRecommendation(rule.recommendation_id);
     }
-  }
-
-  saveRulesToLocalState();
+    requestPersistence();
+  });
 }
 
 /*
 Removes a recommendation from the appState.
 */
-export function removeRecommendation(recomId) {
-  const index = appState.recommendations.findIndex(
-    (recom) => str(recom.recommendation_id) == str(recomId),
-  );
+function removeRecommendation(recomId) {
+  removeById(appState.recommendations, 'recommendation_id', recomId);
+  requestPersistence();
+}
 
-  if (index >= 0) {
-    appState.recommendations.splice(index, 1);
-  }
-
-  saveRecommendationsToLocalState();
+/** Removes a recommendation and every rule that assigns it. */
+export function deleteRecommendation(recommendationId) {
+  transaction(() => {
+    appState.rules = appState.rules.filter(
+      (rule) => str(rule.recommendation_id) !== str(recommendationId),
+    );
+    removeById(appState.recommendations, 'recommendation_id', recommendationId);
+    requestPersistence();
+  });
 }
 
 export function makeUniqueId(prefix, rows, idKey) {
@@ -457,6 +411,23 @@ function nextParameterOrder(issueId) {
     Number(param.order || 0),
   );
   return current.length ? Math.max(...current) + 1 : 1;
+}
+
+function removeById(rows, idKey, id) {
+  const index = rows.findIndex((row) => str(row[idKey]) === str(id));
+  if (index >= 0) rows.splice(index, 1);
+}
+
+function requestPersistence() {
+  hasPendingPersistence = true;
+  if (transactionDepth === 0) flushPersistence();
+}
+
+function flushPersistence() {
+  if (!hasPendingPersistence) return;
+  validateStateRelationships(appState);
+  persistState(appState);
+  hasPendingPersistence = false;
 }
 
 function upsertById(rows, idKey, nextRow) {
@@ -481,67 +452,12 @@ function requireFields(row, fields, entityName) {
   }
 }
 
-function validateStateRelationships(state) {
-  const topicIds = new Set(state.topics.map((topic) => str(topic.topic_id)));
-  const issueIds = new Set(state.issues.map((issue) => str(issue.issue_id)));
-  const recommendationIds = new Set(
-    state.recommendations.map((rec) => str(rec.recommendation_id)),
-  );
-
-  const orphanIssues = state.issues.filter(
-    (issue) => !topicIds.has(str(issue.topic_id)),
-  );
-  if (orphanIssues.length) {
-    throw new Error(
-      `Some issues refer to missing topic_id(s): ${uniqueValues(orphanIssues, 'topic_id').join(', ')}`,
-    );
-  }
-
-  const orphanParameters = state.parameters.filter(
-    (param) => !issueIds.has(str(param.issue_id)),
-  );
-  if (orphanParameters.length) {
-    throw new Error(
-      `Some parameters refer to missing issue_id(s): ${uniqueValues(orphanParameters, 'issue_id').join(', ')}`,
-    );
-  }
-
-  const orphanRules = state.rules.filter(
-    (rule) => !issueIds.has(str(rule.issue_id)),
-  );
-  if (orphanRules.length) {
-    throw new Error(
-      `Some rules refer to missing issue_id(s): ${uniqueValues(orphanRules, 'issue_id').join(', ')}`,
-    );
-  }
-
-  const missingRecommendations = state.rules.filter(
-    (rule) => !recommendationIds.has(str(rule.recommendation_id)),
-  );
-  if (missingRecommendations.length) {
-    throw new Error(
-      `Some rules refer to missing recommendation_id(s): ${uniqueValues(missingRecommendations, 'recommendation_id').join(', ')}`,
-    );
-  }
-}
-
-function uniqueValues(rows, key) {
-  return [...new Set(rows.map((row) => str(row[key])).filter(Boolean))];
-}
-
-/**
- * Updates the visibility of major UI components based on uiState
- */
-export function renderStep() {
-  const uploadPanel = document.getElementById('upload-panel');
-  const editorPanel = document.getElementById('editor-panel');
-  const previewPanel = document.getElementById('preview-panel');
-
-  uploadPanel.classList.toggle('hidden', appState.step >= 2);
-
-  // Toggle Editor Panel visibility
-  editorPanel.classList.toggle('hidden', appState.step < 2);
-
-  // Keep the preview visible throughout the editor workflow.
-  previewPanel.classList.toggle('hidden', appState.step < 2);
+function createStateSnapshot(data) {
+  return {
+    topics: data.topics ?? [],
+    issues: data.issues ?? [],
+    parameters: data.parameters ?? [],
+    rules: data.rules ?? [],
+    recommendations: data.recommendations ?? [],
+  };
 }

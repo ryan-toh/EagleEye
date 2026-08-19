@@ -28,11 +28,6 @@ export function isRequired(value) {
   );
 }
 
-export function toList(items, renderer) {
-  if (!items.length) return '<p class="empty">None found for this issue.</p>';
-  return `<ul>${items.map((item) => `<li>${renderer(item)}</li>`).join('')}</ul>`;
-}
-
 export function validateLibraries() {
   if (!window.XLSX) {
     throw new Error(

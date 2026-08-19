@@ -1,11 +1,13 @@
 {
   "scripts": {
     "start": "http-server . -p 3000 -a 0.0.0.0",
+    "test": "node --test test/*.test.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check"
   },
+  "type": "module",
   "dependencies": {
     "@eslint/js": "^10.0.1",
     "http-server": "^14.1.1"

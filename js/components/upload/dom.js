@@ -1,4 +1,4 @@
-import { setStatus } from './controller.js';
+import { hasSavedDecisionTreeState } from '../../persistence/localState.js';
 
 export const uploadDom = {};
 
@@ -13,26 +13,9 @@ export function initUploadDomElements() {
     fileInputBtn: document.getElementById('botInputFile'),
   });
 
-  uploadDom.loadLocalBtn.hidden = !hasLocalSession();
+  uploadDom.loadLocalBtn.hidden = !hasSavedDecisionTreeState();
 
   return uploadDom;
-}
-
-export function disableLoading(message) {
-  setStatus(message, 'error');
-  uploadDom.loadBtn.disabled = true;
-}
-
-function hasLocalSession() {
-  const requiredStateKeys = [
-    'topics',
-    'issues',
-    'parameters',
-    'rules',
-    'recommendations',
-  ];
-
-  return requiredStateKeys.every((key) => localStorage.getItem(key) !== null);
 }
 
 export function renderStatus(message, type = '') {

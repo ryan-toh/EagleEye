@@ -5,9 +5,12 @@ import {
 } from '../1_topic/controller.js';
 import {
   getSelectedIssue,
-  handleTopicSelection,
   initIssueEditor,
 } from '../2_issue/controller.js';
+import {
+  selectTopic,
+  subscribeToIssuePreviewRefresh,
+} from '../editorCoordinator.js';
 import { initParamEditor } from '../3_parameter/controller.js';
 import { initRecomEditor } from '../4_recommendationMatrix/controller.js';
 
@@ -17,16 +20,27 @@ import {
   renderEditorStatus,
 } from './dom.js';
 
-import { buildIssueFlowchart } from '../../preview/flowchart.js';
+import { buildDecisionGraph } from '../../preview/decisionGraph.js';
+import { buildIssuePreview } from '../../../domain/issuePreview.js';
 import {
   clearIssueView,
   setGraph,
   setIssueSummary,
 } from '../../preview/controller.js';
-import { setStatus } from '../../upload/controller.js';
+import { notify, subscribeToNotifications } from '../../../ui/notifications.js';
 
 import { saveWorkbookData } from '../../../fileService.js';
-import { appState, renderStep } from '../../../appState.js';
+import {
+  getIssue,
+  getIssueParameters,
+  getIssueRules,
+  getRecommendationMap,
+  getRecommendationsForRules,
+  getTopicName,
+  getWorkbookData,
+} from '../../../appState.js';
+import { renderStep } from '../../../ui/stepRenderer.js';
+import { setStep, uiState } from '../../../ui/uiState.js';
 
 export function initEditor() {
   initTopicEditor();
@@ -38,10 +52,12 @@ export function initEditor() {
 
 export function initSharedEditor() {
   initSharedEditorDom();
+  subscribeToNotifications(({ message, type }) => setEditorStatus(message, type));
+  subscribeToIssuePreviewRefresh(() => void renderSelectedIssuePreview());
 
   sharedEditorDom.backToUploadsBtn.addEventListener('click', () => {
-    appState.step = 1;
-    renderStep();
+    setStep(1);
+    renderStep(uiState.step);
   });
   sharedEditorDom.saveSheetBtn.addEventListener('click', saveSheet);
 }
@@ -50,53 +66,54 @@ export function setEditorTopicOptions() {
   clearTopicForm();
 
   setTopicOptions();
-  handleTopicSelection('');
+  selectTopic('');
 }
 
-export async function renderSelectedIssuePreview() {
+async function renderSelectedIssuePreview() {
   const issueId = getSelectedIssue();
   if (!issueId) {
     clearIssueView();
     return;
   }
 
-  setIssueSummary(issueId);
+  const issue = getIssue(issueId);
+  const parameters = getIssueParameters(issueId);
+  const rules = getIssueRules(issueId);
+  const recommendations = getRecommendationsForRules(rules);
+  setIssueSummary(
+    buildIssuePreview({ issue, parameters, rules, recommendations }),
+  );
 
   try {
-    const graphDefinition = buildIssueFlowchart(issueId);
+    const graphDefinition = buildDecisionGraph({
+      issue,
+      topicName: getTopicName(issue.topic_id),
+      parameters,
+      rules,
+      recommendationById: getRecommendationMap(),
+    });
     const result = await setGraph(graphDefinition);
 
+    if (result.stale) return;
+
     if (!result.ok) {
-      setStatus(
+      notify(
         'Files are loaded, but Mermaid could not render the selected issue',
         'error',
       );
     }
   } catch {
-    setStatus(
+    notify(
       'The issue summary is available, but Mermaid could not render the selected issue',
       'error',
     );
   }
 }
 
-export async function saveSheet() {
-  await saveWorkbookData(appState);
+async function saveSheet() {
+  await saveWorkbookData(getWorkbookData());
 }
 
-export function setEditorStatus(message, type = '') {
+function setEditorStatus(message, type = '') {
   renderEditorStatus(message, type);
-}
-
-export function closeDialog(dialog) {
-  dialog.classList.add('closing');
-
-  dialog.addEventListener(
-    'animationend',
-    () => {
-      dialog.classList.remove('closing');
-      dialog.close();
-    },
-    { once: true },
-  );
 }

@@ -13,12 +13,22 @@ import {
   removeParameter,
   upsertParameter,
 } from '../../../appState.js';
+import { closeDialog } from '../../../ui/dialog.js';
+import { notify } from '../../../ui/notifications.js';
 import {
-  setEditorStatus,
-  closeDialog,
-  renderSelectedIssuePreview,
-} from '../shared/controller.js';
-import { refreshRecommendations } from '../4_recommendationMatrix/controller.js';
+  selectIssue as publishIssueSelection,
+  requestIssuePreviewRefresh,
+  subscribeToIssueSelection,
+} from '../editorCoordinator.js';
+import {
+  clearExplorerDragState,
+  getExplorerDragId,
+  markExplorerDropTarget,
+  startExplorerDrag,
+  supportsExplorerDrag,
+} from '../shared/explorerDragDrop.js';
+
+const PARAMETER_DRAG_TYPE = 'application/x-eagle-eye-parameter';
 
 export function initParamEditor() {
   initParamEditorDom();
@@ -32,20 +42,21 @@ export function initParamEditor() {
   paramEditorDom.paramList.addEventListener('click', onParamClick);
   paramEditorDom.paramList.addEventListener('dblclick', onParamDblClick);
   paramEditorDom.paramList.addEventListener('dragstart', onParamDragStart);
-  paramEditorDom.paramList.addEventListener('dragend', clearDragState);
+  paramEditorDom.paramList.addEventListener('dragend', clearExplorerDragState);
 
   issueEditorDom.issueList.addEventListener('dragover', onIssueDragOver);
   issueEditorDom.issueList.addEventListener('dragleave', onIssueDragLeave);
   issueEditorDom.issueList.addEventListener('drop', onIssueDrop);
+  subscribeToIssueSelection(handleIssueSelection);
 }
 
-export function refreshParam(issueId) {
-  handleIssueSelection(issueId);
-}
+/** Shared Functions */
 
 export function clearParamForm() {
   renderParamFormFor('__new__', getSelectedIssue());
 }
+
+/** Event Listener Functions */
 
 export function onParamClick(event) {
   const paramId = getClickedParamId(event);
@@ -54,14 +65,15 @@ export function onParamClick(event) {
     return;
   }
 
+  // deletion
   if (event.target.closest('.decision-explorer__delete')) {
     const issueId = getSelectedIssue();
     removeParameter(paramId);
     renderParamOptions(issueId);
     setDomParamValue('');
-    refreshRecommendations(issueId);
-    void renderSelectedIssuePreview();
-    setEditorStatus('Parameter deleted. Download to save changes.', 'success');
+    publishIssueSelection(issueId);
+    requestIssuePreviewRefresh();
+    notify('Parameter deleted. Download to save changes.', 'success');
     return;
   }
 
@@ -69,6 +81,7 @@ export function onParamClick(event) {
 }
 
 function onParamDblClick(event) {
+  // stop if the user intended to delete instead
   if (event.target.closest('.decision-explorer__delete')) return;
 
   const paramId = getClickedParamId(event);
@@ -81,29 +94,24 @@ function onParamDblClick(event) {
   paramEditorDom.paramDialog.showModal();
 }
 
+/** Issue related functions */
+
 export function setDomParamValue(value) {
   paramEditorDom.paramSelect.value = value;
   setParamSelectedState(value);
 }
 
-export function handleIssueSelection(issueId) {
+function handleIssueSelection(issueId) {
   renderParamOptions(issueId);
   clearParamForm();
   setDomParamValue('');
-  refreshRecommendations(issueId);
 }
 
 export function selectParameter(paramId) {
   setDomParamValue(paramId);
 }
 
-export function setParamOptions(issueId) {
-  renderParamOptions(issueId);
-}
-
-export function setParamForm(paramId) {
-  renderParamFormFor(paramId, getSelectedIssue());
-}
+/** Internal Functions */
 
 function onSaveParameter() {
   try {
@@ -126,15 +134,15 @@ function onSaveParameter() {
 
     closeDialog(paramEditorDom.paramDialog);
 
-    setEditorStatus('Saved parameter. Download to see changes.', 'success');
+    notify('Saved parameter. Download to see changes.', 'success');
   } catch (error) {
-    setEditorStatus(error.message, 'error');
+    notify(error.message, 'error');
   }
 }
 
 function onCreateParam() {
   if (!getSelectedIssue()) {
-    setEditorStatus('Select an issue before creating a parameter.', 'error');
+    notify('Select an issue before creating a parameter.', 'error');
     return;
   }
 
@@ -148,37 +156,29 @@ function selectParameterForEditing(paramId) {
 }
 
 function onParamDragStart(event) {
-  const paramId = getClickedParamId(event);
-  if (!paramId) return;
-
-  event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('application/x-eagle-eye-parameter', paramId);
-  event.target.closest('.decision-explorer__row')?.classList.add('is-dragging');
+  startExplorerDrag(event, getClickedParamId(event), PARAMETER_DRAG_TYPE);
 }
+
+/** Drag and Drop Functions */
 
 function onIssueDragOver(event) {
   const target = event.target.closest('[data-issue-id]');
-  if (!target || !hasDragType(event, 'parameter')) return;
+  if (!target || !supportsExplorerDrag(event, PARAMETER_DRAG_TYPE)) return;
 
   event.preventDefault();
   event.dataTransfer.dropEffect = 'move';
-  issueEditorDom.issueList
-    .querySelectorAll('.is-drop-target')
-    .forEach((row) => row.classList.remove('is-drop-target'));
-  target.closest('.decision-explorer__row')?.classList.add('is-drop-target');
+  markExplorerDropTarget(issueEditorDom.issueList, target);
 }
 
 function onIssueDragLeave(event) {
   if (event.currentTarget.contains(event.relatedTarget)) return;
-  clearDragState();
+  clearExplorerDragState();
 }
 
 function onIssueDrop(event) {
   const target = event.target.closest('[data-issue-id]');
-  const draggedParameterId = event.dataTransfer.getData(
-    'application/x-eagle-eye-parameter',
-  );
-  clearDragState();
+  const draggedParameterId = getExplorerDragId(event, PARAMETER_DRAG_TYPE);
+  clearExplorerDragState();
   if (!target || !draggedParameterId) return;
 
   event.preventDefault();
@@ -188,26 +188,11 @@ function onIssueDrop(event) {
       target.dataset.issueId,
     );
     handleIssueSelection(getSelectedIssue());
-    setEditorStatus(
+    notify(
       `Moved ${movedParameter.parameter_name}. Rules using this parameter were removed. Download to save changes.`,
       'success',
     );
   } catch (error) {
-    setEditorStatus(error.message, 'error');
+    notify(error.message, 'error');
   }
-}
-
-function hasDragType(event, type) {
-  return (
-    type === 'parameter' &&
-    event.dataTransfer.types.includes('application/x-eagle-eye-parameter')
-  );
-}
-
-function clearDragState() {
-  document
-    .querySelectorAll(
-      '.decision-explorer__row.is-dragging, .decision-explorer__row.is-drop-target',
-    )
-    .forEach((row) => row.classList.remove('is-dragging', 'is-drop-target'));
 }

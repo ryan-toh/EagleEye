@@ -1,6 +1,9 @@
 import { appState, getTopic, makeUniqueId } from '../../../appState.js';
-import { str } from '../../../utils.js';
-import { createExplorerItem } from '../shared/dom.js';
+import {
+  getClickedExplorerId,
+  renderExplorerList,
+  setExplorerSelectedState,
+} from '../shared/explorerList.js';
 
 export const topicEditorDom = {};
 
@@ -20,44 +23,31 @@ export function initTopicEditorDom() {
   });
 }
 
+/** Controller Functions */
+
 export function getClickedTopicId(event) {
-  const item = event.target.closest('[data-topic-id]');
-  return item ? item.dataset.topicId : '';
+  return getClickedExplorerId(event, 'topicId');
 }
 
 export function setTopicSelectedState(topicId) {
-  setSelectedState(topicEditorDom.topicList, 'topicId', topicId);
+  setExplorerSelectedState(topicEditorDom.topicList, 'topicId', topicId);
 }
 
 export function renderTopicOptions() {
-  topicEditorDom.topicList.innerHTML = '';
-  const query = topicEditorDom.topicSearch.value.trim().toLowerCase();
-  const topics = appState.topics.filter((topic) =>
-    str(topic.topic_name).toLowerCase().includes(query),
-  );
-
-  if (!topics.length) {
-    topicEditorDom.topicList.innerHTML = `
-      <div class="decision-explorer__empty">
-        ${appState.topics.length ? 'No topics match your search' : 'Load files first'}
-      </div>
-    `;
-    return;
-  }
-
-  topics.forEach((topic) => {
-    const item = createExplorerItem({
-      id: topic.topic_id,
-      title: topic.topic_name,
-      meta: topic.description || '',
-      type: 'topic',
-      icon: '📁',
-    });
-
-    topicEditorDom.topicList.appendChild(item);
+  renderExplorerList({
+    container: topicEditorDom.topicList,
+    items: appState.topics,
+    query: topicEditorDom.topicSearch.value,
+    selectedId: topicEditorDom.topicSelect.value,
+    datasetKey: 'topicId',
+    getId: (topic) => topic.topic_id,
+    getTitle: (topic) => topic.topic_name,
+    getMeta: (topic) => topic.description || '',
+    type: 'topic',
+    icon: '📁',
+    emptyMessage: (topics) =>
+      topics.length ? 'No topics match your search' : 'Load files first',
   });
-
-  setTopicSelectedState(topicEditorDom.topicSelect.value);
 }
 
 export function renderTopicFormFor(topicId) {
@@ -69,15 +59,4 @@ export function renderTopicFormFor(topicId) {
   topicEditorDom.topicName.value = topic?.topic_name || '';
   topicEditorDom.topicDescription.value = topic?.description || '';
   topicEditorDom.topicExamples.value = topic?.example_phrases || '';
-}
-
-function setSelectedState(container, datasetKey, selectedId) {
-  const items = container.querySelectorAll('.decision-explorer__item');
-
-  items.forEach((item) => {
-    item.classList.toggle(
-      'is-selected',
-      item.dataset[datasetKey] === String(selectedId),
-    );
-  });
 }

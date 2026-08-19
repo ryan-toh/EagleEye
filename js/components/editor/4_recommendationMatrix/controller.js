@@ -1,14 +1,11 @@
 import { getSelectedIssue } from '../2_issue/controller.js';
+import { closeDialog } from '../../../ui/dialog.js';
+import { notify } from '../../../ui/notifications.js';
+import { deleteRecommendation } from '../../../appState.js';
 import {
-  closeDialog,
-  renderSelectedIssuePreview,
-  setEditorStatus,
-} from '../shared/controller.js';
-import {
-  appState,
-  removeRecommendation,
-  removeRule,
-} from '../../../appState.js';
+  requestIssuePreviewRefresh,
+  subscribeToIssueSelection,
+} from '../editorCoordinator.js';
 import {
   addRecommendationAssignment,
   collectRecommendationAssignments,
@@ -24,7 +21,7 @@ import {
 import {
   saveRecommendation,
   saveRecommendationAssignments,
-} from './service.js';
+} from '../../../services/recommendationService.js';
 
 export function initRecomEditor() {
   initRecomEditorDom();
@@ -57,12 +54,17 @@ export function initRecomEditor() {
     handleRecommendationAssignmentChange,
   );
   renderRecommendationOptions('');
+  subscribeToIssueSelection(refreshRecommendations);
 }
+
+/** Shared Functions */
 
 export function refreshRecommendations(issueId) {
   renderRecommendationOptions(issueId);
   setRecommendationSelectedState('');
 }
+
+/** Event Listener Functions */
 
 function onCreateRecommendation() {
   renderRecommendationFormFor('__new__', getSelectedIssue());
@@ -73,17 +75,14 @@ function onRecommendationClick(event) {
   const recommendationId = getClickedRecommendationId(event);
   if (!recommendationId) return;
 
+  // deletion
   if (event.target.closest('.decision-explorer__delete')) {
-    appState.rules
-      .filter((rule) => rule.recommendation_id === recommendationId)
-      .map((rule) => rule.rule_id)
-      .forEach(removeRule);
-    removeRecommendation(recommendationId);
+    deleteRecommendation(recommendationId);
     const issueId = getSelectedIssue();
     renderRecommendationOptions(issueId);
     setRecommendationSelectedState('');
-    void renderSelectedIssuePreview();
-    setEditorStatus(
+    requestIssuePreviewRefresh();
+    notify(
       'Recommendation deleted. Download to save changes.',
       'success',
     );
@@ -95,6 +94,7 @@ function onRecommendationClick(event) {
 }
 
 function onRecommendationDoubleClick(event) {
+  // stop if the user intended to delete instead
   if (event.target.closest('.decision-explorer__delete')) return;
 
   const recommendationId = getClickedRecommendationId(event);
@@ -105,7 +105,9 @@ function onRecommendationDoubleClick(event) {
   recomEditorDom.recommDialog.showModal();
 }
 
-async function onSaveRecommendation() {
+/** Internal Functions */
+
+function onSaveRecommendation() {
   try {
     const recommendation = saveRecommendation({
       recommendationId: recomEditorDom.recommendationId.value,
@@ -115,24 +117,31 @@ async function onSaveRecommendation() {
       escalationNote: recomEditorDom.recommendationEscalationNote.value,
     });
     const issueId = getSelectedIssue();
-    const assignmentCount = issueId
-      ? saveRecommendationAssignments(
-          issueId,
-          recommendation.recommendation_id,
-          collectRecommendationAssignments(),
-        )
-      : 0;
+    const assignmentCount = saveAssignmentsForSelectedIssue(
+      issueId,
+      recommendation.recommendation_id,
+    );
 
     renderRecommendationOptions(issueId);
     recomEditorDom.recommSelect.value = '';
     setRecommendationSelectedState('');
     closeDialog(recomEditorDom.recommDialog);
-    await renderSelectedIssuePreview();
-    setEditorStatus(
-      `Saved${issueId ? ` with ${assignmentCount} assignment(s). Download to see changes.` : ''}.`,
-      'success',
-    );
+    requestIssuePreviewRefresh();
+    notify(getRecommendationSavedMessage(issueId, assignmentCount), 'success');
   } catch (error) {
-    setEditorStatus(error.message, 'error');
+    notify(error.message, 'error');
   }
+}
+
+function saveAssignmentsForSelectedIssue(issueId, recommendationId) {
+  if (!issueId) return 0;
+
+  const assignments = collectRecommendationAssignments();
+  return saveRecommendationAssignments(issueId, recommendationId, assignments);
+}
+
+function getRecommendationSavedMessage(issueId, assignmentCount) {
+  if (!issueId) return 'Saved.';
+
+  return `Saved with ${assignmentCount} assignment(s). Download to see changes.`;
 }

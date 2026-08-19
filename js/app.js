@@ -23,16 +23,18 @@ async function main() {
 async function loadParts() {
   const includeElements = document.querySelectorAll('[data-include]');
 
-  for (const element of includeElements) {
-    const filePath = element.getAttribute('data-include');
-    const response = await fetch(filePath);
+  await Promise.all(
+    [...includeElements].map(async (element) => {
+      const filePath = element.getAttribute('data-include');
+      const response = await fetch(filePath);
 
-    if (!response.ok) {
-      throw new Error(`Failed to load partial: ${filePath}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to load partial: ${filePath}`);
+      }
 
-    element.innerHTML = await response.text();
-  }
+      element.innerHTML = await response.text();
+    }),
+  );
 }
 
 /**
@@ -40,7 +42,6 @@ async function loadParts() {
  * Ensures that the required third-party libraries are loaded.
  */
 function initApp() {
-  // try {
   validateLibraries();
 
   initUpload();

@@ -4,8 +4,11 @@ import {
   renderIssueSummary,
   renderEmptyIssueView,
 } from './dom.js';
-import { renderMermaid } from '../../flowchart.js';
-import { appState } from '../../appState.js';
+import { renderMermaid } from './mermaidRenderer.js';
+import { getLastMermaid, setLastMermaid } from '../../ui/uiState.js';
+import { createLatestRequestGate } from './latestRequest.js';
+
+const graphRenderRequests = createLatestRequestGate();
 
 export function initPreview() {
   initPreviewDomElements();
@@ -26,14 +29,15 @@ export function initPreview() {
 }
 
 export async function copyGraph() {
-  if (!appState.lastMermaid) return;
+  const graphDefinition = getLastMermaid();
+  if (!graphDefinition) return;
 
   try {
     if (!navigator.clipboard?.writeText) {
       throw new Error('Clipboard access is unavailable.');
     }
 
-    await navigator.clipboard.writeText(appState.lastMermaid);
+    await navigator.clipboard.writeText(graphDefinition);
     previewDom.copyMermaidBtn.textContent = 'Copied';
   } catch (error) {
     console.error('Could not copy Mermaid:', error);
@@ -47,16 +51,19 @@ export async function copyGraph() {
 }
 
 export async function setGraph(graphDefinition) {
+  const isCurrentRequest = graphRenderRequests.begin();
+  setLastMermaid(graphDefinition);
   previewDom.copyMermaidBtn.disabled = false;
-  return renderMermaid(previewDom.flowchart, graphDefinition);
+  return renderMermaid(previewDom.flowchart, graphDefinition, isCurrentRequest);
 }
 
 export function clearIssueView() {
+  graphRenderRequests.invalidate();
   renderEmptyIssueView();
 }
 
-export function setIssueSummary(issueId) {
-  renderIssueSummary(issueId);
+export function setIssueSummary(preview) {
+  renderIssueSummary(preview);
 }
 
 async function toggleFlowchartFullscreen() {

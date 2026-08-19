@@ -1,11 +1,5 @@
-import {
-  appState,
-  getIssue,
-  getIssueParameters,
-  getIssueRules,
-  getRecommendationsForRules,
-} from '../../appState.js';
-import { escapeHtml, isRequired, str } from '../../utils.js';
+import { clearLastMermaid } from '../../ui/uiState.js';
+import { escapeHtml } from '../../utils.js';
 
 export const previewDom = {};
 
@@ -29,70 +23,90 @@ export function initPreviewDomElements() {
   });
 }
 
-export function renderIssueSummary(issueId) {
-  const issue = getIssue(issueId);
-  const issueParameters = getIssueParameters(issueId);
-  const issueRules = getIssueRules(issueId);
-  const issueRecommendations = getRecommendationsForRules(issueRules);
-  const parameterById = new Map(
-    issueParameters.map((param) => [str(param.parameter_id), param]),
-  );
-
+export function renderIssueSummary(preview) {
   if (previewDom.issueSummaryName) {
-    previewDom.issueSummaryName.textContent =
-      issue?.issue_name || 'Untitled issue';
+    previewDom.issueSummaryName.textContent = preview.name;
   }
   if (previewDom.issueSummaryDescription) {
-    previewDom.issueSummaryDescription.textContent =
-      issue?.issue_description || 'No issue description provided.';
+    previewDom.issueSummaryDescription.textContent = preview.description;
   }
   setSummaryCounts(
-    issueParameters.length,
-    issueRules.length,
-    issueRecommendations.length,
+    preview.parameters.length,
+    preview.rules.length,
+    preview.recommendations.length,
   );
 
   previewDom.parametersList.classList.remove('empty');
   previewDom.parametersList.innerHTML = renderSummaryList(
-    issueParameters,
-    (param) => {
-      const required = isRequired(param.required);
-      return `
-      <div class="summary-row__heading">
-        <strong>${escapeHtml(param.parameter_name)}</strong>
-        <span class="badge ${required ? 'required' : 'optional'}">${required ? 'Required' : 'Optional'}</span>
-      </div>
-      <p class="summary-row__body">${escapeHtml(param.question_to_ask)}</p>
-      ${param.allowed_values ? `<p class="summary-row__meta"><span>Allowed values</span>${escapeHtml(param.allowed_values)}</p>` : ''}
-    `;
-    },
+    preview.parameters,
+    renderParameterSummary,
   );
 
   previewDom.rulesList.classList.remove('empty');
   previewDom.rulesList.innerHTML = renderSummaryList(
-    issueRules,
+    preview.rules,
     (rule) => `
     <div class="summary-row__heading">
       <span class="priority-badge">Priority ${escapeHtml(rule.priority)}</span>
-      <span class="summary-row__id">${escapeHtml(rule.recommendation_id)}</span>
+      <span class="summary-row__id">${escapeHtml(rule.recommendationId)}</span>
     </div>
-    ${renderRuleConditions(rule.conditions, parameterById)}
+    ${renderRuleConditions(rule.conditions)}
   `,
   );
 
   previewDom.recommendationsList.classList.remove('empty');
   previewDom.recommendationsList.innerHTML = renderSummaryList(
-    issueRecommendations,
-    (rec) => `
-    <div class="summary-row__heading">
-      <span class="decision-badge decision-badge--${escapeHtml(rec.final_decision).toLowerCase()}">${escapeHtml(rec.final_decision)}</span>
-      <span class="summary-row__id">${escapeHtml(rec.recommendation_id)}</span>
-    </div>
-    <p class="summary-row__body">${escapeHtml(rec.recommendation_text)}</p>
-    ${rec.next_steps ? `<p class="summary-row__meta"><span>Next steps</span>${escapeHtml(rec.next_steps)}</p>` : ''}
-    ${rec.escalation_note ? `<p class="summary-row__meta summary-row__meta--alert"><span>Escalation</span>${escapeHtml(rec.escalation_note)}</p>` : ''}
-  `,
+    preview.recommendations,
+    renderRecommendationSummary,
   );
+}
+
+function renderParameterSummary(parameter) {
+  const requirementClass = parameter.required ? 'required' : 'optional';
+  const requirementLabel = parameter.required ? 'Required' : 'Optional';
+  const allowedValues = parameter.allowedValues
+    ? renderSummaryMeta('Allowed values', parameter.allowedValues)
+    : '';
+
+  return `
+    <div class="summary-row__heading">
+      <strong>${escapeHtml(parameter.name)}</strong>
+      <span class="badge ${requirementClass}">${requirementLabel}</span>
+    </div>
+    <p class="summary-row__body">${escapeHtml(parameter.question)}</p>
+    ${allowedValues}
+  `;
+}
+
+function renderRecommendationSummary(recommendation) {
+  const decision = escapeHtml(recommendation.final_decision);
+  const decisionClass = decision.toLowerCase();
+  const nextSteps = recommendation.next_steps
+    ? renderSummaryMeta('Next steps', recommendation.next_steps)
+    : '';
+  const escalationNote = recommendation.escalation_note
+    ? renderSummaryMeta(
+        'Escalation',
+        recommendation.escalation_note,
+        'summary-row__meta--alert',
+      )
+    : '';
+
+  return `
+    <div class="summary-row__heading">
+      <span class="decision-badge decision-badge--${decisionClass}">${decision}</span>
+      <span class="summary-row__id">${escapeHtml(recommendation.recommendation_id)}</span>
+    </div>
+    <p class="summary-row__body">${escapeHtml(recommendation.recommendation_text)}</p>
+    ${nextSteps}
+    ${escalationNote}
+  `;
+}
+
+function renderSummaryMeta(label, value, modifierClass = '') {
+  const className = `summary-row__meta ${modifierClass}`.trim();
+
+  return `<p class="${className}"><span>${label}</span>${escapeHtml(value)}</p>`;
 }
 
 export function renderEmptyIssueView() {
@@ -117,7 +131,7 @@ export function renderEmptyIssueView() {
   previewDom.flowchart.textContent = 'Load files and select an issue.';
 
   previewDom.copyMermaidBtn.disabled = true;
-  appState.lastMermaid = '';
+  clearLastMermaid();
 }
 
 function setSummaryCounts(parameterCount, ruleCount, recommendationCount) {
@@ -154,17 +168,9 @@ function renderSummaryList(items, renderer) {
     .join('')}</div>`;
 }
 
-function renderRuleConditions(conditions, parameterById) {
-  const parsedConditions = parseRuleConditions(conditions);
-
-  if (!parsedConditions) {
-    return `<p class="rule-conditions__raw">${escapeHtml(conditions)}</p>`;
-  }
-
-  const items = Object.entries(parsedConditions)
-    .map(([parameterId, value]) => {
-      const parameter = parameterById.get(str(parameterId));
-      const question = parameter?.question_to_ask || parameterId;
+function renderRuleConditions(conditions) {
+  const items = conditions
+    .map(({ question, value }) => {
       return `
       <li class="rule-conditions__item">
         <span class="rule-conditions__label">Parameter:</span>
@@ -177,15 +183,4 @@ function renderRuleConditions(conditions, parameterById) {
     .join('');
 
   return `<ul class="rule-conditions">${items}</ul>`;
-}
-
-function parseRuleConditions(conditions) {
-  try {
-    const parsed = JSON.parse(str(conditions));
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-      ? parsed
-      : null;
-  } catch {
-    return null;
-  }
 }

@@ -1,9 +1,13 @@
-import { appState } from './appState.js';
-
 const flowchartZoomStates = new WeakMap();
 
-export async function renderMermaid(targetElement, graphDefinition) {
-  appState.lastMermaid = graphDefinition;
+/** Renders a Mermaid definition and provides the preview's pan/zoom behavior. */
+export async function renderMermaid(
+  targetElement,
+  graphDefinition,
+  isCurrentRequest = () => true,
+) {
+  if (!isCurrentRequest()) return { ok: false, stale: true };
+  
   targetElement.classList.remove('empty');
   targetElement.innerHTML = '<div class="mermaid"></div>';
 
@@ -12,16 +16,30 @@ export async function renderMermaid(targetElement, graphDefinition) {
       `tree-${Date.now()}`,
       graphDefinition,
     );
+
+    if (!isCurrentRequest()) return { ok: false, stale: true };
+
     targetElement.querySelector('.mermaid').innerHTML = svg;
+
     enableFlowchartPinchZoom(targetElement);
     resetFlowchartZoom(targetElement);
     centerFlowchartViewport(targetElement);
+
     return { ok: true };
   } catch (error) {
+    if (!isCurrentRequest()) return { ok: false, stale: true };
     console.error(error);
-    targetElement.innerHTML = `<pre>${escapeGraph(graphDefinition)}</pre><p class="status error">Mermaid could not render this chart. The raw Mermaid definition is shown above.</p>`;
+    targetElement.innerHTML = renderMermaidError(graphDefinition);
     return { ok: false, error };
   }
+}
+
+function renderMermaidError(graphDefinition) {
+  const escapedGraph = escapeGraph(graphDefinition);
+  const message =
+    'Mermaid could not render this chart. The raw Mermaid definition is shown above.';
+
+  return `<pre>${escapedGraph}</pre><p class="status error">${message}</p>`;
 }
 
 function enableFlowchartPinchZoom(targetElement) {

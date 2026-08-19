@@ -4,7 +4,12 @@ import {
   makeUniqueId,
 } from '../../../appState.js';
 import { isRequired, str } from '../../../utils.js';
-import { createExplorerItem } from '../shared/dom.js';
+import {
+  getClickedExplorerId,
+  renderExplorerEmpty,
+  renderExplorerList,
+  setExplorerSelectedState,
+} from '../shared/explorerList.js';
 
 export const paramEditorDom = {};
 
@@ -32,23 +37,19 @@ export function initParamEditorDom() {
   });
 }
 
+/** Controller Functions */
+
 export function setParamSelectedState(paramId) {
-  setSelectedState(paramEditorDom.paramList, 'paramId', paramId);
+  setExplorerSelectedState(paramEditorDom.paramList, 'paramId', paramId);
 }
 
 export function renderParamOptions(issueId) {
   const params = issueId ? getIssueParameters(issueId) : [];
 
-  paramEditorDom.paramList.innerHTML = '';
-
   if (!issueId) {
     paramEditorDom.paramSearch.disabled = true;
     paramEditorDom.paramPanelHint.textContent = 'Select an issue first';
-    paramEditorDom.paramList.innerHTML = `
-      <div class="decision-explorer__empty">
-        Select an issue first
-      </div>
-    `;
+    renderExplorerEmpty(paramEditorDom.paramList, 'Select an issue first');
     return;
   }
 
@@ -56,38 +57,26 @@ export function renderParamOptions(issueId) {
   paramEditorDom.paramPanelHint.textContent =
     'Create or double click on parameter to edit';
 
-  const query = paramEditorDom.paramSearch.value.trim().toLowerCase();
-  const matchingParams = params.filter((param) =>
-    str(param.parameter_name).toLowerCase().includes(query),
-  );
-
-  if (!matchingParams.length) {
-    paramEditorDom.paramList.innerHTML = `
-      <div class="decision-explorer__empty">
-        ${params.length ? 'No parameters match your search' : 'No parameters found for this issue'}
-      </div>
-    `;
-    return;
-  }
-
-  matchingParams.forEach((param) => {
-    const item = createExplorerItem({
-      id: param.parameter_id,
-      title: param.parameter_name,
-      meta: param.question_to_ask || '',
-      type: 'param',
-      icon: '✏️',
-    });
-
-    paramEditorDom.paramList.appendChild(item);
+  renderExplorerList({
+    container: paramEditorDom.paramList,
+    items: params,
+    query: paramEditorDom.paramSearch.value,
+    selectedId: paramEditorDom.paramSelect.value,
+    datasetKey: 'paramId',
+    getId: (param) => param.parameter_id,
+    getTitle: (param) => param.parameter_name,
+    getMeta: (param) => param.question_to_ask || '',
+    type: 'param',
+    icon: '✏️',
+    emptyMessage: (allParams) =>
+      allParams.length
+        ? 'No parameters match your search'
+        : 'No parameters found for this issue',
   });
-
-  setParamSelectedState(paramEditorDom.paramSelect.value);
 }
 
 export function getClickedParamId(event) {
-  const item = event.target.closest('[data-param-id]');
-  return item ? item.dataset.paramId : '';
+  return getClickedExplorerId(event, 'paramId');
 }
 
 export function renderParamFormFor(parameterId, issueId) {
@@ -107,15 +96,4 @@ export function renderParamFormFor(parameterId, issueId) {
   paramEditorDom.parameterExampleValues.value = parameter?.example_values || '';
   paramEditorDom.parameterOrder.value =
     parameter?.order || parameters.length + 1;
-}
-
-function setSelectedState(container, datasetKey, selectedId) {
-  const items = container.querySelectorAll('.decision-explorer__item');
-
-  items.forEach((item) => {
-    item.classList.toggle(
-      'is-selected',
-      item.dataset[datasetKey] === String(selectedId),
-    );
-  });
 }

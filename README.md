@@ -564,6 +564,12 @@ This section describes how EagleEye is structured, how workbook data is organise
 
 # Architecture
 
+## Paradigms
+
+- MVC-like component separation
+- Imperative / procedural
+- Publish–subscribe / observer
+
 ## High Level Overview
 
 ```text

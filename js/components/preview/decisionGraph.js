@@ -1,23 +1,20 @@
 import { isRequired, safeMermaidLabel, str } from '../../utils.js';
-import {
-  getIssue,
-  getIssueParameters,
-  getIssueRules,
-  getRecommendationMap,
-  getTopicName,
-} from '../../appState.js';
+import { tryParseConditions } from '../../domain/conditions.js';
 
-export function buildIssueFlowchart(issueId) {
-  const issue = getIssue(issueId);
+/** Builds a Mermaid definition from the selected issue's decision data. */
+export function buildDecisionGraph({
+  issue,
+  topicName,
+  parameters: params,
+  rules: issueRules,
+  recommendationById,
+}) {
   if (!issue) return 'flowchart TD\n  missing["Issue not found"]';
 
-  const topicName = getTopicName(issue.topic_id);
-  const params = getIssueParameters(issueId);
-  const rules = getIssueRules(issueId).map((rule) => ({
+  const rules = issueRules.map((rule) => ({
     rule,
-    conditions: parseConditions(rule.conditions),
+    conditions: tryParseConditions(rule.conditions) || {},
   }));
-  const recommendationById = getRecommendationMap();
   const lines = ['flowchart TD'];
   const nodeIds = { parameter: 0, rule: 0 };
 
@@ -34,13 +31,11 @@ export function buildIssueFlowchart(issueId) {
     return lines.join('\n');
   }
 
-  // Build a decision tree: each level asks one parameter and each rule is a leaf.
-  appendParameterBranch({
+  appendDecisionBranch({
     parentNodeId: 'issueNode',
     edgeLabel: '',
     candidates: rules,
-    params,
-    parameterIndex: 0,
+    remainingParams: params,
     recommendationById,
     nodeIds,
     lines,
@@ -49,17 +44,17 @@ export function buildIssueFlowchart(issueId) {
   return lines.join('\n');
 }
 
-function appendParameterBranch({
+function appendDecisionBranch({
   parentNodeId,
   edgeLabel,
   candidates,
-  params,
-  parameterIndex,
+  remainingParams,
   recommendationById,
   nodeIds,
   lines,
 }) {
-  if (parameterIndex >= params.length) {
+  const parameter = chooseDecisionParameter(candidates, remainingParams);
+  if (!parameter) {
     appendRuleLeaves({
       parentNodeId,
       edgeLabel,
@@ -71,7 +66,6 @@ function appendParameterBranch({
     return;
   }
 
-  const parameter = params[parameterIndex];
   const parameterId = str(parameter.parameter_id);
   const parameterNodeId = `parameter${nodeIds.parameter++}`;
   const required = isRequired(parameter.required);
@@ -86,39 +80,100 @@ function appendParameterBranch({
     `${parameterNodeId}{"${safeMermaidLabel(label)}"}`,
   );
 
-  const candidatesByValue = new Map();
-  const wildcardCandidates = [];
+  createDecisionBranches(candidates, parameterId).forEach(
+    ({ label: branchLabel, candidates: matchingCandidates }) => {
+      appendDecisionBranch({
+        parentNodeId: parameterNodeId,
+        edgeLabel: branchLabel,
+        candidates: matchingCandidates,
+        remainingParams: remainingParams.filter(
+          (item) => str(item.parameter_id) !== parameterId,
+        ),
+        recommendationById,
+        nodeIds,
+        lines,
+      });
+    },
+  );
+}
+
+function chooseDecisionParameter(candidates, remainingParams) {
+  const scored = remainingParams
+    .map((parameter, index) => ({
+      parameter,
+      index,
+      score: getParameterSplitScore(candidates, parameter.parameter_id),
+    }))
+    .filter(({ score }) => score > 0);
+
+  if (!scored.length) return null;
+  scored.sort(
+    (first, second) => second.score - first.score || first.index - second.index,
+  );
+  return scored[0].parameter;
+}
+
+function getParameterSplitScore(candidates, parameterId) {
+  const id = str(parameterId);
+  const values = new Set();
+  let wildcardCount = 0;
+
   candidates.forEach((candidate) => {
-    if (
-      !Object.prototype.hasOwnProperty.call(candidate.conditions, parameterId)
-    ) {
-      wildcardCandidates.push(candidate);
-      return;
+    if (Object.hasOwn(candidate.conditions, id)) {
+      values.add(str(candidate.conditions[id]) || 'Blank');
+    } else {
+      wildcardCount += 1;
     }
-
-    const value = candidate.conditions[parameterId];
-    const key = str(value) || 'Blank';
-
-    if (!candidatesByValue.has(key)) candidatesByValue.set(key, []);
-    candidatesByValue.get(key).push(candidate);
   });
 
-  if (!candidatesByValue.size) {
-    candidatesByValue.set('Any value', []);
+  if (!values.size) return 0;
+  return values.size + (wildcardCount ? 1 : 0);
+}
+
+function createDecisionBranches(candidates, parameterId) {
+  const id = str(parameterId);
+  const candidatesWithParameter = candidates.filter((candidate) =>
+    Object.hasOwn(candidate.conditions, id),
+  );
+  const parameterValues = candidatesWithParameter.map((candidate) => {
+    return getCandidateValue(candidate, id);
+  });
+  const uniqueValues = new Set(parameterValues);
+  const values = [...uniqueValues];
+  const wildcardCandidates = getWildcardCandidates(candidates, id);
+  const branches = values.map((value) => {
+    const matchingCandidates = getMatchingCandidates(candidates, id, value);
+
+    return {
+      label: value,
+      candidates: matchingCandidates,
+    };
+  });
+
+  if (wildcardCandidates.length) {
+    branches.push({ label: 'Any other value', candidates: wildcardCandidates });
   }
 
-  candidatesByValue.forEach((matchingCandidates, value) => {
-    appendParameterBranch({
-      parentNodeId: parameterNodeId,
-      edgeLabel: value,
-      candidates: [...matchingCandidates, ...wildcardCandidates],
-      params,
-      parameterIndex: parameterIndex + 1,
-      recommendationById,
-      nodeIds,
-      lines,
-    });
+  return branches;
+}
+
+function getWildcardCandidates(candidates, parameterId) {
+  return candidates.filter(
+    (candidate) => !Object.hasOwn(candidate.conditions, parameterId),
+  );
+}
+
+function getMatchingCandidates(candidates, parameterId, value) {
+  return candidates.filter((candidate) => {
+    const isWildcard = !Object.hasOwn(candidate.conditions, parameterId);
+    const candidateValue = getCandidateValue(candidate, parameterId);
+
+    return isWildcard || candidateValue === value;
   });
+}
+
+function getCandidateValue(candidate, parameterId) {
+  return str(candidate.conditions[parameterId]) || 'Blank';
 }
 
 function appendRuleLeaves({
@@ -190,15 +245,4 @@ function wrapLine(line, maximumLineLength) {
 
   if (currentLine) lines.push(currentLine);
   return lines;
-}
-
-function parseConditions(value) {
-  try {
-    const parsed = JSON.parse(str(value));
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-      ? parsed
-      : {};
-  } catch {
-    return {};
-  }
 }

@@ -1,5 +1,6 @@
-import { handleTopicSelection } from '../2_issue/controller.js';
-import { setEditorStatus, closeDialog } from '../shared/controller.js';
+import { selectTopic } from '../editorCoordinator.js';
+import { closeDialog } from '../../../ui/dialog.js';
+import { notify } from '../../../ui/notifications.js';
 import {
   initTopicEditorDom,
   topicEditorDom,
@@ -21,13 +22,23 @@ export function initTopicEditor() {
   topicEditorDom.topicList.addEventListener('dblclick', onTopicDblClick);
 }
 
-export function refreshTopic() {
-  clearTopicForm();
+/** Shared Functions */
+
+export function setTopicOptions() {
+  renderTopicOptions();
 }
 
 export function clearTopicForm() {
   renderTopicFormFor('__new__');
 }
+
+/** Issue related functions */
+
+export function getSelectedTopic() {
+  return topicEditorDom.topicSelect.value;
+}
+
+/** Event Listener Functions */
 
 export function onTopicClick(event) {
   const topicId = getClickedTopicId(event);
@@ -36,20 +47,25 @@ export function onTopicClick(event) {
     return;
   }
 
+
+  // deletion
   if (event.target.closest('.decision-explorer__delete')) {
     removeTopic(topicId);
     renderTopicOptions();
     setDomTopicValue('');
-    handleTopicSelection('');
-    setEditorStatus('Topic deleted. Download to save changes.', 'success');
+    selectTopic('');
+    notify('Topic deleted. Download to save changes.', 'success');
+
     return;
   }
 
   setDomTopicValue(topicId);
-  handleTopicSelection(topicId);
+  selectTopic(topicId);
 }
 
 function onTopicDblClick(event) {
+
+  // stop if the user intended to delete instead
   if (event.target.closest('.decision-explorer__delete')) return;
 
   const topicId = getClickedTopicId(event);
@@ -60,33 +76,6 @@ function onTopicDblClick(event) {
 
   selectTopicForEditing(topicId);
   topicEditorDom.topicDialog.showModal();
-}
-
-export function setTopicOptions() {
-  renderTopicOptions();
-}
-
-export function setDomTopicValue(value) {
-  topicEditorDom.topicSelect.value = value;
-  setTopicSelectedState(value);
-}
-
-export function getSelectedTopic() {
-  return topicEditorDom.topicSelect.value;
-}
-
-export function setTopicForm(topicId) {
-  renderTopicFormFor(topicId);
-}
-
-function onCreateTopic() {
-  selectTopicForEditing('__new__');
-  topicEditorDom.topicDialog.showModal();
-}
-
-function selectTopicForEditing(topicId) {
-  setDomTopicValue(topicId === '__new__' ? '' : topicId);
-  renderTopicFormFor(topicId);
 }
 
 function onSaveTopic() {
@@ -100,14 +89,31 @@ function onSaveTopic() {
       example_phrases: topicEditorDom.topicExamples.value,
     });
 
-    setEditorStatus('Saved topic. Download to see changes.', 'success');
+    notify('Saved topic. Download to see changes.', 'success');
 
     closeDialog(topicEditorDom.topicDialog);
 
     renderTopicOptions();
     setDomTopicValue('');
-    handleTopicSelection('');
+    selectTopic('');
   } catch (error) {
-    setEditorStatus(error.message, 'error');
+    notify(error.message, 'error');
   }
+}
+
+/** Internal Functions */
+
+function setDomTopicValue(value) {
+  topicEditorDom.topicSelect.value = value;
+  setTopicSelectedState(value);
+}
+
+function onCreateTopic() {
+  selectTopicForEditing('__new__');
+  topicEditorDom.topicDialog.showModal();
+}
+
+function selectTopicForEditing(topicId) {
+  setDomTopicValue(topicId === '__new__' ? '' : topicId);
+  renderTopicFormFor(topicId);
 }

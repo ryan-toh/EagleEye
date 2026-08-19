@@ -98,13 +98,22 @@ export async function loadWorkbookData(fileInput) {
 // validate that each sheet has the required columns
 export function validateWorkbookData(workbookData) {
   Object.entries(FILE_CONFIG.sheet).forEach(([key, config]) => {
+    const headers = getWorkbookHeaders(workbookData, key);
+
     validateRequiredColumns(
       config.sheetName,
-      workbookData[SHEET_HEADERS_KEY]?.[key] ??
-        Object.keys(workbookData[key]?.[0] || {}),
+      headers,
       config.requiredColumns,
     );
   });
+}
+
+function getWorkbookHeaders(workbookData, key) {
+  const savedHeaders = workbookData[SHEET_HEADERS_KEY]?.[key];
+  if (savedHeaders) return savedHeaders;
+
+  const firstRow = workbookData[key]?.[0] || {};
+  return Object.keys(firstRow);
 }
 
 // read a multi-sheet workbook and map each sheet to its key via sheetName
@@ -116,15 +125,6 @@ function readMultiSheetXlsx(file) {
       try {
         const data = new Uint8Array(event.target.result);
         const workbook = window.XLSX.read(data, { type: 'array' });
-
-        // Build a reverse lookup: sheetName → key
-        // e.g. { "1_topics": "topics", "2_issues": "issues", ... }
-        Object.fromEntries(
-          Object.entries(FILE_CONFIG.sheet).map(([key, config]) => [
-            config.sheetName,
-            key,
-          ]),
-        );
 
         const result = { [SHEET_HEADERS_KEY]: {} };
 

@@ -3,7 +3,7 @@ import { toHtml } from '../../utils.js';
 
 document.addEventListener('DOMContentLoaded', main);
 
-export function main() {
+function main() {
   initUserGuideDom();
   loadUserGuide();
 }
