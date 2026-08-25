@@ -12,14 +12,24 @@ export function escapeHtml(value) {
 }
 
 export function safeMermaidLabel(value) {
-  return str(value)
+  const safeLabel = str(value)
     .replaceAll('"', "'")
     .replaceAll('[', '(')
     .replaceAll(']', ')')
     .replaceAll('{', '(')
     .replaceAll('}', ')')
-    .replaceAll('|', '-')
-    .slice(0, 180);
+    .replaceAll('|', '-');
+
+  return safeLabel.length > 180 ? `${safeLabel.slice(0, 177)}...` : safeLabel;
+}
+
+export function recommendationEmoji(finalDecision) {
+  const decision = str(finalDecision).toLowerCase();
+  if (decision.includes('escalat')) return '🚨';
+  if (decision.includes('clarif')) return '❓';
+  if (decision.includes('unanswer')) return '🟡';
+  if (decision.includes('answer')) return '🟢';
+  return '💡';
 }
 
 export function isRequired(value) {

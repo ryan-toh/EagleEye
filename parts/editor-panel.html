@@ -18,6 +18,28 @@
   <input type="hidden" id="editorParamSelect" value="" />
   <input type="hidden" id="editorRecommendationSelect" value="" />
 
+  <section class="global-search" aria-label="Search knowledge base">
+    <label class="global-search__label" for="editorGlobalSearch">
+      Search knowledge base
+    </label>
+    <input
+      id="editorGlobalSearch"
+      type="search"
+      placeholder="Search topics, issues, parameters, and recommendations"
+      aria-describedby="editorGlobalSearchHint"
+      autocomplete="off"
+      disabled
+    />
+    <p id="editorGlobalSearchHint" class="helper-text">
+      Search across all loaded knowledge-base content.
+    </p>
+    <div
+      id="editorGlobalSearchResults"
+      class="global-search__results"
+      hidden
+    ></div>
+  </section>
+
   <div class="decision-explorer">
     <section class="decision-explorer__pane decision-explorer__pane--topics">
       <div class="decision-explorer__pane-header">
@@ -31,16 +53,6 @@
         >
           +
         </button>
-      </div>
-
-      <div class="editor-explorer__search">
-        <input
-          id="editorTopicSearch"
-          type="search"
-          placeholder="Search topics"
-          aria-label="Search topics"
-          autocomplete="off"
-        />
       </div>
 
       <div
@@ -63,17 +75,6 @@
         >
           +
         </button>
-      </div>
-
-      <div class="editor-explorer__search">
-        <input
-          id="editorIssueSearch"
-          type="search"
-          placeholder="Search issues"
-          aria-label="Search issues"
-          autocomplete="off"
-          disabled
-        />
       </div>
 
       <div
@@ -101,17 +102,6 @@
         </button>
       </div>
 
-      <div class="editor-explorer__search">
-        <input
-          id="editorParamSearch"
-          type="search"
-          placeholder="Search parameters"
-          aria-label="Search parameters"
-          autocomplete="off"
-          disabled
-        />
-      </div>
-
       <div
         class="decision-explorer__list"
         id="editorParamList"
@@ -134,16 +124,6 @@
         >
           +
         </button>
-      </div>
-      <div class="editor-explorer__search">
-        <input
-          id="editorRecommendationSearch"
-          type="search"
-          placeholder="Search final decisions"
-          aria-label="Search recommendations"
-          autocomplete="off"
-          disabled
-        />
       </div>
       <div
         class="decision-explorer__list"

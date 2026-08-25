@@ -24,7 +24,6 @@ export const recomEditorDom = {};
 export function initRecomEditorDom() {
   Object.assign(recomEditorDom, {
     createRecommendationBtn: document.getElementById('createRecommendationBtn'),
-    recommSearch: document.getElementById('editorRecommendationSearch'),
     recommSelect: document.getElementById('editorRecommendationSelect'),
     recommList: document.getElementById('editorRecommendationList'),
     recommPanelHint: document.getElementById('editorRecommendationPanelHint'),
@@ -66,17 +65,15 @@ export function renderRecommendationOptions(issueId) {
     : 'Select an issue first';
 
   if (!issueId) {
-    recomEditorDom.recommSearch.disabled = true;
     renderExplorerEmpty(recomEditorDom.recommList, 'Select an issue first');
     return;
   }
 
-  recomEditorDom.recommSearch.disabled = false;
   const recommendations = getRecommendationsForIssue(issueId);
   renderExplorerList({
     container: recomEditorDom.recommList,
     items: recommendations,
-    query: recomEditorDom.recommSearch.value,
+    query: '',
     selectedId: recomEditorDom.recommSelect.value,
     datasetKey: 'recommendationId',
     getId: (recommendation) => recommendation.recommendation_id,
@@ -114,9 +111,10 @@ export function renderRecommendationFormFor(recommendationId, issueId) {
 }
 
 export function collectRecommendationAssignments() {
-  const assignmentElements = recomEditorDom.recommendationAssignments.querySelectorAll(
-    '[data-recommendation-assignment]',
-  );
+  const assignmentElements =
+    recomEditorDom.recommendationAssignments.querySelectorAll(
+      '[data-recommendation-assignment]',
+    );
 
   return [...assignmentElements].map(readRecommendationAssignment);
 }

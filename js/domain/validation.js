@@ -1,5 +1,5 @@
 import { str } from '../utils.js';
-import { validateRuleConditions } from './conditions.js';
+import { serializeConditions, validateRuleConditions } from './conditions.js';
 
 /** Validates foreign-key relationships */
 export function validateStateRelationships(state) {
@@ -18,6 +18,22 @@ export function validateStateRelationships(state) {
   state.rules.forEach((rule) =>
     validateRuleConditions(rule.conditions, rule.issue_id, state.parameters),
   );
+  assertUniqueRuleCombinations(state.rules);
+}
+
+function assertUniqueRuleCombinations(rules) {
+  const ruleByCombination = new Map();
+
+  rules.forEach((rule) => {
+    const key = `${str(rule.issue_id)}:${serializeConditions(rule.conditions)}`;
+    const existingRule = ruleByCombination.get(key);
+    if (existingRule) {
+      throw new Error(
+        `Rules ${existingRule.rule_id} and ${rule.rule_id} use the same parameter combination.`,
+      );
+    }
+    ruleByCombination.set(key, rule);
+  });
 }
 
 function validateStateShape(state) {

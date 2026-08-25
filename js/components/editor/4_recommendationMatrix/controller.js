@@ -1,5 +1,10 @@
 import { getSelectedIssue } from '../2_issue/controller.js';
-import { closeDialog } from '../../../ui/dialog.js';
+import {
+  clearDialogError,
+  closeDialog,
+  confirmDeletion,
+  showDialogError,
+} from '../../../ui/dialog.js';
 import { notify } from '../../../ui/notifications.js';
 import { deleteRecommendation } from '../../../appState.js';
 import {
@@ -21,6 +26,7 @@ import {
 import {
   saveRecommendation,
   saveRecommendationAssignments,
+  validateRecommendationAssignments,
 } from '../../../services/recommendationService.js';
 
 export function initRecomEditor() {
@@ -28,9 +34,6 @@ export function initRecomEditor() {
   recomEditorDom.createRecommendationBtn.addEventListener(
     'click',
     onCreateRecommendation,
-  );
-  recomEditorDom.recommSearch.addEventListener('input', () =>
-    renderRecommendationOptions(getSelectedIssue()),
   );
   recomEditorDom.recommList.addEventListener('click', onRecommendationClick);
   recomEditorDom.recommList.addEventListener(
@@ -67,6 +70,7 @@ export function refreshRecommendations(issueId) {
 /** Event Listener Functions */
 
 function onCreateRecommendation() {
+  clearDialogError(recomEditorDom.recommDialog);
   renderRecommendationFormFor('__new__', getSelectedIssue());
   recomEditorDom.recommDialog.showModal();
 }
@@ -77,15 +81,20 @@ function onRecommendationClick(event) {
 
   // deletion
   if (event.target.closest('.decision-explorer__delete')) {
+    if (
+      !confirmDeletion(
+        'recommendation',
+        'This also removes its matching rules.',
+      )
+    ) {
+      return;
+    }
     deleteRecommendation(recommendationId);
     const issueId = getSelectedIssue();
     renderRecommendationOptions(issueId);
     setRecommendationSelectedState('');
     requestIssuePreviewRefresh();
-    notify(
-      'Recommendation deleted. Download to save changes.',
-      'success',
-    );
+    notify('Recommendation deleted. Download to save changes.', 'success');
     return;
   }
 
@@ -101,6 +110,7 @@ function onRecommendationDoubleClick(event) {
   if (!recommendationId) return;
   recomEditorDom.recommSelect.value = recommendationId;
   setRecommendationSelectedState(recommendationId);
+  clearDialogError(recomEditorDom.recommDialog);
   renderRecommendationFormFor(recommendationId, getSelectedIssue());
   recomEditorDom.recommDialog.showModal();
 }
@@ -109,6 +119,13 @@ function onRecommendationDoubleClick(event) {
 
 function onSaveRecommendation() {
   try {
+    const issueId = getSelectedIssue();
+    const assignments = collectRecommendationAssignments();
+    validateRecommendationAssignments(
+      issueId,
+      recomEditorDom.recommendationId.value,
+      assignments,
+    );
     const recommendation = saveRecommendation({
       recommendationId: recomEditorDom.recommendationId.value,
       finalDecision: recomEditorDom.recommendationDecision.value,
@@ -116,10 +133,10 @@ function onSaveRecommendation() {
       nextSteps: recomEditorDom.recommendationNextSteps.value,
       escalationNote: recomEditorDom.recommendationEscalationNote.value,
     });
-    const issueId = getSelectedIssue();
     const assignmentCount = saveAssignmentsForSelectedIssue(
       issueId,
       recommendation.recommendation_id,
+      assignments,
     );
 
     renderRecommendationOptions(issueId);
@@ -129,14 +146,16 @@ function onSaveRecommendation() {
     requestIssuePreviewRefresh();
     notify(getRecommendationSavedMessage(issueId, assignmentCount), 'success');
   } catch (error) {
-    notify(error.message, 'error');
+    showDialogError(recomEditorDom.recommDialog, error.message);
   }
 }
 
-function saveAssignmentsForSelectedIssue(issueId, recommendationId) {
+function saveAssignmentsForSelectedIssue(
+  issueId,
+  recommendationId,
+  assignments,
+) {
   if (!issueId) return 0;
-
-  const assignments = collectRecommendationAssignments();
   return saveRecommendationAssignments(issueId, recommendationId, assignments);
 }
 

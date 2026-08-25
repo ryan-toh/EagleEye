@@ -15,8 +15,6 @@ export function initTopicEditorDom() {
     topicExamples: document.getElementById('editorTopicExamples'),
     saveTopicBtn: document.getElementById('saveTopicBtn'),
     createTopicBtn: document.getElementById('createTopicBtn'),
-    topicSearch: document.getElementById('editorTopicSearch'),
-
     topicSelect: document.getElementById('editorTopicSelect'),
     topicList: document.getElementById('editorTopicList'),
     topicDialog: document.getElementById('editorTopicDialog'),
@@ -37,7 +35,7 @@ export function renderTopicOptions() {
   renderExplorerList({
     container: topicEditorDom.topicList,
     items: appState.topics,
-    query: topicEditorDom.topicSearch.value,
+    query: '',
     selectedId: topicEditorDom.topicSelect.value,
     datasetKey: 'topicId',
     getId: (topic) => topic.topic_id,

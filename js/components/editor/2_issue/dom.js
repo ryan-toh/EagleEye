@@ -21,8 +21,6 @@ export function initIssueEditorDom() {
     issueExamples: document.getElementById('editorIssueExamples'),
     saveIssueBtn: document.getElementById('saveIssueBtn'),
     createIssueBtn: document.getElementById('createIssueBtn'),
-    issueSearch: document.getElementById('editorIssueSearch'),
-
     issueSelect: document.getElementById('editorIssueSelect'),
     issueList: document.getElementById('editorIssueList'),
     issuePanelHint: document.getElementById('editorIssuePaneHint'),
@@ -40,20 +38,18 @@ export function renderIssueOptions(topicId) {
   const issues = topicId ? getIssuesForTopic(topicId) : [];
 
   if (!topicId) {
-    issueEditorDom.issueSearch.disabled = true;
     issueEditorDom.issuePanelHint.textContent = 'Select a topic first';
     renderExplorerEmpty(issueEditorDom.issueList, 'Select a topic first');
     return;
   }
 
-  issueEditorDom.issueSearch.disabled = false;
   issueEditorDom.issuePanelHint.textContent =
     'Create or double click on issue to edit';
 
   renderExplorerList({
     container: issueEditorDom.issueList,
     items: issues,
-    query: issueEditorDom.issueSearch.value,
+    query: '',
     selectedId: issueEditorDom.issueSelect.value,
     datasetKey: 'issueId',
     getId: (issue) => issue.issue_id,

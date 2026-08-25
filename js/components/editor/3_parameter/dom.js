@@ -28,8 +28,6 @@ export function initParamEditorDom() {
     parameterOrder: document.getElementById('editorParameterOrder'),
     saveParameterBtn: document.getElementById('saveParameterBtn'),
     createParamBtn: document.getElementById('createParamBtn'),
-    paramSearch: document.getElementById('editorParamSearch'),
-
     paramSelect: document.getElementById('editorParamSelect'),
     paramList: document.getElementById('editorParamList'),
     paramPanelHint: document.getElementById('editorParamPanelHint'),
@@ -47,20 +45,18 @@ export function renderParamOptions(issueId) {
   const params = issueId ? getIssueParameters(issueId) : [];
 
   if (!issueId) {
-    paramEditorDom.paramSearch.disabled = true;
     paramEditorDom.paramPanelHint.textContent = 'Select an issue first';
     renderExplorerEmpty(paramEditorDom.paramList, 'Select an issue first');
     return;
   }
 
-  paramEditorDom.paramSearch.disabled = false;
   paramEditorDom.paramPanelHint.textContent =
     'Create or double click on parameter to edit';
 
   renderExplorerList({
     container: paramEditorDom.paramList,
     items: params,
-    query: paramEditorDom.paramSearch.value,
+    query: '',
     selectedId: paramEditorDom.paramSelect.value,
     datasetKey: 'paramId',
     getId: (param) => param.parameter_id,

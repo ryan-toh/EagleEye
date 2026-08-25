@@ -10,7 +10,12 @@ import {
   removeIssue,
   upsertIssue,
 } from '../../../appState.js';
-import { closeDialog } from '../../../ui/dialog.js';
+import {
+  clearDialogError,
+  closeDialog,
+  confirmDeletion,
+  showDialogError,
+} from '../../../ui/dialog.js';
 import { notify } from '../../../ui/notifications.js';
 import {
   issueEditorDom,
@@ -35,10 +40,6 @@ export function initIssueEditor() {
 
   issueEditorDom.saveIssueBtn.addEventListener('click', onSaveIssue);
   issueEditorDom.createIssueBtn.addEventListener('click', onCreateIssue);
-  issueEditorDom.issueSearch.addEventListener('input', () =>
-    renderIssueOptions(getSelectedTopic()),
-  );
-
   issueEditorDom.issueList.addEventListener('click', onIssueClick);
   issueEditorDom.issueList.addEventListener('dblclick', onIssueDblClick);
   issueEditorDom.issueList.addEventListener('dragstart', onIssueDragStart);
@@ -61,6 +62,14 @@ function onIssueClick(event) {
 
   // deletion
   if (event.target.closest('.decision-explorer__delete')) {
+    if (
+      !confirmDeletion(
+        'issue',
+        'This also removes its parameters, rules, and recommendations.',
+      )
+    ) {
+      return;
+    }
     const topicId = getSelectedTopic();
     removeIssue(issueId);
     renderIssueOptions(topicId);
@@ -137,7 +146,7 @@ function onSaveIssue() {
     publishIssueSelection('');
     requestIssuePreviewRefresh();
   } catch (error) {
-    notify(error.message, 'error');
+    showDialogError(issueEditorDom.issueDialog, error.message);
   }
 }
 
@@ -158,6 +167,7 @@ function onCreateIssue() {
 }
 
 function selectIssueForEditing(issueId) {
+  clearDialogError(issueEditorDom.issueDialog);
   selectIssue(issueId);
   renderIssueFormFor(issueId);
 }

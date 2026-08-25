@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { appState, makeUniqueId, removeTopic } from '../js/appState.js';
+import {
+  appState,
+  loadState,
+  makeUniqueId,
+  removeTopic,
+} from '../js/appState.js';
 import { buildDecisionGraph } from '../js/components/preview/decisionGraph.js';
 
 const writes = [];
@@ -86,6 +91,35 @@ test('cascade deletion persists one complete state snapshot', () => {
   assert.deepEqual(appState.rules, []);
   assert.deepEqual(appState.recommendations, []);
   assert.equal(writes.length, 5);
+});
+
+test('loading a workbook replaces every existing state collection', () => {
+  setState();
+  loadState({
+    topics: [{ topic_id: 'NEW_TOPIC', topic_name: 'New topic' }],
+    issues: [
+      {
+        issue_id: 'NEW_ISSUE',
+        topic_id: 'NEW_TOPIC',
+        issue_name: 'New issue',
+      },
+    ],
+    parameters: [],
+    rules: [],
+    recommendations: [],
+  });
+
+  assert.deepEqual(
+    appState.topics.map((topic) => topic.topic_id),
+    ['NEW_TOPIC'],
+  );
+  assert.deepEqual(
+    appState.issues.map((issue) => issue.issue_id),
+    ['NEW_ISSUE'],
+  );
+  assert.equal(appState.parameters.length, 0);
+  assert.equal(appState.rules.length, 0);
+  assert.equal(appState.recommendations.length, 0);
 });
 
 test('flowchart asks only rule-relevant questions', () => {

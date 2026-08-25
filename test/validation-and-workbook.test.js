@@ -39,6 +39,16 @@ test('state validation catches broken relationships and collection shapes', () =
     () => validateStateRelationships(malformed),
     /topics must be an array/,
   );
+
+  const duplicateCombination = createValidState();
+  duplicateCombination.rules.push({
+    ...duplicateCombination.rules[0],
+    rule_id: 'DUPLICATE_RULE',
+  });
+  assert.throws(
+    () => validateStateRelationships(duplicateCombination),
+    /same parameter combination/,
+  );
 });
 
 test('workbook validation requires every configured header', () => {

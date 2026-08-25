@@ -80,14 +80,23 @@ export function saveRecommendationAssignments(
     return getRecommendationAssignments(issueId, recommendationId).length;
   }
 
-  const normalizedAssignments = normalizeRecommendationAssignments(assignments);
+  const normalizedAssignments = validateRecommendationAssignments(
+    issueId,
+    recommendationId,
+    assignments,
+  );
 
   return transaction(() => {
     const selectedKeys = getAssignmentConditionKeys(normalizedAssignments);
     let savedCount = 0;
 
     normalizedAssignments.forEach((assignment, index) => {
-      saveRecommendationAssignment(issueId, recommendationId, assignment, index);
+      saveRecommendationAssignment(
+        issueId,
+        recommendationId,
+        assignment,
+        index,
+      );
       savedCount = index + 1;
     });
 
@@ -99,6 +108,38 @@ export function saveRecommendationAssignments(
 
     return savedCount;
   });
+}
+
+/** Ensures one recommendation owns each condition combination within an issue. */
+export function validateRecommendationAssignments(
+  issueId,
+  recommendationId,
+  assignments,
+) {
+  const normalizedAssignments = normalizeRecommendationAssignments(assignments);
+  const combinationKeys = new Set();
+
+  normalizedAssignments.forEach((assignment) => {
+    const combinationKey = stringifyConditions(assignment.conditions);
+    if (combinationKeys.has(combinationKey)) {
+      throw new Error(
+        'Each parameter combination can only be assigned to one recommendation.',
+      );
+    }
+    combinationKeys.add(combinationKey);
+
+    const existingRule = getRuleForCombination(issueId, assignment.conditions);
+    if (
+      existingRule &&
+      str(existingRule.recommendation_id) !== str(recommendationId)
+    ) {
+      throw new Error(
+        'This parameter combination is already assigned to another recommendation.',
+      );
+    }
+  });
+
+  return normalizedAssignments;
 }
 
 function getRecommendationId(recommendationId) {
@@ -116,8 +157,21 @@ function getAssignmentConditionKeys(assignments) {
   return new Set(conditionKeys);
 }
 
-function saveRecommendationAssignment(issueId, recommendationId, assignment, index) {
+function saveRecommendationAssignment(
+  issueId,
+  recommendationId,
+  assignment,
+  index,
+) {
   const existingRule = getRuleForCombination(issueId, assignment.conditions);
+  if (
+    existingRule &&
+    str(existingRule.recommendation_id) !== str(recommendationId)
+  ) {
+    throw new Error(
+      'This parameter combination is already assigned to another recommendation.',
+    );
+  }
   const ruleId = existingRule?.rule_id || createRuleId();
   const conditions = stringifyConditions(assignment.conditions);
   const priority = assignment.priority || index + 1;

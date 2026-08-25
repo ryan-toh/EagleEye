@@ -3,16 +3,14 @@ import {
   initTopicEditor,
   setTopicOptions,
 } from '../1_topic/controller.js';
-import {
-  getSelectedIssue,
-  initIssueEditor,
-} from '../2_issue/controller.js';
+import { getSelectedIssue, initIssueEditor } from '../2_issue/controller.js';
 import {
   selectTopic,
   subscribeToIssuePreviewRefresh,
 } from '../editorCoordinator.js';
 import { initParamEditor } from '../3_parameter/controller.js';
 import { initRecomEditor } from '../4_recommendationMatrix/controller.js';
+import { initGlobalSearch } from '../globalSearch/controller.js';
 
 import {
   initSharedEditorDom,
@@ -47,12 +45,15 @@ export function initEditor() {
   initIssueEditor();
   initParamEditor();
   initRecomEditor();
+  initGlobalSearch();
   initSharedEditor();
 }
 
 export function initSharedEditor() {
   initSharedEditorDom();
-  subscribeToNotifications(({ message, type }) => setEditorStatus(message, type));
+  subscribeToNotifications(({ message, type }) =>
+    setEditorStatus(message, type),
+  );
   subscribeToIssuePreviewRefresh(() => void renderSelectedIssuePreview());
 
   sharedEditorDom.backToUploadsBtn.addEventListener('click', () => {

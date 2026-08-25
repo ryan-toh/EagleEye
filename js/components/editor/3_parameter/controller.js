@@ -13,7 +13,12 @@ import {
   removeParameter,
   upsertParameter,
 } from '../../../appState.js';
-import { closeDialog } from '../../../ui/dialog.js';
+import {
+  clearDialogError,
+  closeDialog,
+  confirmDeletion,
+  showDialogError,
+} from '../../../ui/dialog.js';
 import { notify } from '../../../ui/notifications.js';
 import {
   selectIssue as publishIssueSelection,
@@ -35,10 +40,6 @@ export function initParamEditor() {
 
   paramEditorDom.saveParameterBtn.addEventListener('click', onSaveParameter);
   paramEditorDom.createParamBtn.addEventListener('click', onCreateParam);
-  paramEditorDom.paramSearch.addEventListener('input', () =>
-    renderParamOptions(getSelectedIssue()),
-  );
-
   paramEditorDom.paramList.addEventListener('click', onParamClick);
   paramEditorDom.paramList.addEventListener('dblclick', onParamDblClick);
   paramEditorDom.paramList.addEventListener('dragstart', onParamDragStart);
@@ -67,6 +68,14 @@ export function onParamClick(event) {
 
   // deletion
   if (event.target.closest('.decision-explorer__delete')) {
+    if (
+      !confirmDeletion(
+        'parameter',
+        'This also removes rules and recommendations that depend on it.',
+      )
+    ) {
+      return;
+    }
     const issueId = getSelectedIssue();
     removeParameter(paramId);
     renderParamOptions(issueId);
@@ -136,7 +145,7 @@ function onSaveParameter() {
 
     notify('Saved parameter. Download to see changes.', 'success');
   } catch (error) {
-    notify(error.message, 'error');
+    showDialogError(paramEditorDom.paramDialog, error.message);
   }
 }
 
@@ -151,6 +160,7 @@ function onCreateParam() {
 }
 
 function selectParameterForEditing(paramId) {
+  clearDialogError(paramEditorDom.paramDialog);
   selectParameter(paramId);
   renderParamFormFor(paramId, getSelectedIssue());
 }

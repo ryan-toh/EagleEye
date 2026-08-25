@@ -1,5 +1,10 @@
 import { selectTopic } from '../editorCoordinator.js';
-import { closeDialog } from '../../../ui/dialog.js';
+import {
+  clearDialogError,
+  closeDialog,
+  confirmDeletion,
+  showDialogError,
+} from '../../../ui/dialog.js';
 import { notify } from '../../../ui/notifications.js';
 import {
   initTopicEditorDom,
@@ -16,8 +21,6 @@ export function initTopicEditor() {
 
   topicEditorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
   topicEditorDom.createTopicBtn.addEventListener('click', onCreateTopic);
-  topicEditorDom.topicSearch.addEventListener('input', renderTopicOptions);
-
   topicEditorDom.topicList.addEventListener('click', onTopicClick);
   topicEditorDom.topicList.addEventListener('dblclick', onTopicDblClick);
 }
@@ -47,9 +50,16 @@ export function onTopicClick(event) {
     return;
   }
 
-
   // deletion
   if (event.target.closest('.decision-explorer__delete')) {
+    if (
+      !confirmDeletion(
+        'topic',
+        'This also removes its issues, parameters, rules, and recommendations.',
+      )
+    ) {
+      return;
+    }
     removeTopic(topicId);
     renderTopicOptions();
     setDomTopicValue('');
@@ -64,7 +74,6 @@ export function onTopicClick(event) {
 }
 
 function onTopicDblClick(event) {
-
   // stop if the user intended to delete instead
   if (event.target.closest('.decision-explorer__delete')) return;
 
@@ -97,13 +106,13 @@ function onSaveTopic() {
     setDomTopicValue('');
     selectTopic('');
   } catch (error) {
-    notify(error.message, 'error');
+    showDialogError(topicEditorDom.topicDialog, error.message);
   }
 }
 
 /** Internal Functions */
 
-function setDomTopicValue(value) {
+export function setDomTopicValue(value) {
   topicEditorDom.topicSelect.value = value;
   setTopicSelectedState(value);
 }
@@ -114,6 +123,7 @@ function onCreateTopic() {
 }
 
 function selectTopicForEditing(topicId) {
+  clearDialogError(topicEditorDom.topicDialog);
   setDomTopicValue(topicId === '__new__' ? '' : topicId);
   renderTopicFormFor(topicId);
 }

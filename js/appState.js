@@ -21,6 +21,7 @@ export const appState = {
 let transactionDepth = 0;
 let hasPendingPersistence = false;
 let transactionFailed = false;
+const stateEvents = new EventTarget();
 
 /** Batches related synchronous mutations into one validated state snapshot. */
 export function transaction(action) {
@@ -44,14 +45,21 @@ export function transaction(action) {
 export function loadState(workbookData) {
   const candidate = createStateSnapshot(workbookData);
   validateStateRelationships(candidate);
-  Object.assign(appState, candidate);
+  replaceState(candidate);
+  notifyStateChange();
 }
 
 export function loadLocalState() {
   const savedState = readLocalState();
   const candidate = createStateSnapshot(savedState);
   validateStateRelationships(candidate);
-  Object.assign(appState, candidate);
+  replaceState(candidate);
+  notifyStateChange();
+}
+
+export function subscribeToStateChanges(handler) {
+  stateEvents.addEventListener('change', handler);
+  return () => stateEvents.removeEventListener('change', handler);
 }
 
 export function saveToLocalState() {
@@ -428,6 +436,11 @@ function flushPersistence() {
   validateStateRelationships(appState);
   persistState(appState);
   hasPendingPersistence = false;
+  notifyStateChange();
+}
+
+function notifyStateChange() {
+  stateEvents.dispatchEvent(new Event('change'));
 }
 
 function upsertById(rows, idKey, nextRow) {
@@ -460,4 +473,11 @@ function createStateSnapshot(data) {
     rules: data.rules ?? [],
     recommendations: data.recommendations ?? [],
   };
+}
+
+/** Replaces every collection while preserving the public appState object. */
+function replaceState(nextState) {
+  Object.keys(appState).forEach((key) => {
+    appState[key].splice(0, appState[key].length, ...nextState[key]);
+  });
 }

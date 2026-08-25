@@ -1,4 +1,4 @@
-import { isRequired, str } from '../utils.js';
+import { isRequired, recommendationEmoji, str } from '../utils.js';
 import { tryParseConditions } from './conditions.js';
 
 export function buildIssuePreview({
@@ -9,6 +9,12 @@ export function buildIssuePreview({
 }) {
   const parameterById = new Map(
     parameters.map((parameter) => [str(parameter.parameter_id), parameter]),
+  );
+  const recommendationById = new Map(
+    recommendations.map((recommendation) => [
+      str(recommendation.recommendation_id),
+      recommendation,
+    ]),
   );
 
   return {
@@ -22,7 +28,9 @@ export function buildIssuePreview({
     })),
     rules: rules.map((rule) => ({
       priority: rule.priority,
-      recommendationId: rule.recommendation_id,
+      recommendationEmoji: recommendationEmoji(
+        recommendationById.get(str(rule.recommendation_id))?.final_decision,
+      ),
       conditions: Object.entries(tryParseConditions(rule.conditions) || {}).map(
         ([parameterId, value]) => ({
           question:

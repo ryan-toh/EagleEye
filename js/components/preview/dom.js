@@ -1,5 +1,5 @@
 import { clearLastMermaid } from '../../ui/uiState.js';
-import { escapeHtml } from '../../utils.js';
+import { escapeHtml, recommendationEmoji } from '../../utils.js';
 
 export const previewDom = {};
 
@@ -36,25 +36,25 @@ export function renderIssueSummary(preview) {
     preview.recommendations.length,
   );
 
-  previewDom.parametersList.classList.remove('empty');
+  previewDom.parametersList.className = 'summary-list';
   previewDom.parametersList.innerHTML = renderSummaryList(
     preview.parameters,
     renderParameterSummary,
   );
 
-  previewDom.rulesList.classList.remove('empty');
+  previewDom.rulesList.className = 'summary-list';
   previewDom.rulesList.innerHTML = renderSummaryList(
     preview.rules,
     (rule) => `
     <div class="summary-row__heading">
       <span class="priority-badge">Priority ${escapeHtml(rule.priority)}</span>
-      <span class="summary-row__id">${escapeHtml(rule.recommendationId)}</span>
+      <span class="summary-row__id" aria-label="Recommendation">${escapeHtml(rule.recommendationEmoji)}</span>
     </div>
     ${renderRuleConditions(rule.conditions)}
   `,
   );
 
-  previewDom.recommendationsList.classList.remove('empty');
+  previewDom.recommendationsList.className = 'summary-list';
   previewDom.recommendationsList.innerHTML = renderSummaryList(
     preview.recommendations,
     renderRecommendationSummary,
@@ -95,7 +95,7 @@ function renderRecommendationSummary(recommendation) {
   return `
     <div class="summary-row__heading">
       <span class="decision-badge decision-badge--${decisionClass}">${decision}</span>
-      <span class="summary-row__id">${escapeHtml(recommendation.recommendation_id)}</span>
+      <span class="summary-row__id" aria-label="Recommendation">${escapeHtml(recommendationEmoji(recommendation.final_decision))}</span>
     </div>
     <p class="summary-row__body">${escapeHtml(recommendation.recommendation_text)}</p>
     ${nextSteps}
@@ -118,13 +118,13 @@ export function renderEmptyIssueView() {
       'Select an issue to review its decision setup.';
   }
   setSummaryCounts(0, 0, 0);
-  previewDom.parametersList.className = 'empty';
+  previewDom.parametersList.className = 'summary-list empty';
   previewDom.parametersList.textContent = 'No issue selected.';
 
-  previewDom.rulesList.className = 'empty';
+  previewDom.rulesList.className = 'summary-list empty';
   previewDom.rulesList.textContent = 'No issue selected.';
 
-  previewDom.recommendationsList.className = 'empty';
+  previewDom.recommendationsList.className = 'summary-list empty';
   previewDom.recommendationsList.textContent = 'No issue selected.';
 
   previewDom.flowchart.className = 'flowchart empty';

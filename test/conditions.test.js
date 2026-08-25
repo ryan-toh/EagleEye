@@ -8,6 +8,7 @@ import {
   serializeConditions,
   validateRuleConditions,
 } from '../js/domain/conditions.js';
+import { safeMermaidLabel } from '../js/utils.js';
 import { normalizeRecommendationAssignments } from '../js/domain/recommendationAssignments.js';
 
 test('conditions are canonicalized before comparison', () => {
@@ -68,4 +69,10 @@ test('recommendation assignment validation is independent of the DOM', () => {
       ]),
     /only be used once/,
   );
+});
+
+test('truncated Mermaid labels communicate omitted text', () => {
+  const label = safeMermaidLabel('a'.repeat(200));
+  assert.equal(label.length, 180);
+  assert.match(label, /\.\.\.$/);
 });
