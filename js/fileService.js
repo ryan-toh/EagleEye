@@ -1,5 +1,10 @@
 import { FILE_CONFIG } from './schema.js';
 import { getSampleWorkbookData } from './schema.js';
+import {
+  parseConditions,
+  validateRuleConditions,
+} from './domain/conditions.js';
+import { str } from './utils.js';
 
 const SHEET_HEADERS_KEY = '__sheetHeaders';
 
@@ -100,12 +105,11 @@ export function validateWorkbookData(workbookData) {
   Object.entries(FILE_CONFIG.sheet).forEach(([key, config]) => {
     const headers = getWorkbookHeaders(workbookData, key);
 
-    validateRequiredColumns(
-      config.sheetName,
-      headers,
-      config.requiredColumns,
-    );
+    validateRequiredColumns(config.sheetName, headers, config.requiredColumns);
+    validateSheetRows(key, config, workbookData[key]);
   });
+
+  validateWorkbookRelationships(workbookData);
 }
 
 function getWorkbookHeaders(workbookData, key) {
@@ -182,4 +186,179 @@ function validateRequiredColumns(sheetName, headers, columns) {
       `Sheet "${sheetName}" is missing column(s): ${missing.join(', ')}`,
     );
   }
+}
+
+function validateSheetRows(key, config, rows) {
+  if (!Array.isArray(rows)) {
+    throw new Error(`Sheet "${config.sheetName}" could not be read as rows.`);
+  }
+
+  const idColumn = getIdColumn(key);
+  const knownIds = new Set();
+
+  rows.forEach((row, index) => {
+    const location = createCellLocation(config.sheetName, index);
+    if (!row || typeof row !== 'object' || Array.isArray(row)) {
+      throw new Error(`${location}: expected a data row.`);
+    }
+
+    getRequiredValueColumns(key).forEach((column) => {
+      if (!str(row[column])) {
+        throw new Error(
+          `${location}, column "${column}" is required but is blank.`,
+        );
+      }
+    });
+
+    validateRowFormats(key, row, location);
+
+    if (idColumn) {
+      const id = str(row[idColumn]);
+      if (knownIds.has(id)) {
+        throw new Error(
+          `${location}, column "${idColumn}" duplicates ID "${id}".`,
+        );
+      }
+      knownIds.add(id);
+    }
+  });
+}
+
+function validateRowFormats(key, row, location) {
+  if (key === 'parameters') {
+    const requiredValue = str(row.required).toLowerCase();
+    if (
+      requiredValue &&
+      !['yes', 'no', 'true', 'false', 'y', 'n', '1', '0'].includes(
+        requiredValue,
+      )
+    ) {
+      throw new Error(
+        `${location}, column "required" must be yes or no (or a boolean value).`,
+      );
+    }
+    if (str(row.order) && !isPositiveInteger(row.order)) {
+      throw new Error(
+        `${location}, column "order" must be a positive whole number.`,
+      );
+    }
+  }
+
+  if (key === 'rules') {
+    try {
+      parseConditions(row.conditions);
+    } catch {
+      throw new Error(
+        `${location}, column "conditions" must be a JSON object, for example {"PARAM_001":"Yes"}.`,
+      );
+    }
+    if (str(row.priority) && !isPositiveInteger(row.priority)) {
+      throw new Error(
+        `${location}, column "priority" must be a positive whole number.`,
+      );
+    }
+  }
+}
+
+function validateWorkbookRelationships(workbookData) {
+  const topicIds = new Set(workbookData.topics.map((row) => str(row.topic_id)));
+  const issueIds = new Set(workbookData.issues.map((row) => str(row.issue_id)));
+  const recommendationIds = new Set(
+    workbookData.recommendations.map((row) => str(row.recommendation_id)),
+  );
+
+  workbookData.issues.forEach((row, index) => {
+    assertReference(
+      topicIds,
+      row.topic_id,
+      '2_issues',
+      index,
+      'topic_id',
+      '1_topics',
+    );
+  });
+  workbookData.parameters.forEach((row, index) => {
+    assertReference(
+      issueIds,
+      row.issue_id,
+      '3_parameters',
+      index,
+      'issue_id',
+      '2_issues',
+    );
+  });
+  workbookData.rules.forEach((row, index) => {
+    assertReference(
+      issueIds,
+      row.issue_id,
+      '4_decision_rules',
+      index,
+      'issue_id',
+      '2_issues',
+    );
+    assertReference(
+      recommendationIds,
+      row.recommendation_id,
+      '4_decision_rules',
+      index,
+      'recommendation_id',
+      '5_recommendations',
+    );
+    try {
+      validateRuleConditions(
+        row.conditions,
+        row.issue_id,
+        workbookData.parameters,
+      );
+    } catch (error) {
+      throw new Error(
+        `${createCellLocation('4_decision_rules', index)}, column "conditions" is invalid: ${error.message}`,
+        { cause: error },
+      );
+    }
+  });
+}
+
+function assertReference(
+  validIds,
+  value,
+  sheetName,
+  rowIndex,
+  column,
+  targetSheet,
+) {
+  const id = str(value);
+  if (!validIds.has(id)) {
+    throw new Error(
+      `${createCellLocation(sheetName, rowIndex)}, column "${column}" references "${id}", which does not exist in sheet "${targetSheet}".`,
+    );
+  }
+}
+
+function isPositiveInteger(value) {
+  return Number.isInteger(Number(value)) && Number(value) > 0;
+}
+
+function createCellLocation(sheetName, rowIndex) {
+  return `Sheet "${sheetName}", row ${rowIndex + 2}`;
+}
+
+function getIdColumn(key) {
+  return {
+    topics: 'topic_id',
+    issues: 'issue_id',
+    parameters: 'parameter_id',
+    rules: 'rule_id',
+    recommendations: 'recommendation_id',
+  }[key];
+}
+
+function getRequiredValueColumns(key) {
+  return {
+    topics: ['topic_id', 'topic_name'],
+    issues: ['issue_id', 'topic_id', 'issue_name'],
+    parameters: ['issue_id', 'parameter_id', 'parameter_name'],
+    rules: ['rule_id', 'issue_id', 'conditions', 'recommendation_id'],
+    recommendations: ['recommendation_id', 'final_decision'],
+  }[key];
 }
