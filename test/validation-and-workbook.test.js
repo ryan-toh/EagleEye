@@ -7,19 +7,19 @@ import { FILE_CONFIG } from '../js/schema.js';
 function createValidState() {
   return {
     topics: [{ topic_id: 'TOPIC' }],
-    issues: [{ issue_id: 'ISSUE', topic_id: 'TOPIC' }],
-    parameters: [
-      { issue_id: 'ISSUE', parameter_id: 'PARAM', allowed_values: 'Yes; No' },
+    questions: [{ question_id: 'ISSUE', topic_id: 'TOPIC' }],
+    leadingQuestions: [
+      { question_id: 'ISSUE', leadingQuestion_id: 'PARAM', allowed_values: 'Yes; No' },
     ],
     rules: [
       {
         rule_id: 'RULE',
-        issue_id: 'ISSUE',
+        question_id: 'ISSUE',
         conditions: '{"PARAM":"Yes"}',
-        recommendation_id: 'REC',
+        answer_id: 'REC',
       },
     ],
-    recommendations: [{ recommendation_id: 'REC' }],
+    answers: [{ answer_id: 'REC' }],
   };
 }
 
@@ -27,10 +27,10 @@ test('state validation catches broken relationships and collection shapes', () =
   validateStateRelationships(createValidState());
 
   const orphanRule = createValidState();
-  orphanRule.rules[0].issue_id = 'MISSING';
+  orphanRule.rules[0].question_id = 'MISSING';
   assert.throws(
     () => validateStateRelationships(orphanRule),
-    /missing issue_id/,
+    /missing question_id/,
   );
 
   const malformed = createValidState();
@@ -47,7 +47,7 @@ test('state validation catches broken relationships and collection shapes', () =
   });
   assert.throws(
     () => validateStateRelationships(duplicateCombination),
-    /same parameter combination/,
+    /same leadingQuestion combination/,
   );
 });
 
@@ -69,23 +69,23 @@ test('workbook validation identifies the sheet, row, column, and bad format', ()
     workbook.__sheetHeaders[key] = [...config.requiredColumns];
     workbook[key] = [];
   });
-  workbook.issues.push({
-    issue_id: 'ISSUE_001',
+  workbook.questions.push({
+    question_id: 'ISSUE_001',
     topic_id: '',
-    issue_name: 'Example issue',
+    question_name: 'Example question',
   });
 
   assert.throws(
     () => validateWorkbookData(workbook),
-    /Sheet "2_issues", row 2, column "topic_id" is required but is blank/,
+    /Sheet "2_questions", row 2, column "topic_id" is required but is blank/,
   );
 
-  workbook.issues[0].topic_id = 'TOPIC_001';
+  workbook.questions[0].topic_id = 'TOPIC_001';
   workbook.topics.push({ topic_id: 'TOPIC_001', topic_name: 'Example topic' });
-  workbook.parameters.push({
-    issue_id: 'ISSUE_001',
-    parameter_id: 'PARAM_001',
-    parameter_name: 'Example parameter',
+  workbook.leadingQuestions.push({
+    question_id: 'ISSUE_001',
+    leadingQuestion_id: 'PARAM_001',
+    leadingQuestion_name: 'Example leadingQuestion',
     question_to_ask: 'Example question',
     required: 'sometimes',
     order: '1',
@@ -93,7 +93,7 @@ test('workbook validation identifies the sheet, row, column, and bad format', ()
 
   assert.throws(
     () => validateWorkbookData(workbook),
-    /Sheet "3_parameters", row 2, column "required" must be yes or no/,
+    /Sheet "3_leadingQuestions", row 2, column "required" must be yes or no/,
   );
 });
 
@@ -104,30 +104,30 @@ test('workbook validation allows blank optional values', () => {
     workbook[key] = [];
   });
   workbook.topics.push({ topic_id: 'TOPIC_001', topic_name: 'Example topic' });
-  workbook.issues.push({
-    issue_id: 'ISSUE_001',
+  workbook.questions.push({
+    question_id: 'ISSUE_001',
     topic_id: 'TOPIC_001',
-    issue_name: 'Example issue',
+    question_name: 'Example question',
   });
-  workbook.parameters.push({
-    issue_id: 'ISSUE_001',
-    parameter_id: 'PARAM_001',
-    parameter_name: 'Example parameter',
+  workbook.leadingQuestions.push({
+    question_id: 'ISSUE_001',
+    leadingQuestion_id: 'PARAM_001',
+    leadingQuestion_name: 'Example leadingQuestion',
     question_to_ask: '',
     required: '',
     order: '',
   });
-  workbook.recommendations.push({
-    recommendation_id: 'REC_001',
+  workbook.answers.push({
+    answer_id: 'REC_001',
     final_decision: 'Review',
-    recommendation_text: '',
+    answer_text: '',
     next_steps: '',
   });
   workbook.rules.push({
     rule_id: 'RULE_001',
-    issue_id: 'ISSUE_001',
+    question_id: 'ISSUE_001',
     conditions: '{}',
-    recommendation_id: 'REC_001',
+    answer_id: 'REC_001',
     priority: '',
   });
 

@@ -18,8 +18,8 @@ export function parseConditions(value) {
   }
 
   return Object.fromEntries(
-    Object.entries(parsed).map(([parameterId, response]) => [
-      str(parameterId),
+    Object.entries(parsed).map(([leadingQuestionId, response]) => [
+      str(leadingQuestionId),
       str(response),
     ]),
   );
@@ -47,31 +47,31 @@ export function conditionsEqual(first, second) {
   return serializeConditions(first) === serializeConditions(second);
 }
 
-export function referencesParameter(conditions, parameterId) {
+export function referencesLeadingQuestion(conditions, leadingQuestionId) {
   const parsed = tryParseConditions(conditions);
-  return parsed ? Object.hasOwn(parsed, str(parameterId)) : false;
+  return parsed ? Object.hasOwn(parsed, str(leadingQuestionId)) : false;
 }
 
-export function validateRuleConditions(conditions, issueId, parameters) {
+export function validateRuleConditions(conditions, questionId, leadingQuestions) {
   const parsed = parseConditions(conditions);
-  const parametersById = new Map(
-    parameters
-      .filter((parameter) => str(parameter.issue_id) === str(issueId))
-      .map((parameter) => [str(parameter.parameter_id), parameter]),
+  const leadingQuestionsById = new Map(
+    leadingQuestions
+      .filter((leadingQuestion) => str(leadingQuestion.question_id) === str(questionId))
+      .map((leadingQuestion) => [str(leadingQuestion.leadingQuestion_id), leadingQuestion]),
   );
 
-  Object.entries(parsed).forEach(([parameterId, response]) => {
-    const parameter = parametersById.get(parameterId);
-    if (!parameter) {
+  Object.entries(parsed).forEach(([leadingQuestionId, response]) => {
+    const leadingQuestion = leadingQuestionsById.get(leadingQuestionId);
+    if (!leadingQuestion) {
       throw new Error(
-        `Rule condition parameter_id ${parameterId} does not belong to issue_id ${issueId}.`,
+        `Rule condition leadingQuestion_id ${leadingQuestionId} does not belong to question_id ${questionId}.`,
       );
     }
 
-    const allowedValues = parseAllowedValues(parameter.allowed_values);
+    const allowedValues = parseAllowedValues(leadingQuestion.allowed_values);
     if (!allowedValues.includes(response)) {
       throw new Error(
-        `Rule condition value "${response}" is not allowed for parameter_id ${parameterId}.`,
+        `Rule condition value "${response}" is not allowed for leadingQuestion_id ${leadingQuestionId}.`,
       );
     }
   });

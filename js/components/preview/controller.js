@@ -1,8 +1,8 @@
 import {
   previewDom,
   initPreviewDomElements,
-  renderIssueSummary,
-  renderEmptyIssueView,
+  renderQuestionSummary,
+  renderEmptyQuestionView,
 } from './dom.js';
 import { renderMermaid } from './mermaidRenderer.js';
 import { getLastMermaid, setLastMermaid } from '../../ui/uiState.js';
@@ -57,13 +57,13 @@ export async function setGraph(graphDefinition) {
   return renderMermaid(previewDom.flowchart, graphDefinition, isCurrentRequest);
 }
 
-export function clearIssueView() {
+export function clearQuestionView() {
   graphRenderRequests.invalidate();
-  renderEmptyIssueView();
+  renderEmptyQuestionView();
 }
 
-export function setIssueSummary(preview) {
-  renderIssueSummary(preview);
+export function setQuestionSummary(preview) {
+  renderQuestionSummary(preview);
 }
 
 async function toggleFlowchartFullscreen() {

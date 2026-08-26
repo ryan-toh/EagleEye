@@ -4,24 +4,24 @@ export function selectTopic(topicId) {
   dispatchSelection('topic-selected', topicId);
 }
 
-export function selectIssue(issueId) {
-  dispatchSelection('issue-selected', issueId);
+export function selectQuestion(questionId) {
+  dispatchSelection('question-selected', questionId);
 }
 
-export function requestIssuePreviewRefresh() {
-  dispatchSelection('issue-preview-refresh');
+export function requestQuestionPreviewRefresh() {
+  dispatchSelection('question-preview-refresh');
 }
 
 export function subscribeToTopicSelection(handler) {
   return subscribeToSelection('topic-selected', handler);
 }
 
-export function subscribeToIssueSelection(handler) {
-  return subscribeToSelection('issue-selected', handler);
+export function subscribeToQuestionSelection(handler) {
+  return subscribeToSelection('question-selected', handler);
 }
 
-export function subscribeToIssuePreviewRefresh(handler) {
-  return subscribeToSelection('issue-preview-refresh', handler);
+export function subscribeToQuestionPreviewRefresh(handler) {
+  return subscribeToSelection('question-preview-refresh', handler);
 }
 
 function dispatchSelection(type, id) {

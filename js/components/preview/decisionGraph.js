@@ -1,42 +1,42 @@
 import { isRequired, safeMermaidLabel, str } from '../../utils.js';
 import { tryParseConditions } from '../../domain/conditions.js';
 
-/** Builds a Mermaid definition from the selected issue's decision data. */
+/** Builds a Mermaid definition from the selected question's decision data. */
 export function buildDecisionGraph({
-  issue,
+  question,
   topicName,
-  parameters: params,
-  rules: issueRules,
-  recommendationById,
+  leadingQuestions: params,
+  rules: questionRules,
+  answerById,
 }) {
-  if (!issue) return 'flowchart TD\n  missing["Issue not found"]';
+  if (!question) return 'flowchart TD\n  missing["Question not found"]';
 
-  const rules = issueRules.map((rule) => ({
+  const rules = questionRules.map((rule) => ({
     rule,
     conditions: tryParseConditions(rule.conditions) || {},
   }));
   const lines = ['flowchart TD'];
-  const nodeIds = { parameter: 0, rule: 0 };
+  const nodeIds = { leadingQuestion: 0, rule: 0 };
 
   lines.push(
-    `  start([User query]) --> issueNode["${safeMermaidLabel(
-      `Topic: ${topicName}\nIssue: ${issue.issue_name}`,
+    `  start([User query]) --> questionNode["${safeMermaidLabel(
+      `Topic: ${topicName}\nQuestion: ${question.question_name}`,
     )}"]`,
   );
 
   if (!rules.length) {
     lines.push(
-      '  issueNode --> noRules["No rules defined: clarify or escalate"]',
+      '  questionNode --> noRules["No rules defined: clarify or escalate"]',
     );
     return lines.join('\n');
   }
 
   appendDecisionBranch({
-    parentNodeId: 'issueNode',
+    parentNodeId: 'questionNode',
     edgeLabel: '',
     candidates: rules,
     remainingParams: params,
-    recommendationById,
+    answerById,
     nodeIds,
     lines,
   });
@@ -49,47 +49,47 @@ function appendDecisionBranch({
   edgeLabel,
   candidates,
   remainingParams,
-  recommendationById,
+  answerById,
   nodeIds,
   lines,
 }) {
-  const parameter = chooseDecisionParameter(candidates, remainingParams);
-  if (!parameter) {
+  const leadingQuestion = chooseDecisionLeadingQuestion(candidates, remainingParams);
+  if (!leadingQuestion) {
     appendRuleLeaves({
       parentNodeId,
       edgeLabel,
       candidates,
-      recommendationById,
+      answerById,
       nodeIds,
       lines,
     });
     return;
   }
 
-  const parameterId = str(parameter.parameter_id);
-  const parameterNodeId = `parameter${nodeIds.parameter++}`;
-  const required = isRequired(parameter.required);
+  const leadingQuestionId = str(leadingQuestion.leadingQuestion_id);
+  const leadingQuestionNodeId = `leadingQuestion${nodeIds.leadingQuestion++}`;
+  const required = isRequired(leadingQuestion.required);
   const label = wrapFlowchartLabel(
-    `${required ? 'Required' : 'Optional'}: ${parameter.parameter_name}\n${parameter.question_to_ask}`,
+    `${required ? 'Required' : 'Optional'}: ${leadingQuestion.leadingQuestion_name}\n${leadingQuestion.question_to_ask}`,
   );
 
   appendEdge(
     lines,
     parentNodeId,
     edgeLabel,
-    `${parameterNodeId}{"${safeMermaidLabel(label)}"}`,
+    `${leadingQuestionNodeId}{"${safeMermaidLabel(label)}"}`,
   );
 
-  createDecisionBranches(candidates, parameterId).forEach(
+  createDecisionBranches(candidates, leadingQuestionId).forEach(
     ({ label: branchLabel, candidates: matchingCandidates }) => {
       appendDecisionBranch({
-        parentNodeId: parameterNodeId,
+        parentNodeId: leadingQuestionNodeId,
         edgeLabel: branchLabel,
         candidates: matchingCandidates,
         remainingParams: remainingParams.filter(
-          (item) => str(item.parameter_id) !== parameterId,
+          (item) => str(item.leadingQuestion_id) !== leadingQuestionId,
         ),
-        recommendationById,
+        answerById,
         nodeIds,
         lines,
       });
@@ -97,12 +97,12 @@ function appendDecisionBranch({
   );
 }
 
-function chooseDecisionParameter(candidates, remainingParams) {
+function chooseDecisionLeadingQuestion(candidates, remainingParams) {
   const scored = remainingParams
-    .map((parameter, index) => ({
-      parameter,
+    .map((leadingQuestion, index) => ({
+      leadingQuestion,
       index,
-      score: getParameterSplitScore(candidates, parameter.parameter_id),
+      score: getLeadingQuestionSplitScore(candidates, leadingQuestion.leadingQuestion_id),
     }))
     .filter(({ score }) => score > 0);
 
@@ -110,11 +110,11 @@ function chooseDecisionParameter(candidates, remainingParams) {
   scored.sort(
     (first, second) => second.score - first.score || first.index - second.index,
   );
-  return scored[0].parameter;
+  return scored[0].leadingQuestion;
 }
 
-function getParameterSplitScore(candidates, parameterId) {
-  const id = str(parameterId);
+function getLeadingQuestionSplitScore(candidates, leadingQuestionId) {
+  const id = str(leadingQuestionId);
   const values = new Set();
   let wildcardCount = 0;
 
@@ -130,15 +130,15 @@ function getParameterSplitScore(candidates, parameterId) {
   return values.size + (wildcardCount ? 1 : 0);
 }
 
-function createDecisionBranches(candidates, parameterId) {
-  const id = str(parameterId);
-  const candidatesWithParameter = candidates.filter((candidate) =>
+function createDecisionBranches(candidates, leadingQuestionId) {
+  const id = str(leadingQuestionId);
+  const candidatesWithLeadingQuestion = candidates.filter((candidate) =>
     Object.hasOwn(candidate.conditions, id),
   );
-  const parameterValues = candidatesWithParameter.map((candidate) => {
+  const leadingQuestionValues = candidatesWithLeadingQuestion.map((candidate) => {
     return getCandidateValue(candidate, id);
   });
-  const uniqueValues = new Set(parameterValues);
+  const uniqueValues = new Set(leadingQuestionValues);
   const values = [...uniqueValues];
   const wildcardCandidates = getWildcardCandidates(candidates, id);
   const branches = values.map((value) => {
@@ -157,42 +157,42 @@ function createDecisionBranches(candidates, parameterId) {
   return branches;
 }
 
-function getWildcardCandidates(candidates, parameterId) {
+function getWildcardCandidates(candidates, leadingQuestionId) {
   return candidates.filter(
-    (candidate) => !Object.hasOwn(candidate.conditions, parameterId),
+    (candidate) => !Object.hasOwn(candidate.conditions, leadingQuestionId),
   );
 }
 
-function getMatchingCandidates(candidates, parameterId, value) {
+function getMatchingCandidates(candidates, leadingQuestionId, value) {
   return candidates.filter((candidate) => {
-    const isWildcard = !Object.hasOwn(candidate.conditions, parameterId);
-    const candidateValue = getCandidateValue(candidate, parameterId);
+    const isWildcard = !Object.hasOwn(candidate.conditions, leadingQuestionId);
+    const candidateValue = getCandidateValue(candidate, leadingQuestionId);
 
     return isWildcard || candidateValue === value;
   });
 }
 
-function getCandidateValue(candidate, parameterId) {
-  return str(candidate.conditions[parameterId]) || 'Blank';
+function getCandidateValue(candidate, leadingQuestionId) {
+  return str(candidate.conditions[leadingQuestionId]) || 'Blank';
 }
 
 function appendRuleLeaves({
   parentNodeId,
   edgeLabel,
   candidates,
-  recommendationById,
+  answerById,
   nodeIds,
   lines,
 }) {
   candidates.forEach((candidate, index) => {
     const { rule } = candidate;
-    const recommendation = recommendationById.get(str(rule.recommendation_id));
-    const decision = recommendation
-      ? recommendation.final_decision
-      : 'Unknown recommendation';
-    const response = recommendation
-      ? recommendation.recommendation_text
-      : `Missing recommendation ${rule.recommendation_id}`;
+    const answer = answerById.get(str(rule.answer_id));
+    const decision = answer
+      ? answer.final_decision
+      : 'Unknown answer';
+    const response = answer
+      ? answer.answer_text
+      : `Missing answer ${rule.answer_id}`;
     const ruleNodeId = `rule${nodeIds.rule++}`;
     const label = wrapFlowchartLabel(
       `Priority ${rule.priority}\n${decision}\n${response}`,

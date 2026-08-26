@@ -2,19 +2,19 @@ import { appState, subscribeToStateChanges } from '../../../appState.js';
 import { InMemorySearchIndex } from '../../../services/inMemorySearch.js';
 import {
   selectTopic,
-  selectIssue,
-  requestIssuePreviewRefresh,
+  selectQuestion,
+  requestQuestionPreviewRefresh,
 } from '../editorCoordinator.js';
 import { setDomTopicValue } from '../1_topic/controller.js';
-import { setDomIssueValue } from '../2_issue/controller.js';
-import { setDomParamValue } from '../3_parameter/controller.js';
+import { setDomQuestionValue } from '../2_question/controller.js';
+import { setDomParamValue } from '../3_leadingQuestion/controller.js';
 import {
   recomEditorDom,
-  setRecommendationSelectedState,
-} from '../4_recommendationMatrix/dom.js';
+  setAnswerSelectedState,
+} from '../4_answerMatrix/dom.js';
 
 const SEARCH_DELAY_MS = 180;
-const RESULT_TYPES = ['topic', 'issue', 'parameter', 'recommendation'];
+const RESULT_TYPES = ['topic', 'question', 'leadingQuestion', 'answer'];
 
 let searchIndex;
 let searchInput;
@@ -43,40 +43,40 @@ function createSearchSources() {
       onSelect: (topic) => navigateToTopic(topic.topic_id),
     },
     {
-      type: 'issue',
-      getItems: () => appState.issues,
-      getId: (issue) => issue.issue_id,
-      getTitle: (issue) => issue.issue_name,
-      getContext: (issue) => getTopicName(issue.topic_id),
-      fields: [{ name: 'issue_name', weight: 8 }],
-      onSelect: (issue) => navigateToIssue(issue.topic_id, issue.issue_id),
+      type: 'question',
+      getItems: () => appState.questions,
+      getId: (question) => question.question_id,
+      getTitle: (question) => question.question_name,
+      getContext: (question) => getTopicName(question.topic_id),
+      fields: [{ name: 'question_name', weight: 8 }],
+      onSelect: (question) => navigateToQuestion(question.topic_id, question.question_id),
     },
     {
-      type: 'parameter',
-      getItems: () => appState.parameters,
-      getId: (parameter) => parameter.parameter_id,
-      getTitle: (parameter) => parameter.parameter_name,
-      getContext: (parameter) => getIssueContext(parameter.issue_id),
+      type: 'leadingQuestion',
+      getItems: () => appState.leadingQuestions,
+      getId: (leadingQuestion) => leadingQuestion.leadingQuestion_id,
+      getTitle: (leadingQuestion) => leadingQuestion.leadingQuestion_name,
+      getContext: (leadingQuestion) => getQuestionContext(leadingQuestion.question_id),
       fields: [
-        { name: 'parameter_name', weight: 8 },
+        { name: 'leadingQuestion_name', weight: 8 },
         { name: 'question_to_ask', weight: 4 },
         { name: 'allowed_values', weight: 2 },
       ],
-      onSelect: (parameter) =>
-        navigateToParameter(parameter.issue_id, parameter.parameter_id),
+      onSelect: (leadingQuestion) =>
+        navigateToLeadingQuestion(leadingQuestion.question_id, leadingQuestion.leadingQuestion_id),
     },
     {
-      type: 'recommendation',
-      getItems: () => appState.recommendations,
-      getId: (recommendation) => recommendation.recommendation_id,
-      getTitle: (recommendation) => recommendation.final_decision || 'Clarify',
-      getContext: getRecommendationContext,
+      type: 'answer',
+      getItems: () => appState.answers,
+      getId: (answer) => answer.answer_id,
+      getTitle: (answer) => answer.final_decision || 'Clarify',
+      getContext: getAnswerContext,
       fields: [
-        { name: 'recommendation_text', weight: 6 },
+        { name: 'answer_text', weight: 6 },
         { name: 'next_steps', weight: 4 },
         { name: 'escalation_note', weight: 3 },
       ],
-      onSelect: navigateToRecommendation,
+      onSelect: navigateToAnswer,
     },
   ];
 }
@@ -173,24 +173,24 @@ function getTopicName(topicId) {
   )?.topic_name;
 }
 
-function getIssueContext(issueId) {
-  const issue = appState.issues.find(
-    (item) => String(item.issue_id) === String(issueId),
+function getQuestionContext(questionId) {
+  const question = appState.questions.find(
+    (item) => String(item.question_id) === String(questionId),
   );
-  if (!issue) return '';
-  return [getTopicName(issue.topic_id), issue.issue_name]
+  if (!question) return '';
+  return [getTopicName(question.topic_id), question.question_name]
     .filter(Boolean)
     .join(' → ');
 }
 
-function getRecommendationContext(recommendation) {
+function getAnswerContext(answer) {
   const rules = appState.rules.filter(
     (rule) =>
-      String(rule.recommendation_id) ===
-      String(recommendation.recommendation_id),
+      String(rule.answer_id) ===
+      String(answer.answer_id),
   );
-  if (!rules.length) return 'Not assigned to an issue';
-  const context = getIssueContext(rules[0].issue_id);
+  if (!rules.length) return 'Not assigned to an question';
+  const context = getQuestionContext(rules[0].question_id);
   return rules.length > 1 ? `${context} (+${rules.length - 1} more)` : context;
 }
 
@@ -199,36 +199,36 @@ function navigateToTopic(topicId) {
   selectTopic(topicId);
 }
 
-function navigateToIssue(topicId, issueId) {
+function navigateToQuestion(topicId, questionId) {
   navigateToTopic(topicId);
-  setDomIssueValue(issueId);
-  selectIssue(issueId);
-  requestIssuePreviewRefresh();
+  setDomQuestionValue(questionId);
+  selectQuestion(questionId);
+  requestQuestionPreviewRefresh();
 }
 
-function navigateToParameter(issueId, parameterId) {
-  const issue = appState.issues.find(
-    (item) => String(item.issue_id) === String(issueId),
+function navigateToLeadingQuestion(questionId, leadingQuestionId) {
+  const question = appState.questions.find(
+    (item) => String(item.question_id) === String(questionId),
   );
-  if (!issue) return;
-  navigateToIssue(issue.topic_id, issueId);
-  setDomParamValue(parameterId);
+  if (!question) return;
+  navigateToQuestion(question.topic_id, questionId);
+  setDomParamValue(leadingQuestionId);
 }
 
-function navigateToRecommendation(recommendation) {
+function navigateToAnswer(answer) {
   const rule = appState.rules.find(
     (item) =>
-      String(item.recommendation_id) ===
-      String(recommendation.recommendation_id),
+      String(item.answer_id) ===
+      String(answer.answer_id),
   );
   if (!rule) return;
-  const issue = appState.issues.find(
-    (item) => String(item.issue_id) === String(rule.issue_id),
+  const question = appState.questions.find(
+    (item) => String(item.question_id) === String(rule.question_id),
   );
-  if (!issue) return;
-  navigateToIssue(issue.topic_id, issue.issue_id);
-  recomEditorDom.recommSelect.value = recommendation.recommendation_id;
-  setRecommendationSelectedState(recommendation.recommendation_id);
+  if (!question) return;
+  navigateToQuestion(question.topic_id, question.question_id);
+  recomEditorDom.recommSelect.value = answer.answer_id;
+  setAnswerSelectedState(answer.answer_id);
 }
 
 function formatFieldName(fieldName) {
@@ -239,7 +239,7 @@ function formatFieldName(fieldName) {
 
 const typeLabels = {
   topic: 'Topics',
-  issue: 'Issues',
-  parameter: 'Parameters',
-  recommendation: 'Recommendations',
+  question: 'Questions',
+  leadingQuestion: 'LeadingQuestions',
+  answer: 'Answers',
 };

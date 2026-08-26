@@ -25,31 +25,31 @@
     <button id="saveTopicBtn" type="button">Save topic</button>
   </dialog>
 
-  <dialog id="editorIssueDialog" class="editor-card">
+  <dialog id="editorQuestionDialog" class="editor-card">
     <form method="dialog" class="editor-dialog__close-form">
       <button
         class="editor-dialog__close"
         type="submit"
-        aria-label="Close issue dialog"
+        aria-label="Close question dialog"
         title="Close"
       >
         ×
       </button>
     </form>
-    <h3>Issue</h3>
-    <!-- <label>Issue ID <input id="editorIssueId" type="text" /></label> -->
+    <h3>Question</h3>
+    <!-- <label>Question ID <input id="editorQuestionId" type="text" /></label> -->
     <label class="hidden"
-      >Issue ID <input id="editorIssueId" type="text"
+      >Question ID <input id="editorQuestionId" type="text"
     /></label>
-    <label>Issue name <input id="editorIssueName" type="text" /></label>
+    <label>Question name <input id="editorQuestionName" type="text" /></label>
     <label
-      >Issue description
-      <textarea id="editorIssueDescription" rows="3"></textarea>
+      >Question description
+      <textarea id="editorQuestionDescription" rows="3"></textarea>
     </label>
     <label
-      >Example phrases <textarea id="editorIssueExamples" rows="3"></textarea>
+      >Example phrases <textarea id="editorQuestionExamples" rows="3"></textarea>
     </label>
-    <button id="saveIssueBtn" type="button">Save issue</button>
+    <button id="saveQuestionBtn" type="button">Save question</button>
   </dialog>
 
   <dialog id="editorParamDialog" class="editor-card">
@@ -57,25 +57,25 @@
       <button
         class="editor-dialog__close"
         type="submit"
-        aria-label="Close parameter dialog"
+        aria-label="Close leadingQuestion dialog"
         title="Close"
       >
         ×
       </button>
     </form>
-    <h3>Parameter</h3>
-    <!-- <label>Parameter ID <input id="editorParameterId" type="text" /></label> -->
+    <h3>LeadingQuestion</h3>
+    <!-- <label>LeadingQuestion ID <input id="editorLeadingQuestionId" type="text" /></label> -->
     <label class="hidden"
-      >Parameter ID <input id="editorParameterId" type="text"
+      >LeadingQuestion ID <input id="editorLeadingQuestionId" type="text"
     /></label>
-    <label>Parameter name <input id="editorParameterName" type="text" /></label>
+    <label>LeadingQuestion name <input id="editorLeadingQuestionName" type="text" /></label>
     <label
       >Question to ask
-      <textarea id="editorParameterQuestion" rows="3"></textarea>
+      <textarea id="editorLeadingQuestionQuestion" rows="3"></textarea>
     </label>
     <label>
       Required
-      <select id="editorParameterRequired">
+      <select id="editorLeadingQuestionRequired">
         <option value="yes">yes</option>
         <option value="no">no</option>
       </select>
@@ -86,65 +86,65 @@
         Seperate the values with ';' or ',' or a new line.
       </p>
       <textarea
-        id="editorParameterAllowedValues"
+        id="editorLeadingQuestionAllowedValues"
         rows="3"
         placeholder="yes, no, unclear"
       ></textarea>
     </label>
     <label
       >Example values
-      <textarea id="editorParameterExampleValues" rows="2"></textarea>
+      <textarea id="editorLeadingQuestionExampleValues" rows="2"></textarea>
     </label>
     <label
-      >Order <input id="editorParameterOrder" type="number" min="1"
+      >Order <input id="editorLeadingQuestionOrder" type="number" min="1"
     /></label>
-    <button id="saveParameterBtn" type="button">Save parameter</button>
+    <button id="saveLeadingQuestionBtn" type="button">Save leadingQuestion</button>
   </dialog>
 
-  <dialog id="editorRecommendationDialog" class="editor-card">
+  <dialog id="editorAnswerDialog" class="editor-card">
     <form method="dialog" class="editor-dialog__close-form">
       <button
         class="editor-dialog__close"
         type="submit"
-        aria-label="Close recommendation dialog"
+        aria-label="Close answer dialog"
         title="Close"
       >
         ×
       </button>
     </form>
-    <h3>Recommendation</h3>
+    <h3>Answer</h3>
     <label class="hidden"
-      >Recommendation ID <input id="editorRecommendationId" type="text"
+      >Answer ID <input id="editorAnswerId" type="text"
     /></label>
     <label>
       Final decision
-      <input id="editorRecommendationDecision" type="text" />
+      <input id="editorAnswerDecision" type="text" />
     </label>
     <label
       >Final response
-      <textarea id="editorRecommendationText" rows="3"></textarea>
+      <textarea id="editorAnswerText" rows="3"></textarea>
     </label>
     <label
       >Next steps
-      <textarea id="editorRecommendationNextSteps" rows="2"></textarea>
+      <textarea id="editorAnswerNextSteps" rows="2"></textarea>
     </label>
     <label
       >Escalation note
-      <textarea id="editorRecommendationEscalationNote" rows="2"></textarea>
+      <textarea id="editorAnswerEscalationNote" rows="2"></textarea>
     </label>
-    <fieldset class="recommendation-assignments-fieldset">
+    <fieldset class="answer-assignments-fieldset">
       <legend>Assign when</legend>
       <p class="helper-text">
-        Add only the answers needed to give this recommendation. Any parameter
+        Add only the answers needed to give this answer. Any leadingQuestion
         not included here is not needed for this answer.
       </p>
-      <div id="editorRecommendationAssignments"></div>
-      <button id="addRecommendationAssignmentBtn" type="button">
+      <div id="editorAnswerAssignments"></div>
+      <button id="addAnswerAssignmentBtn" type="button">
         Add assignment
       </button>
     </fieldset>
-    <button id="saveRecommendationBtn" type="button">
-      Save recommendation
+    <button id="saveAnswerBtn" type="button">
+      Save answer
     </button>
   </dialog>
 </section>

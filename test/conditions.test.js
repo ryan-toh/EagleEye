@@ -4,12 +4,12 @@ import {
   conditionsEqual,
   parseAllowedValues,
   parseConditions,
-  referencesParameter,
+  referencesLeadingQuestion,
   serializeConditions,
   validateRuleConditions,
 } from '../js/domain/conditions.js';
 import { safeMermaidLabel } from '../js/utils.js';
-import { normalizeRecommendationAssignments } from '../js/domain/recommendationAssignments.js';
+import { normalizeAnswerAssignments } from '../js/domain/answerAssignments.js';
 
 test('conditions are canonicalized before comparison', () => {
   assert.equal(serializeConditions({ B: '2', A: '1' }), '{"A":"1","B":"2"}');
@@ -18,8 +18,8 @@ test('conditions are canonicalized before comparison', () => {
 
 test('condition helpers handle malformed input safely', () => {
   assert.throws(() => parseConditions('{"P" = "Yes"}'), SyntaxError);
-  assert.equal(referencesParameter('{"P":"Yes"}', 'P'), true);
-  assert.equal(referencesParameter('not json', 'P'), false);
+  assert.equal(referencesLeadingQuestion('{"P":"Yes"}', 'P'), true);
+  assert.equal(referencesLeadingQuestion('not json', 'P'), false);
   assert.deepEqual(parseAllowedValues('Yes; No|Maybe\nLater'), [
     'Yes',
     'No',
@@ -28,30 +28,30 @@ test('condition helpers handle malformed input safely', () => {
   ]);
 });
 
-test('rule conditions must reference an issue parameter and allowed value', () => {
-  const parameters = [
-    { issue_id: 'ISSUE_A', parameter_id: 'P', allowed_values: 'Yes; No' },
+test('rule conditions must reference an question leadingQuestion and allowed value', () => {
+  const leadingQuestions = [
+    { question_id: 'ISSUE_A', leadingQuestion_id: 'P', allowed_values: 'Yes; No' },
   ];
 
   assert.deepEqual(
-    validateRuleConditions('{"P":"Yes"}', 'ISSUE_A', parameters),
+    validateRuleConditions('{"P":"Yes"}', 'ISSUE_A', leadingQuestions),
     { P: 'Yes' },
   );
   assert.throws(
-    () => validateRuleConditions('{"P":"Maybe"}', 'ISSUE_A', parameters),
+    () => validateRuleConditions('{"P":"Maybe"}', 'ISSUE_A', leadingQuestions),
     /not allowed/,
   );
   assert.throws(
-    () => validateRuleConditions('{"OTHER":"Yes"}', 'ISSUE_A', parameters),
+    () => validateRuleConditions('{"OTHER":"Yes"}', 'ISSUE_A', leadingQuestions),
     /does not belong/,
   );
 });
 
-test('recommendation assignment validation is independent of the DOM', () => {
+test('answer assignment validation is independent of the DOM', () => {
   assert.deepEqual(
-    normalizeRecommendationAssignments([
+    normalizeAnswerAssignments([
       {
-        conditions: [{ parameterId: 'P', value: 'Yes' }],
+        conditions: [{ leadingQuestionId: 'P', value: 'Yes' }],
         priority: '1',
       },
     ]),
@@ -59,11 +59,11 @@ test('recommendation assignment validation is independent of the DOM', () => {
   );
   assert.throws(
     () =>
-      normalizeRecommendationAssignments([
+      normalizeAnswerAssignments([
         {
           conditions: [
-            { parameterId: 'P', value: 'Yes' },
-            { parameterId: 'P', value: 'No' },
+            { leadingQuestionId: 'P', value: 'Yes' },
+            { leadingQuestionId: 'P', value: 'No' },
           ],
         },
       ]),

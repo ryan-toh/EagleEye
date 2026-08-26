@@ -14,9 +14,9 @@
 
   <!-- Hidden values keep the existing controller-style getter/setter API working -->
   <input type="hidden" id="editorTopicSelect" value="" />
-  <input type="hidden" id="editorIssueSelect" value="" />
+  <input type="hidden" id="editorQuestionSelect" value="" />
   <input type="hidden" id="editorParamSelect" value="" />
-  <input type="hidden" id="editorRecommendationSelect" value="" />
+  <input type="hidden" id="editorAnswerSelect" value="" />
 
   <section class="global-search" aria-label="Search knowledge base">
     <label class="global-search__label" for="editorGlobalSearch">
@@ -25,7 +25,7 @@
     <input
       id="editorGlobalSearch"
       type="search"
-      placeholder="Search topics, issues, parameters, and recommendations"
+      placeholder="Search topics, questions, leadingQuestions, and answers"
       aria-describedby="editorGlobalSearchHint"
       autocomplete="off"
       disabled
@@ -64,12 +64,12 @@
       </div>
     </section>
 
-    <section class="decision-explorer__pane decision-explorer__pane--issues">
+    <section class="decision-explorer__pane decision-explorer__pane--questions">
       <div class="decision-explorer__pane-header">
-        <h3>Issues</h3>
-        <p class="helper-text" id="editorIssuePaneHint">Select a topic first</p>
+        <h3>Questions</h3>
+        <p class="helper-text" id="editorQuestionPaneHint">Select a topic first</p>
         <button
-          id="createIssueBtn"
+          id="createQuestionBtn"
           class="editor-explorer__add-btn"
           type="button"
         >
@@ -79,8 +79,8 @@
 
       <div
         class="decision-explorer__list"
-        id="editorIssueList"
-        aria-label="Issues"
+        id="editorQuestionList"
+        aria-label="Questions"
       >
         <div class="decision-explorer__empty">Select a topic first</div>
       </div>
@@ -88,9 +88,9 @@
 
     <section class="decision-explorer__pane decision-explorer__pane--params">
       <div class="decision-explorer__pane-header">
-        <h3>Parameters</h3>
+        <h3>LeadingQuestions</h3>
         <p class="helper-text" id="editorParamPanelHint">
-          Select an issue first
+          Select an question first
         </p>
         <button
           id="createParamBtn"
@@ -105,20 +105,20 @@
       <div
         class="decision-explorer__list"
         id="editorParamList"
-        aria-label="Parameters"
+        aria-label="LeadingQuestions"
       >
-        <div class="decision-explorer__empty">Select an issue first</div>
+        <div class="decision-explorer__empty">Select an question first</div>
       </div>
     </section>
 
     <section class="decision-explorer__pane editor-form-pane">
       <div class="decision-explorer__pane-header">
-        <h3>Recommendations</h3>
-        <p class="helper-text" id="editorRecommendationPanelHint">
-          Select an issue to assign recommendations.
+        <h3>Answers</h3>
+        <p class="helper-text" id="editorAnswerPanelHint">
+          Select an question to assign answers.
         </p>
         <button
-          id="createRecommendationBtn"
+          id="createAnswerBtn"
           class="editor-explorer__add-btn"
           type="button"
         >
@@ -127,10 +127,10 @@
       </div>
       <div
         class="decision-explorer__list"
-        id="editorRecommendationList"
-        aria-label="Recommendations"
+        id="editorAnswerList"
+        aria-label="Answers"
       >
-        <div class="decision-explorer__empty">Select an issue first</div>
+        <div class="decision-explorer__empty">Select an question first</div>
       </div>
     </section>
   </div>

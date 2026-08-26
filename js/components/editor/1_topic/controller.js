@@ -35,7 +35,7 @@ export function clearTopicForm() {
   renderTopicFormFor('__new__');
 }
 
-/** Issue related functions */
+/** Question related functions */
 
 export function getSelectedTopic() {
   return topicEditorDom.topicSelect.value;
@@ -55,7 +55,7 @@ export function onTopicClick(event) {
     if (
       !confirmDeletion(
         'topic',
-        'This also removes its issues, parameters, rules, and recommendations.',
+        'This also removes its questions, leadingQuestions, rules, and answers.',
       )
     ) {
       return;

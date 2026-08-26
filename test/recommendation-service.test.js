@@ -1,64 +1,64 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { appState } from '../js/appState.js';
-import { validateRecommendationAssignments } from '../js/services/recommendationService.js';
+import { validateAnswerAssignments } from '../js/services/answerService.js';
 
 function setState() {
   Object.assign(appState, {
     topics: [],
-    issues: [],
-    parameters: [],
-    recommendations: [],
+    questions: [],
+    leadingQuestions: [],
+    answers: [],
     rules: [
       {
         rule_id: 'RULE_ONE',
-        issue_id: 'ISSUE_ONE',
+        question_id: 'ISSUE_ONE',
         conditions: '{"PARAM_A":"Yes"}',
-        recommendation_id: 'REC_ONE',
+        answer_id: 'REC_ONE',
       },
     ],
   });
 }
 
-test('recommendation assignments cannot reuse another recommendation combination', () => {
+test('answer assignments cannot reuse another answer combination', () => {
   setState();
   const assignments = [
     {
-      conditions: [{ parameterId: 'PARAM_A', value: 'Yes' }],
+      conditions: [{ leadingQuestionId: 'PARAM_A', value: 'Yes' }],
       priority: '1',
     },
   ];
 
   assert.throws(
     () =>
-      validateRecommendationAssignments('ISSUE_ONE', 'REC_TWO', assignments),
-    /already assigned to another recommendation/,
+      validateAnswerAssignments('ISSUE_ONE', 'REC_TWO', assignments),
+    /already assigned to another answer/,
   );
   assert.doesNotThrow(() =>
-    validateRecommendationAssignments('ISSUE_ONE', 'REC_ONE', assignments),
+    validateAnswerAssignments('ISSUE_ONE', 'REC_ONE', assignments),
   );
 });
 
-test('recommendation assignments reject duplicate combinations in one save', () => {
+test('answer assignments reject duplicate combinations in one save', () => {
   setState();
   const duplicateAssignments = [
     {
-      conditions: [{ parameterId: 'PARAM_A', value: 'No' }],
+      conditions: [{ leadingQuestionId: 'PARAM_A', value: 'No' }],
       priority: '1',
     },
     {
-      conditions: [{ parameterId: 'PARAM_A', value: 'No' }],
+      conditions: [{ leadingQuestionId: 'PARAM_A', value: 'No' }],
       priority: '2',
     },
   ];
 
   assert.throws(
     () =>
-      validateRecommendationAssignments(
+      validateAnswerAssignments(
         'ISSUE_ONE',
         'REC_TWO',
         duplicateAssignments,
       ),
-    /only be assigned to one recommendation/,
+    /only be assigned to one answer/,
   );
 });

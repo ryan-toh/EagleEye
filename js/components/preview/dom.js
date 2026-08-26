@@ -1,21 +1,21 @@
 import { clearLastMermaid } from '../../ui/uiState.js';
-import { escapeHtml, recommendationEmoji } from '../../utils.js';
+import { escapeHtml, answerEmoji } from '../../utils.js';
 
 export const previewDom = {};
 
 export function initPreviewDomElements() {
   Object.assign(previewDom, {
-    parametersList: document.getElementById('parametersList'),
+    leadingQuestionsList: document.getElementById('leadingQuestionsList'),
     rulesList: document.getElementById('rulesList'),
-    recommendationsList: document.getElementById('recommendationsList'),
-    issueSummaryName: document.getElementById('issueSummaryName'),
-    issueSummaryDescription: document.getElementById('issueSummaryDescription'),
-    parameterCount: document.getElementById('parameterCount'),
+    answersList: document.getElementById('answersList'),
+    questionSummaryName: document.getElementById('questionSummaryName'),
+    questionSummaryDescription: document.getElementById('questionSummaryDescription'),
+    leadingQuestionCount: document.getElementById('leadingQuestionCount'),
     ruleCount: document.getElementById('ruleCount'),
-    recommendationCount: document.getElementById('recommendationCount'),
-    parameterCardCount: document.getElementById('parameterCardCount'),
+    answerCount: document.getElementById('answerCount'),
+    leadingQuestionCardCount: document.getElementById('leadingQuestionCardCount'),
     ruleCardCount: document.getElementById('ruleCardCount'),
-    recommendationCardCount: document.getElementById('recommendationCardCount'),
+    answerCardCount: document.getElementById('answerCardCount'),
     flowchartPanel: document.getElementById('flowchartPanel'),
     flowchart: document.getElementById('flowchart'),
     copyMermaidBtn: document.getElementById('copyMermaidBtn'),
@@ -23,23 +23,23 @@ export function initPreviewDomElements() {
   });
 }
 
-export function renderIssueSummary(preview) {
-  if (previewDom.issueSummaryName) {
-    previewDom.issueSummaryName.textContent = preview.name;
+export function renderQuestionSummary(preview) {
+  if (previewDom.questionSummaryName) {
+    previewDom.questionSummaryName.textContent = preview.name;
   }
-  if (previewDom.issueSummaryDescription) {
-    previewDom.issueSummaryDescription.textContent = preview.description;
+  if (previewDom.questionSummaryDescription) {
+    previewDom.questionSummaryDescription.textContent = preview.description;
   }
   setSummaryCounts(
-    preview.parameters.length,
+    preview.leadingQuestions.length,
     preview.rules.length,
-    preview.recommendations.length,
+    preview.answers.length,
   );
 
-  previewDom.parametersList.className = 'summary-list';
-  previewDom.parametersList.innerHTML = renderSummaryList(
-    preview.parameters,
-    renderParameterSummary,
+  previewDom.leadingQuestionsList.className = 'summary-list';
+  previewDom.leadingQuestionsList.innerHTML = renderSummaryList(
+    preview.leadingQuestions,
+    renderLeadingQuestionSummary,
   );
 
   previewDom.rulesList.className = 'summary-list';
@@ -48,46 +48,46 @@ export function renderIssueSummary(preview) {
     (rule) => `
     <div class="summary-row__heading">
       <span class="priority-badge">Priority ${escapeHtml(rule.priority)}</span>
-      <span class="summary-row__id" aria-label="Recommendation">${escapeHtml(rule.recommendationEmoji)}</span>
+      <span class="summary-row__id" aria-label="Answer">${escapeHtml(rule.answerEmoji)}</span>
     </div>
     ${renderRuleConditions(rule.conditions)}
   `,
   );
 
-  previewDom.recommendationsList.className = 'summary-list';
-  previewDom.recommendationsList.innerHTML = renderSummaryList(
-    preview.recommendations,
-    renderRecommendationSummary,
+  previewDom.answersList.className = 'summary-list';
+  previewDom.answersList.innerHTML = renderSummaryList(
+    preview.answers,
+    renderAnswerSummary,
   );
 }
 
-function renderParameterSummary(parameter) {
-  const requirementClass = parameter.required ? 'required' : 'optional';
-  const requirementLabel = parameter.required ? 'Required' : 'Optional';
-  const allowedValues = parameter.allowedValues
-    ? renderSummaryMeta('Allowed values', parameter.allowedValues)
+function renderLeadingQuestionSummary(leadingQuestion) {
+  const requirementClass = leadingQuestion.required ? 'required' : 'optional';
+  const requirementLabel = leadingQuestion.required ? 'Required' : 'Optional';
+  const allowedValues = leadingQuestion.allowedValues
+    ? renderSummaryMeta('Allowed values', leadingQuestion.allowedValues)
     : '';
 
   return `
     <div class="summary-row__heading">
-      <strong>${escapeHtml(parameter.name)}</strong>
+      <strong>${escapeHtml(leadingQuestion.name)}</strong>
       <span class="badge ${requirementClass}">${requirementLabel}</span>
     </div>
-    <p class="summary-row__body">${escapeHtml(parameter.question)}</p>
+    <p class="summary-row__body">${escapeHtml(leadingQuestion.question)}</p>
     ${allowedValues}
   `;
 }
 
-function renderRecommendationSummary(recommendation) {
-  const decision = escapeHtml(recommendation.final_decision);
+function renderAnswerSummary(answer) {
+  const decision = escapeHtml(answer.final_decision);
   const decisionClass = decision.toLowerCase();
-  const nextSteps = recommendation.next_steps
-    ? renderSummaryMeta('Next steps', recommendation.next_steps)
+  const nextSteps = answer.next_steps
+    ? renderSummaryMeta('Next steps', answer.next_steps)
     : '';
-  const escalationNote = recommendation.escalation_note
+  const escalationNote = answer.escalation_note
     ? renderSummaryMeta(
         'Escalation',
-        recommendation.escalation_note,
+        answer.escalation_note,
         'summary-row__meta--alert',
       )
     : '';
@@ -95,9 +95,9 @@ function renderRecommendationSummary(recommendation) {
   return `
     <div class="summary-row__heading">
       <span class="decision-badge decision-badge--${decisionClass}">${decision}</span>
-      <span class="summary-row__id" aria-label="Recommendation">${escapeHtml(recommendationEmoji(recommendation.final_decision))}</span>
+      <span class="summary-row__id" aria-label="Answer">${escapeHtml(answerEmoji(answer.final_decision))}</span>
     </div>
-    <p class="summary-row__body">${escapeHtml(recommendation.recommendation_text)}</p>
+    <p class="summary-row__body">${escapeHtml(answer.answer_text)}</p>
     ${nextSteps}
     ${escalationNote}
   `;
@@ -109,45 +109,45 @@ function renderSummaryMeta(label, value, modifierClass = '') {
   return `<p class="${className}"><span>${label}</span>${escapeHtml(value)}</p>`;
 }
 
-export function renderEmptyIssueView() {
-  if (previewDom.issueSummaryName) {
-    previewDom.issueSummaryName.textContent = 'No issue selected';
+export function renderEmptyQuestionView() {
+  if (previewDom.questionSummaryName) {
+    previewDom.questionSummaryName.textContent = 'No question selected';
   }
-  if (previewDom.issueSummaryDescription) {
-    previewDom.issueSummaryDescription.textContent =
-      'Select an issue to review its decision setup.';
+  if (previewDom.questionSummaryDescription) {
+    previewDom.questionSummaryDescription.textContent =
+      'Select an question to review its decision setup.';
   }
   setSummaryCounts(0, 0, 0);
-  previewDom.parametersList.className = 'summary-list empty';
-  previewDom.parametersList.textContent = 'No issue selected.';
+  previewDom.leadingQuestionsList.className = 'summary-list empty';
+  previewDom.leadingQuestionsList.textContent = 'No question selected.';
 
   previewDom.rulesList.className = 'summary-list empty';
-  previewDom.rulesList.textContent = 'No issue selected.';
+  previewDom.rulesList.textContent = 'No question selected.';
 
-  previewDom.recommendationsList.className = 'summary-list empty';
-  previewDom.recommendationsList.textContent = 'No issue selected.';
+  previewDom.answersList.className = 'summary-list empty';
+  previewDom.answersList.textContent = 'No question selected.';
 
   previewDom.flowchart.className = 'flowchart empty';
-  previewDom.flowchart.textContent = 'Load files and select an issue.';
+  previewDom.flowchart.textContent = 'Load files and select an question.';
 
   previewDom.copyMermaidBtn.disabled = true;
   clearLastMermaid();
 }
 
-function setSummaryCounts(parameterCount, ruleCount, recommendationCount) {
+function setSummaryCounts(leadingQuestionCount, ruleCount, answerCount) {
   const counts = [
     [
-      parameterCount,
-      'parameter',
-      previewDom.parameterCount,
-      previewDom.parameterCardCount,
+      leadingQuestionCount,
+      'leadingQuestion',
+      previewDom.leadingQuestionCount,
+      previewDom.leadingQuestionCardCount,
     ],
     [ruleCount, 'rule', previewDom.ruleCount, previewDom.ruleCardCount],
     [
-      recommendationCount,
-      'recommendation',
-      previewDom.recommendationCount,
-      previewDom.recommendationCardCount,
+      answerCount,
+      'answer',
+      previewDom.answerCount,
+      previewDom.answerCardCount,
     ],
   ];
 
@@ -162,7 +162,7 @@ function setSummaryCounts(parameterCount, ruleCount, recommendationCount) {
 }
 
 function renderSummaryList(items, renderer) {
-  if (!items.length) return '<p class="empty">None found for this issue.</p>';
+  if (!items.length) return '<p class="empty">None found for this question.</p>';
   return `<div class="summary-list">${items
     .map((item) => `<article class="summary-row">${renderer(item)}</article>`)
     .join('')}</div>`;
@@ -173,7 +173,7 @@ function renderRuleConditions(conditions) {
     .map(({ question, value }) => {
       return `
       <li class="rule-conditions__item">
-        <span class="rule-conditions__label">Parameter:</span>
+        <span class="rule-conditions__label">LeadingQuestion:</span>
         <span class="rule-conditions__name">${escapeHtml(question)}</span>
         <span class="rule-conditions__label">Response:</span>
         <span class="rule-conditions__value">${escapeHtml(value)}</span>

@@ -1,9 +1,9 @@
 const STORAGE_KEYS = [
   'topics',
-  'issues',
-  'parameters',
+  'questions',
+  'leadingQuestions',
   'rules',
-  'recommendations',
+  'answers',
 ];
 
 export function readLocalState() {

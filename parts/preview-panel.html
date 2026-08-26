@@ -20,51 +20,51 @@
     </div>
     <br />
     <div id="flowchart" class="flowchart empty">
-      Load files and select an issue.
+      Load files and select an question.
     </div>
   </section>
 
-  <section class="issue-summary panel">
-    <header class="issue-summary__header">
+  <section class="question-summary panel">
+    <header class="question-summary__header">
       <div>
-        <h2 id="issueSummaryName">No issue selected</h2>
-        <p id="issueSummaryDescription" class="issue-summary__description">
-          Select an issue to review its decision setup.
+        <h2 id="questionSummaryName">No question selected</h2>
+        <p id="questionSummaryDescription" class="question-summary__description">
+          Select an question to review its decision setup.
         </p>
       </div>
-      <div class="issue-summary__counts" aria-label="Issue totals">
-        <span id="parameterCount" class="issue-summary__count"
-          >0 parameters</span
+      <div class="question-summary__counts" aria-label="Question totals">
+        <span id="leadingQuestionCount" class="question-summary__count"
+          >0 leadingQuestions</span
         >
-        <span id="ruleCount" class="issue-summary__count">0 rules</span>
-        <span id="recommendationCount" class="issue-summary__count"
-          >0 recommendations</span
+        <span id="ruleCount" class="question-summary__count">0 rules</span>
+        <span id="answerCount" class="question-summary__count"
+          >0 answers</span
         >
       </div>
     </header>
     <div class="preview-grid">
       <article class="preview-card">
         <header class="preview-card__header">
-          <h3>Parameters</h3>
-          <span id="parameterCardCount" class="preview-card__count">0</span>
+          <h3>LeadingQuestions</h3>
+          <span id="leadingQuestionCardCount" class="preview-card__count">0</span>
         </header>
-        <div id="parametersList" class="empty">No issue selected.</div>
+        <div id="leadingQuestionsList" class="empty">No question selected.</div>
       </article>
       <article class="preview-card">
         <header class="preview-card__header">
           <h3>Matching rules</h3>
           <span id="ruleCardCount" class="preview-card__count">0</span>
         </header>
-        <div id="rulesList" class="empty">No issue selected.</div>
+        <div id="rulesList" class="empty">No question selected.</div>
       </article>
       <article class="preview-card">
         <header class="preview-card__header">
-          <h3>Recommendations</h3>
-          <span id="recommendationCardCount" class="preview-card__count"
+          <h3>Answers</h3>
+          <span id="answerCardCount" class="preview-card__count"
             >0</span
           >
         </header>
-        <div id="recommendationsList" class="empty">No issue selected.</div>
+        <div id="answersList" class="empty">No question selected.</div>
       </article>
     </div>
   </section>

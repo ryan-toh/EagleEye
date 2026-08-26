@@ -3,12 +3,12 @@
    Used by: parts/preview-panel.html
    ============================================================ */
 
-.preview-panel .issue-summary {
+.preview-panel .question-summary {
   padding: 0;
   overflow: hidden;
 }
 
-.preview-panel .issue-summary__header {
+.preview-panel .question-summary__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -17,25 +17,25 @@
   border-bottom: 1px solid var(--border);
 }
 
-.preview-panel .issue-summary__header h2 {
+.preview-panel .question-summary__header h2 {
   margin-bottom: 4px;
   font-size: 20px;
 }
 
-.preview-panel .issue-summary__description {
+.preview-panel .question-summary__description {
   max-width: 680px;
   margin: 0;
   color: var(--muted);
 }
 
-.preview-panel .issue-summary__counts {
+.preview-panel .question-summary__counts {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
 }
 
-.preview-panel .issue-summary__count,
+.preview-panel .question-summary__count,
 .preview-panel .preview-card__count {
   display: inline-flex;
   align-items: center;
@@ -47,7 +47,7 @@
   font-weight: 700;
 }
 
-.preview-panel .issue-summary__count {
+.preview-panel .question-summary__count {
   min-height: 28px;
   padding: 4px 10px;
 }
@@ -319,13 +319,13 @@
     justify-content: flex-start;
   }
 
-  .preview-panel .issue-summary__header {
+  .preview-panel .question-summary__header {
     flex-direction: column;
     gap: 16px;
     padding: 18px;
   }
 
-  .preview-panel .issue-summary__counts {
+  .preview-panel .question-summary__counts {
     justify-content: flex-start;
   }
 

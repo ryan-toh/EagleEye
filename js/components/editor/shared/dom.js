@@ -21,7 +21,7 @@ export function createExplorerItem({ id, title, meta, type, icon }) {
 
   button.type = 'button';
   button.className = 'decision-explorer__item';
-  button.draggable = type === 'issue' || type === 'param';
+  button.draggable = type === 'question' || type === 'param';
   row.className = 'decision-explorer__row';
 
   deleteButton.type = 'button';
@@ -35,9 +35,9 @@ export function createExplorerItem({ id, title, meta, type, icon }) {
     row.dataset.topicId = String(id);
   }
 
-  if (type === 'issue') {
-    button.dataset.issueId = String(id);
-    row.dataset.issueId = String(id);
+  if (type === 'question') {
+    button.dataset.questionId = String(id);
+    row.dataset.questionId = String(id);
   }
 
   if (type === 'param') {
@@ -45,9 +45,9 @@ export function createExplorerItem({ id, title, meta, type, icon }) {
     row.dataset.paramId = String(id);
   }
 
-  if (type === 'recommendation') {
-    button.dataset.recommendationId = String(id);
-    row.dataset.recommendationId = String(id);
+  if (type === 'answer') {
+    button.dataset.answerId = String(id);
+    row.dataset.answerId = String(id);
   }
 
   button.innerHTML = `

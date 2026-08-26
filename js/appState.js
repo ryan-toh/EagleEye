@@ -1,7 +1,7 @@
 import { str } from './utils.js';
 import { validateStateRelationships } from './domain/validation.js';
 import {
-  referencesParameter,
+  referencesLeadingQuestion,
   validateRuleConditions,
 } from './domain/conditions.js';
 import {
@@ -12,10 +12,10 @@ import {
 // core appState
 export const appState = {
   topics: [],
-  issues: [],
-  parameters: [],
+  questions: [],
+  leadingQuestions: [],
   rules: [],
-  recommendations: [],
+  answers: [],
 };
 
 let transactionDepth = 0;
@@ -67,18 +67,18 @@ export function saveToLocalState() {
 }
 
 export function getWorkbookData() {
-  const { topics, issues, parameters, rules, recommendations } = appState;
-  return { topics, issues, parameters, rules, recommendations };
+  const { topics, questions, leadingQuestions, rules, answers } = appState;
+  return { topics, questions, leadingQuestions, rules, answers };
 }
 
-export function getIssuesForTopic(topicId) {
-  return appState.issues.filter(
-    (issue) => str(issue.topic_id) === str(topicId),
+export function getQuestionsForTopic(topicId) {
+  return appState.questions.filter(
+    (question) => str(question.topic_id) === str(topicId),
   );
 }
 
-export function getIssue(issueId) {
-  return appState.issues.find((issue) => str(issue.issue_id) === str(issueId));
+export function getQuestion(questionId) {
+  return appState.questions.find((question) => str(question.question_id) === str(questionId));
 }
 
 export function getTopic(topicId) {
@@ -92,36 +92,36 @@ export function getTopicName(topicId) {
   return topic ? topic.topic_name : topicId;
 }
 
-export function getIssueParameters(issueId) {
-  return appState.parameters
-    .filter((param) => str(param.issue_id) === str(issueId))
+export function getQuestionLeadingQuestions(questionId) {
+  return appState.leadingQuestions
+    .filter((param) => str(param.question_id) === str(questionId))
     .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
 }
 
-export function getIssueRules(issueId) {
+export function getQuestionRules(questionId) {
   return appState.rules
-    .filter((rule) => str(rule.issue_id) === str(issueId))
+    .filter((rule) => str(rule.question_id) === str(questionId))
     .sort(
       (a, b) => Number(a.priority || 999999) - Number(b.priority || 999999),
     );
 }
 
-function getRecommendation(recommendationId) {
-  return appState.recommendations.find(
-    (rec) => str(rec.recommendation_id) === str(recommendationId),
+function getAnswer(answerId) {
+  return appState.answers.find(
+    (rec) => str(rec.answer_id) === str(answerId),
   );
 }
 
-export function getRecommendationsForRules(rules) {
-  const ids = new Set(rules.map((rule) => str(rule.recommendation_id)));
-  return appState.recommendations.filter((rec) =>
-    ids.has(str(rec.recommendation_id)),
+export function getAnswersForRules(rules) {
+  const ids = new Set(rules.map((rule) => str(rule.answer_id)));
+  return appState.answers.filter((rec) =>
+    ids.has(str(rec.answer_id)),
   );
 }
 
-export function getRecommendationMap() {
+export function getAnswerMap() {
   return new Map(
-    appState.recommendations.map((rec) => [str(rec.recommendation_id), rec]),
+    appState.answers.map((rec) => [str(rec.answer_id), rec]),
   );
 }
 
@@ -140,137 +140,137 @@ export function upsertTopic(topic) {
   return normalized;
 }
 
-export function upsertIssue(issue) {
+export function upsertQuestion(question) {
   const normalized = {
-    issue_id: str(issue.issue_id),
-    topic_id: str(issue.topic_id),
-    issue_name: str(issue.issue_name),
-    issue_description: str(issue.issue_description),
-    example_phrases: str(issue.example_phrases),
+    question_id: str(question.question_id),
+    topic_id: str(question.topic_id),
+    question_name: str(question.question_name),
+    question_description: str(question.question_description),
+    example_phrases: str(question.example_phrases),
   };
 
-  requireFields(normalized, ['issue_id', 'topic_id', 'issue_name'], 'issue');
+  requireFields(normalized, ['question_id', 'topic_id', 'question_name'], 'question');
 
   if (!getTopic(normalized.topic_id)) {
     throw new Error(
-      `Cannot save issue: topic_id ${normalized.topic_id} does not exist.`,
+      `Cannot save question: topic_id ${normalized.topic_id} does not exist.`,
     );
   }
 
-  upsertById(appState.issues, 'issue_id', normalized);
+  upsertById(appState.questions, 'question_id', normalized);
   requestPersistence();
   return normalized;
 }
 
-export function upsertParameter(parameter) {
+export function upsertLeadingQuestion(leadingQuestion) {
   const normalized = {
-    issue_id: str(parameter.issue_id),
-    parameter_id: str(parameter.parameter_id),
-    parameter_name: str(parameter.parameter_name),
-    question_to_ask: str(parameter.question_to_ask),
-    required: str(parameter.required || 'yes'),
-    allowed_values: str(parameter.allowed_values),
-    example_values: str(parameter.example_values),
-    order: str(parameter.order || nextParameterOrder(parameter.issue_id)),
+    question_id: str(leadingQuestion.question_id),
+    leadingQuestion_id: str(leadingQuestion.leadingQuestion_id),
+    leadingQuestion_name: str(leadingQuestion.leadingQuestion_name),
+    question_to_ask: str(leadingQuestion.question_to_ask),
+    required: str(leadingQuestion.required || 'yes'),
+    allowed_values: str(leadingQuestion.allowed_values),
+    example_values: str(leadingQuestion.example_values),
+    order: str(leadingQuestion.order || nextLeadingQuestionOrder(leadingQuestion.question_id)),
   };
 
   requireFields(
     normalized,
     [
-      'issue_id',
-      'parameter_id',
-      'parameter_name',
+      'question_id',
+      'leadingQuestion_id',
+      'leadingQuestion_name',
       'question_to_ask',
       'required',
       'order',
     ],
-    'parameter',
+    'leadingQuestion',
   );
 
-  if (!getIssue(normalized.issue_id)) {
+  if (!getQuestion(normalized.question_id)) {
     throw new Error(
-      `Cannot save parameter: issue_id ${normalized.issue_id} does not exist.`,
+      `Cannot save leadingQuestion: question_id ${normalized.question_id} does not exist.`,
     );
   }
 
-  const existingIndex = appState.parameters.findIndex(
+  const existingIndex = appState.leadingQuestions.findIndex(
     (param) =>
-      str(param.issue_id) === normalized.issue_id &&
-      str(param.parameter_id) === normalized.parameter_id,
+      str(param.question_id) === normalized.question_id &&
+      str(param.leadingQuestion_id) === normalized.leadingQuestion_id,
   );
 
   if (existingIndex >= 0) {
-    appState.parameters[existingIndex] = {
-      ...appState.parameters[existingIndex],
+    appState.leadingQuestions[existingIndex] = {
+      ...appState.leadingQuestions[existingIndex],
       ...normalized,
     };
   } else {
-    appState.parameters.push(normalized);
+    appState.leadingQuestions.push(normalized);
   }
 
   requestPersistence();
   return normalized;
 }
 
-export function moveIssueToTopic(issueId, topicId) {
-  const issue = getIssue(issueId);
+export function moveQuestionToTopic(questionId, topicId) {
+  const question = getQuestion(questionId);
   const targetTopic = getTopic(topicId);
 
-  if (!issue)
-    throw new Error(`Cannot move issue: issue_id ${issueId} does not exist.`);
+  if (!question)
+    throw new Error(`Cannot move question: question_id ${questionId} does not exist.`);
   if (!targetTopic)
-    throw new Error(`Cannot move issue: topic_id ${topicId} does not exist.`);
-  if (str(issue.topic_id) === str(topicId)) return issue;
+    throw new Error(`Cannot move question: topic_id ${topicId} does not exist.`);
+  if (str(question.topic_id) === str(topicId)) return question;
 
-  issue.topic_id = str(topicId);
+  question.topic_id = str(topicId);
 
   requestPersistence();
-  return issue;
+  return question;
 }
 
-export function moveParameterToIssue(parameterId, issueId) {
+export function moveLeadingQuestionToQuestion(leadingQuestionId, questionId) {
   return transaction(() => {
-    const parameter = appState.parameters.find(
-      (param) => str(param.parameter_id) === str(parameterId),
+    const leadingQuestion = appState.leadingQuestions.find(
+      (param) => str(param.leadingQuestion_id) === str(leadingQuestionId),
     );
-    const targetIssue = getIssue(issueId);
+    const targetQuestion = getQuestion(questionId);
 
-    if (!parameter)
+    if (!leadingQuestion)
       throw new Error(
-        `Cannot move parameter: parameter_id ${parameterId} does not exist.`,
+        `Cannot move leadingQuestion: leadingQuestion_id ${leadingQuestionId} does not exist.`,
       );
-    if (!targetIssue)
+    if (!targetQuestion)
       throw new Error(
-        `Cannot move parameter: issue_id ${issueId} does not exist.`,
+        `Cannot move leadingQuestion: question_id ${questionId} does not exist.`,
       );
-    if (str(parameter.issue_id) === str(issueId)) return parameter;
+    if (str(leadingQuestion.question_id) === str(questionId)) return leadingQuestion;
 
     appState.rules
-      .filter((rule) => referencesParameter(rule.conditions, parameterId))
+      .filter((rule) => referencesLeadingQuestion(rule.conditions, leadingQuestionId))
       .map((rule) => rule.rule_id)
       .forEach(removeRule);
-    parameter.issue_id = str(issueId);
-    parameter.order = str(nextParameterOrder(issueId));
+    leadingQuestion.question_id = str(questionId);
+    leadingQuestion.order = str(nextLeadingQuestionOrder(questionId));
     requestPersistence();
-    return parameter;
+    return leadingQuestion;
   });
 }
 
-export function upsertRecommendation(recommendation) {
+export function upsertAnswer(answer) {
   const normalized = {
-    recommendation_id: str(recommendation.recommendation_id),
-    final_decision: str(recommendation.final_decision),
-    recommendation_text: str(recommendation.recommendation_text),
-    next_steps: str(recommendation.next_steps),
-    escalation_note: str(recommendation.escalation_note),
+    answer_id: str(answer.answer_id),
+    final_decision: str(answer.final_decision),
+    answer_text: str(answer.answer_text),
+    next_steps: str(answer.next_steps),
+    escalation_note: str(answer.escalation_note),
   };
 
   requireFields(
     normalized,
-    ['recommendation_id', 'final_decision', 'recommendation_text'],
-    'recommendation',
+    ['answer_id', 'final_decision', 'answer_text'],
+    'answer',
   );
-  upsertById(appState.recommendations, 'recommendation_id', normalized);
+  upsertById(appState.answers, 'answer_id', normalized);
 
   requestPersistence();
   return normalized;
@@ -279,34 +279,34 @@ export function upsertRecommendation(recommendation) {
 export function upsertRule(rule) {
   const normalized = {
     rule_id: str(rule.rule_id),
-    issue_id: str(rule.issue_id),
+    question_id: str(rule.question_id),
     conditions: str(rule.conditions),
-    recommendation_id: str(rule.recommendation_id),
+    answer_id: str(rule.answer_id),
     priority: str(rule.priority),
   };
 
   requireFields(
     normalized,
-    ['rule_id', 'issue_id', 'conditions', 'recommendation_id', 'priority'],
+    ['rule_id', 'question_id', 'conditions', 'answer_id', 'priority'],
     'rule',
   );
 
-  if (!getIssue(normalized.issue_id)) {
+  if (!getQuestion(normalized.question_id)) {
     throw new Error(
-      `Cannot save rule: issue_id ${normalized.issue_id} does not exist.`,
+      `Cannot save rule: question_id ${normalized.question_id} does not exist.`,
     );
   }
 
-  if (!getRecommendation(normalized.recommendation_id)) {
+  if (!getAnswer(normalized.answer_id)) {
     throw new Error(
-      `Cannot save rule: recommendation_id ${normalized.recommendation_id} does not exist.`,
+      `Cannot save rule: answer_id ${normalized.answer_id} does not exist.`,
     );
   }
 
   validateRuleConditions(
     normalized.conditions,
-    normalized.issue_id,
-    appState.parameters,
+    normalized.question_id,
+    appState.leadingQuestions,
   );
 
   upsertById(appState.rules, 'rule_id', normalized);
@@ -317,52 +317,52 @@ export function upsertRule(rule) {
 
 /*
 Removes a topic from the appState.
-Deletes all issues, parameters, rules & recommendations associated with the topicId
+Deletes all questions, leadingQuestions, rules & answers associated with the topicId
 */
 export function removeTopic(topicId) {
   transaction(() => {
-    appState.issues
-      .filter((issue) => str(issue.topic_id) === str(topicId))
-      .map((issue) => issue.issue_id)
-      .forEach(removeIssue);
+    appState.questions
+      .filter((question) => str(question.topic_id) === str(topicId))
+      .map((question) => question.question_id)
+      .forEach(removeQuestion);
     removeById(appState.topics, 'topic_id', topicId);
     requestPersistence();
   });
 }
 
 /*
-Removes an issue from the appState.
-Deletes all parameters, rules & recommendations associated with the issueId
+Removes an question from the appState.
+Deletes all leadingQuestions, rules & answers associated with the questionId
 */
-export function removeIssue(issueId) {
+export function removeQuestion(questionId) {
   transaction(() => {
-    appState.parameters
-      .filter((param) => str(param.issue_id) === str(issueId))
-      .map((param) => param.parameter_id)
-      .forEach(removeParameter);
-    removeById(appState.issues, 'issue_id', issueId);
+    appState.leadingQuestions
+      .filter((param) => str(param.question_id) === str(questionId))
+      .map((param) => param.leadingQuestion_id)
+      .forEach(removeLeadingQuestion);
+    removeById(appState.questions, 'question_id', questionId);
     requestPersistence();
   });
 }
 
 /*
-Removes a parameter from the appState.
-Deletes all rules & recommendations associated with the paramId
+Removes a leadingQuestion from the appState.
+Deletes all rules & answers associated with the paramId
 */
-export function removeParameter(paramId) {
+export function removeLeadingQuestion(paramId) {
   transaction(() => {
     appState.rules
-      .filter((rule) => referencesParameter(rule.conditions, paramId))
+      .filter((rule) => referencesLeadingQuestion(rule.conditions, paramId))
       .map((rule) => rule.rule_id)
       .forEach(removeRule);
-    removeById(appState.parameters, 'parameter_id', paramId);
+    removeById(appState.leadingQuestions, 'leadingQuestion_id', paramId);
     requestPersistence();
   });
 }
 
 /*
 Removes a rule from the appState.
-Deletes all recommendations associated with the ruleId if no longer used
+Deletes all answers associated with the ruleId if no longer used
 */
 export function removeRule(ruleId) {
   transaction(() => {
@@ -373,30 +373,30 @@ export function removeRule(ruleId) {
     removeById(appState.rules, 'rule_id', ruleId);
     if (
       !appState.rules.some(
-        (item) => str(item.recommendation_id) === str(rule.recommendation_id),
+        (item) => str(item.answer_id) === str(rule.answer_id),
       )
     ) {
-      removeRecommendation(rule.recommendation_id);
+      removeAnswer(rule.answer_id);
     }
     requestPersistence();
   });
 }
 
 /*
-Removes a recommendation from the appState.
+Removes a answer from the appState.
 */
-function removeRecommendation(recomId) {
-  removeById(appState.recommendations, 'recommendation_id', recomId);
+function removeAnswer(recomId) {
+  removeById(appState.answers, 'answer_id', recomId);
   requestPersistence();
 }
 
-/** Removes a recommendation and every rule that assigns it. */
-export function deleteRecommendation(recommendationId) {
+/** Removes a answer and every rule that assigns it. */
+export function deleteAnswer(answerId) {
   transaction(() => {
     appState.rules = appState.rules.filter(
-      (rule) => str(rule.recommendation_id) !== str(recommendationId),
+      (rule) => str(rule.answer_id) !== str(answerId),
     );
-    removeById(appState.recommendations, 'recommendation_id', recommendationId);
+    removeById(appState.answers, 'answer_id', answerId);
     requestPersistence();
   });
 }
@@ -414,8 +414,8 @@ export function makeUniqueId(prefix, rows, idKey) {
   return candidate;
 }
 
-function nextParameterOrder(issueId) {
-  const current = getIssueParameters(issueId).map((param) =>
+function nextLeadingQuestionOrder(questionId) {
+  const current = getQuestionLeadingQuestions(questionId).map((param) =>
     Number(param.order || 0),
   );
   return current.length ? Math.max(...current) + 1 : 1;
@@ -468,10 +468,10 @@ function requireFields(row, fields, entityName) {
 function createStateSnapshot(data) {
   return {
     topics: data.topics ?? [],
-    issues: data.issues ?? [],
-    parameters: data.parameters ?? [],
+    questions: data.questions ?? [],
+    leadingQuestions: data.leadingQuestions ?? [],
     rules: data.rules ?? [],
-    recommendations: data.recommendations ?? [],
+    answers: data.answers ?? [],
   };
 }
 

@@ -28,10 +28,10 @@ EagleEye is a web application for building and maintaining structured decision-s
 Instead of manually creating complex decision trees, EagleEye allows you to define chatbot behaviour using a structured Excel workbook consisting of:
 
 - Topics
-- Issues
-- Parameters
+- Questions
+- Leading questions
 - Decision Rules
-- Recommendations
+- Answers
 
 The workbook becomes the source of truth for a rule-based chatbot.
 
@@ -148,10 +148,10 @@ http://localhost:3000
 EagleEye is designed for structured decision-support chatbots that need to:
 
 1. Identify the user's broad topic.
-2. Identify the relevant issue within that topic.
+2. Identify the relevant question within that topic.
 3. Collect only the information needed to match a decision rule.
 4. Apply decision rules in priority order.
-5. Return an approved recommendation with any required next steps or escalation notes.
+5. Return an approved answer with any required next steps or escalation notes.
 
 Typical use cases include:
 
@@ -178,45 +178,45 @@ You are a structured decision-support chatbot that answers <your topic here>-rel
 Use the uploaded XLSX file as the sole source of truth:
 
 - `1_topics` identifies broad query topics.
-- `2_issues` identifies specific issues under each topic.
-- `3_parameters` defines information to collect for each issue.
-- `4_decision_rules` defines rule conditions, priorities, and the recommendation assigned to each outcome.
-- `5_recommendations` defines the approved response text, next steps, and escalation notes.
+- `2_questions` identifies specific questions under each topic.
+- `3_leadingQuestionss` defines information to collect for each question.
+- `4_decision_rules` defines rule conditions, priorities, and the answer assigned to each outcome.
+- `5_answers` defines the approved response text, next steps, and escalation notes.
 
 Conversation process:
 
 1. Identify the most relevant topic from `1_topics`.
-2. Identify the most relevant issue under that topic from `2_issues`.
-3. If multiple issues may apply, ask the user to clarify which issue they mean.
-4. Extract any parameter information already provided by the user.
-5. Check `3_parameters` for the selected issue. Ask only for required parameters that are missing, unclear, or outside their allowed values.
-6. After each parameter response, compare the information available so far against `4_decision_rules` for the selected issue. A rule may intentionally use only some parameters.
-7. If a rule is fully matched, select the matching rule with the highest priority and provide its recommendation without asking for parameters that are not part of that rule. When priority is numeric, lower numbers have higher priority.
-8. Use only the recommendation referenced by that selected rule. A recommendation belongs to an issue only when it is assigned through a decision rule for that issue.
-9. Do not use recommendations assigned to another issue, and do not provide a recommendation that is not supported by a matching decision rule.
+2. Identify the most relevant question under that topic from `2_questions`.
+3. If multiple questions may apply, ask the user to clarify which question they mean.
+4. Extract any leadingQuestions information already provided by the user.
+5. Check `3_leadingQuestionss` for the selected question. Ask only for required leadingQuestionss that are missing, unclear, or outside their allowed values.
+6. After each leadingQuestions response, compare the information available so far against `4_decision_rules` for the selected question. A rule may intentionally use only some leadingQuestionss.
+7. If a rule is fully matched, select the matching rule with the highest priority and provide its answer without asking for leadingQuestionss that are not part of that rule. When priority is numeric, lower numbers have higher priority.
+8. Use only the answer referenced by that selected rule. A answer belongs to an question only when it is assigned through a decision rule for that question.
+9. Do not use answers assigned to another question, and do not provide a answer that is not supported by a matching decision rule.
 
-Parameter handling:
+Leading question handling:
 
 - Treat `required = yes` as mandatory.
 - Use `allowed_values` to normalize responses.
 - If a required response does not fit the allowed values, ask the user to clarify or choose from the valid values.
 - Use `example_values` and `example_phrases` only to understand intent, never as policy.
-- Optional parameters may inform the result but must not block a recommendation when absent.
-- An issue may have no parameters. If the selected issue has no required parameters, proceed directly to evaluate its decision rules; do not ask the user for additional information unless clarification is needed to identify the issue or match a rule.
+- Optional leadingQuestionss may inform the result but must not block a answer when absent.
+- An question may have no leadingQuestionss. If the selected question has no required leadingQuestionss, proceed directly to evaluate its decision rules; do not ask the user for additional information unless clarification is needed to identify the question or match a rule.
 
 Decision handling:
 
-- Evaluate decision rules after each parameter response. A matching rule may be conclusive before every parameter is collected when its conditions do not require those parameters.
+- Evaluate decision rules after each leadingQuestions response. A matching rule may be conclusive before every leadingQuestions is collected when its conditions do not require those leadingQuestionss.
 - If multiple rules match, select the highest-priority rule.
 - If no rule matches, do not force an answer. Ask a targeted clarification question or recommend escalation when the matter is sensitive, urgent, or ambiguous.
-- Do not expose internal topic, issue, rule, or recommendation IDs unless the user asks for the decision basis.
+- Do not expose internal topic, question, rule, or answer IDs unless the user asks for the decision basis.
 
 Response rules:
 
-- Do not invent policies, requirements, procedures, or recommendations not supported by the uploaded XLSX file.
+- Do not invent policies, requirements, procedures, or answers not supported by the uploaded XLSX file.
 - Keep responses concise, professional, clear, and practical.
-- When asking for missing information, list only the missing parameters.
-- When giving a final recommendation, include:
+- When asking for missing information, list only the missing leadingQuestionss.
+- When giving a final answer, include:
   - Final decision
   - Reason based on the matched rule
   - Recommended next steps
@@ -238,15 +238,15 @@ Response rules:
 ### Knowledge Base Editing
 
 - Create and edit Topics.
-- Create and edit Issues.
-- Create and edit Parameters.
-- Generate Recommendations.
+- Create and edit Questions.
+- Create and edit Leading questions.
+- Generate Answers.
 
 ### Visualisation
 
-- Browse Topics and Issues.
+- Browse Topics and Questions.
 - Preview decision trees as flowcharts.
-- Automatically regenerate flowcharts when an Issue is selected.
+- Automatically regenerate flowcharts when an Question is selected.
 
 ---
 
@@ -266,11 +266,11 @@ Response rules:
 A typical EagleEye workflow is:
 
 1. Create a Topic.
-2. Create one or more Issues.
-3. Define the required Parameters.
+2. Create one or more Questions.
+3. Define the required Leading questions.
 4. Configure allowed values.
-5. Create recommendation assignments for the relevant answers.
-6. Create Recommendations.
+5. Create answer assignments for the relevant answers.
+6. Create Answers.
 7. Generate Decision Rules.
 8. Preview the flowchart.
 9. Export the workbook.
@@ -280,10 +280,10 @@ The exported workbook contains five sheets:
 
 ```text
 1_topics
-2_issues
-3_parameters
+2_questions
+3_leadingQuestionss
 4_decision_rules
-5_recommendations
+5_answers
 ```
 
 These sheets form the chatbot's complete decision-support knowledge base.
@@ -301,7 +301,7 @@ Before you can edit a knowledge base, you must load an Excel workbook.
 3. Select an Excel workbook.
 4. Click **Load**.
 5. EagleEye validates the workbook structure.
-6. If validation succeeds, the Topics and Issues are loaded into the application.
+6. If validation succeeds, the Topics and Questions are loaded into the application.
 
 > **Validation**
 >
@@ -315,30 +315,30 @@ Alternatively, you may restore the file you were editing previously.
 
 1. Open EagleEye.
 2. Click **Restore Previous Session**.
-3. EagleEye loads the previous Topics and Issues you were editing.
+3. EagleEye loads the previous Topics and Questions you were editing.
 
 > **Saving Behaviour**
 >
-> EagleEye saves all data up to the last time you clicked **Save** on each topic, issue, parameter or recommendation.
+> EagleEye saves all data up to the last time you clicked **Save** on each topic, question, leadingQuestions or answer.
 
 
 ---
 
 ## Viewing a Decision Tree
 
-Decision trees are organised by **Topic** and **Issue**.
+Decision trees are organised by **Topic** and **Question**.
 
 ### Steps
 
 1. Select a **Topic**.
-2. Select an **Issue** under that Topic.
+2. Select an **Question** under that Topic.
 3. EagleEye displays:
 
-   - Parameters
+   - Leading questions
    - Decision Rules
-   - Recommendations
+   - Answers
 
-4. The Preview panel automatically generates a flowchart for the selected Issue.
+4. The Preview panel automatically generates a flowchart for the selected Question.
 
 > **Note**
 >
@@ -349,13 +349,13 @@ Decision trees are organised by **Topic** and **Issue**.
 ```text
 topics
     ↓
-issues
+questions
     ↓
-parameters
+leadingQuestionss
     ↓
 decision rules
     ↓
-recommendations
+answers
 ```
 
 ---
@@ -369,9 +369,9 @@ Different items require different selections before they can be created or edite
 | Item           | Required Selection |
 | -------------- | ------------------ |
 | Topic          | None               |
-| Issue          | Topic              |
-| Parameter      | Topic + Issue      |
-| Recommendation | Topic + Issue      |
+| Question          | Topic              |
+| Leading question      | Topic + Question      |
+| Answer | Topic + Question      |
 
 You can either:
 
@@ -397,35 +397,35 @@ Topics are broad categories of user enquiries.
 
 ---
 
-## Issues
+## Questions
 
-Issues represent specific problems or requests within a Topic.
+Questions represent specific problems or requests within a Topic.
 
-### Create or Edit an Issue
+### Create or Edit an Question
 
 1. Select a Topic.
-2. Create a new Issue or open an existing one.
+2. Create a new Question or open an existing one.
 3. Enter:
 
-   - **Issue name**
-   - Issue description
+   - **Question name**
+   - Question description
    - Example phrases (optional)
 
-4. Save the Issue.
+4. Save the Question.
 
-> Every Issue must belong to an existing Topic.
+> Every Question must belong to an existing Topic.
 
 ---
 
-## Parameters
+## Leading questions
 
-Parameters define the information the chatbot must collect before making a decision.
+Leading questions define the information the chatbot must collect before making a decision.
 
-### Create or Edit a Parameter
+### Create or Edit a Leading question
 
 1. Select a Topic.
-2. Select an Issue.
-3. Create or edit a Parameter.
+2. Select an Question.
+3. Create or edit a Leading question.
 4. Enter:
 
    - **Question to ask**
@@ -434,7 +434,7 @@ Parameters define the information the chatbot must collect before making a decis
    - Example values (optional)
    - Question order
 
-5. Save the Parameter.
+5. Save the Leading question.
 
 Example allowed values:
 
@@ -442,48 +442,48 @@ Example allowed values:
 low, medium, high
 ```
 
-> **Required Parameters**
+> **Required Leading questions**
 >
-> Parameters marked **required = yes** should be collected unless a fully matching decision rule can already provide a recommendation without them.
+> Leading questions marked **required = yes** should be collected unless a fully matching decision rule can already provide a answer without them.
 
 ---
 
-## Recommendations
+## Answers
 
-Recommendations define the chatbot's final response for one or more sets of parameter answers.
+Answers define the chatbot's final response for one or more sets of leadingQuestions answers.
 
-### Before Creating Recommendations
+### Before Creating Answers
 
-Ensure each relevant Parameter has **allowed_values** defined.
+Ensure each relevant Leading question has **allowed_values** defined.
 
 Allowed values provide the selectable responses used when defining assignments.
 
 ---
 
-### Create or Edit a Recommendation
+### Create or Edit a Answer
 
 1. Select a Topic.
-2. Select an Issue.
-3. Create or edit a Recommendation.
+2. Select an Question.
+3. Create or edit a Answer.
 4. Enter:
 
    - Final decision
-   - Recommendation text
+   - Answer text
    - Next steps
    - Escalation note (optional)
-   - One or more assignments, each containing only the relevant parameter responses
+   - One or more assignments, each containing only the relevant leadingQuestions responses
    - Optional advanced priority
 
-> **No Parameter Recommendations**
+> **No Leading question Answers**
 >
-> You may assign a recommendation directly to an issue if you do not have any parameters.
+> You may assign a answer directly to an question if you do not have any leadingQuestionss.
 
-5. Save the Recommendation.
+5. Save the Answer.
 
 EagleEye automatically creates or updates:
 
 - `4_decision_rules`
-- `5_recommendations`
+- `5_answers`
 
 Example generated condition:
 
@@ -513,7 +513,7 @@ Example:
 | Priority | Behaviour                          |
 | -------- | ---------------------------------- |
 | 1        | Escalate urgent or sensitive cases |
-| 2        | Return the standard recommendation |
+| 2        | Return the standard answer |
 | 3        | Ask the user for clarification     |
 
 ---
@@ -529,10 +529,10 @@ EagleEye exports the current application state into an Excel workbook containing
 
 ```text
 1_topics
-2_issues
-3_parameters
+2_questions
+3_leadingQuestionss
 4_decision_rules
-5_recommendations
+5_answers
 ```
 
 The exported workbook can later be uploaded back into EagleEye for further editing or attached to your chatbot.
@@ -544,17 +544,17 @@ The exported workbook can later be uploaded back into EagleEye for further editi
 For a new knowledge base, the recommended workflow is:
 
 1. Create a Topic.
-2. Create an Issue.
-3. Define the Parameters that may be needed.
+2. Create an Question.
+3. Define the Leading questions that may be needed.
 4. Configure allowed values.
-5. Create recommendation assignments for the relevant answers.
-6. Create Recommendations.
+5. Create answer assignments for the relevant answers.
+6. Create Answers.
 7. Review the generated Decision Rules.
 8. Preview the flowchart.
 9. Export the workbook.
 10. Test the workbook with your chatbot.
 
-Following this workflow helps ensure every Issue has complete parameters, rules, and recommendations before deployment.
+Following this workflow helps ensure every Question has complete leadingQuestionss, rules, and answers before deployment.
 
 # Developer Guide
 
@@ -588,7 +588,7 @@ app.js
 │   Workbook upload UI
 │
 ├── editor/
-│   Topic, Issue, Parameter and Recommendation editors
+│   Topic, Question, Leading question and Answer editors
 │
 └── preview/
     Flowchart generation and rendering
@@ -621,10 +621,10 @@ EagleEye stores chatbot knowledge in a single Excel workbook.
 ```text
 decision_support_knowledge_base.xlsx
 ├── 1_topics
-├── 2_issues
-├── 3_parameters
+├── 2_questions
+├── 3_leadingQuestionss
 ├── 4_decision_rules
-└── 5_recommendations
+└── 5_answers
 ```
 
 These five sheets together form the chatbot's knowledge base.
@@ -654,39 +654,39 @@ Example
 
 ---
 
-## 2_issues
+## 2_questions
 
-Stores Issues that belong to a Topic.
+Stores Questions that belong to a Topic.
 
 ### Required Columns
 
 ```text
-issue_id
+question_id
 topic_id
-issue_name
-issue_description
+question_name
+question_description
 example_phrases
 ```
 
 Example
 
-| issue_id | topic_id | issue_name        | issue_description                      | example_phrases |
+| question_id | topic_id | question_name        | question_description                      | example_phrases |
 | -------- | -------- | ----------------- | -------------------------------------- | --------------- |
 | I001     | T001     | Claim eligibility | Determines whether a claim may proceed | can I claim     |
 
-> Every Issue must reference an existing `topic_id`.
+> Every Question must reference an existing `topic_id`.
 
 ---
 
-## 3_parameters
+## 3_leadingQuestionss
 
 Stores information the chatbot must collect before making a decision.
 
 ### Required Columns
 
 ```text
-issue_id
-parameter_id
+question_id
+leadingQuestions_id
 question_to_ask
 required
 allowed_values
@@ -696,13 +696,13 @@ order
 
 Example
 
-| issue_id | parameter_id | question_to_ask       | required | allowed_values    | example_values | order |
+| question_id | leadingQuestions_id | question_to_ask       | required | allowed_values    | example_values | order |
 | -------- | ------------ | --------------------- | -------- | ----------------- | -------------- | ----: |
 | I001     | severity     | What is the severity? | yes      | low, medium, high | urgent         |     1 |
 
 ### Notes
 
-- `required = yes` means the chatbot **must** collect the parameter.
+- `required = yes` means the chatbot **must** collect the leadingQuestions.
 - `allowed_values` defines accepted responses.
 - `example_values` help interpret user input.
 - `order` controls the preferred questioning sequence.
@@ -711,50 +711,50 @@ Example
 
 ## 4_decision_rules
 
-Maps parameter conditions to Recommendations.
+Maps leadingQuestions conditions to Answers.
 
 ### Required Columns
 
 ```text
 rule_id
-issue_id
+question_id
 conditions
-recommendation_id
+answer_id
 priority
 ```
 
 Example
 
-| rule_id | issue_id | conditions          | recommendation_id | priority |
+| rule_id | question_id | conditions          | answer_id | priority |
 | ------- | -------- | ------------------- | ----------------- | -------: |
 | R001    | I001     | {"severity":"high"} | REC001            |        1 |
 
 ### Notes
 
-- Rules are evaluated after each parameter response; a rule can match without every parameter when those parameters are not in its conditions.
+- Rules are evaluated after each leadingQuestions response; a rule can match without every leadingQuestions when those leadingQuestionss are not in its conditions.
 - Lower numeric priorities are evaluated first.
 - If multiple rules match, the lowest priority number wins.
 - Conditions should use a consistent structured format such as JSON.
 
 ---
 
-## 5_recommendations
+## 5_answers
 
 Stores approved chatbot responses.
 
 ### Required Columns
 
 ```text
-recommendation_id
+answer_id
 final_decision
-recommendation_text
+answer_text
 next_steps
 escalation_note
 ```
 
 Example
 
-| recommendation_id | final_decision | recommendation_text                 | next_steps                    | escalation_note                |
+| answer_id | final_decision | answer_text                 | next_steps                    | escalation_note                |
 | ----------------- | -------------- | ----------------------------------- | ----------------------------- | ------------------------------ |
 | REC001            | Escalate       | Refer this case to a human officer. | Collect supporting documents. | Escalate to the relevant team. |
 
@@ -775,10 +775,10 @@ When modifying a knowledge base, follow these rules.
 
 ## Relationships
 
-- Every Issue must belong to a Topic.
-- Every Parameter must belong to an Issue.
-- Every Decision Rule must reference a Recommendation.
-- Recommendations should not exist without a corresponding Rule unless intentionally unused.
+- Every Question must belong to a Topic.
+- Every Leading question must belong to an Question.
+- Every Decision Rule must reference a Answer.
+- Answers should not exist without a corresponding Rule unless intentionally unused.
 
 ## IDs
 
@@ -786,15 +786,15 @@ When modifying a knowledge base, follow these rules.
 - Keep IDs stable once published.
 - Avoid reusing deleted IDs.
 
-## Parameters
+## Leading questions
 
 - Use consistent `allowed_values`.
 - Mark mandatory information as `required = yes`.
 
-## Recommendations
+## Answers
 
-- Keep recommendation text policy-based.
-- Avoid embedding business logic inside recommendations.
+- Keep answer text policy-based.
+- Avoid embedding business logic inside answers.
 - Use escalation for sensitive, urgent or ambiguous cases.
 
 ---
@@ -851,13 +851,13 @@ async function main() {
 
 ---
 
-## `recommendation_id is not defined`
+## `answer_id is not defined`
 
 Incorrect
 
 ```javascript
 rules.push({
-  recommendation_id,
+  answer_id,
 });
 ```
 
@@ -865,7 +865,7 @@ Correct
 
 ```javascript
 rules.push({
-  recommendation_id: recommendationId,
+  answer_id: answerId,
 });
 ```
 
@@ -884,12 +884,12 @@ The export service should always write workbook data from `appState`, not direct
 | Term               | Description                                                       |
 | ------------------ | ----------------------------------------------------------------- |
 | Topic              | A broad category of user enquiries                                |
-| Issue              | A specific problem within a Topic                                 |
-| Parameter          | Information required before making a decision                     |
-| Required Parameter | Information that must be collected before recommending an outcome |
-| Allowed Values     | Valid responses for a Parameter                                   |
-| Decision Rule      | Conditions that determine which Recommendation is selected        |
-| Recommendation     | The chatbot's approved response                                   |
+| Question              | A specific problem within a Topic                                 |
+| Leading question          | Information required before making a decision                     |
+| Required Leading question | Information that must be collected before recommending an outcome |
+| Allowed Values     | Valid responses for a Leading question                                   |
+| Decision Rule      | Conditions that determine which Answer is selected        |
+| Answer     | The chatbot's approved response                                   |
 | Escalation         | Referral to a human or higher-level process                       |
 
 ---
@@ -898,7 +898,7 @@ The export service should always write workbook data from `appState`, not direct
 
 Planned improvements include:
 
-- Delete Topics, Issues, Parameters, Rules and Recommendations
+- Delete Topics, Questions, Leading questions, Rules and Answers
 - Rule conflict detection
 - Incomplete decision tree warnings
 - Import/export version metadata

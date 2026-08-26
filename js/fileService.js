@@ -32,10 +32,10 @@ export function saveWorkbookData(
 
   const sheets = [
     { key: 'topics', config: sheet_config.topics },
-    { key: 'issues', config: sheet_config.issues },
-    { key: 'parameters', config: sheet_config.parameters },
+    { key: 'questions', config: sheet_config.questions },
+    { key: 'leadingQuestions', config: sheet_config.leadingQuestions },
     { key: 'rules', config: sheet_config.rules },
-    { key: 'recommendations', config: sheet_config.recommendations },
+    { key: 'answers', config: sheet_config.answers },
   ];
 
   for (const { key, config } of sheets) {
@@ -94,7 +94,7 @@ export function validateFilePresent(fileInput) {
   }
 }
 
-// read single workbook and return { topics: [...], issues: [...], ... }
+// read single workbook and return { topics: [...], questions: [...], ... }
 export async function loadWorkbookData(fileInput) {
   validateFilePresent(fileInput);
   return await readMultiSheetXlsx(fileInput.files[0]);
@@ -225,7 +225,7 @@ function validateSheetRows(key, config, rows) {
 }
 
 function validateRowFormats(key, row, location) {
-  if (key === 'parameters') {
+  if (key === 'leadingQuestions') {
     const requiredValue = str(row.required).toLowerCase();
     if (
       requiredValue &&
@@ -262,53 +262,53 @@ function validateRowFormats(key, row, location) {
 
 function validateWorkbookRelationships(workbookData) {
   const topicIds = new Set(workbookData.topics.map((row) => str(row.topic_id)));
-  const issueIds = new Set(workbookData.issues.map((row) => str(row.issue_id)));
-  const recommendationIds = new Set(
-    workbookData.recommendations.map((row) => str(row.recommendation_id)),
+  const questionIds = new Set(workbookData.questions.map((row) => str(row.question_id)));
+  const answerIds = new Set(
+    workbookData.answers.map((row) => str(row.answer_id)),
   );
 
-  workbookData.issues.forEach((row, index) => {
+  workbookData.questions.forEach((row, index) => {
     assertReference(
       topicIds,
       row.topic_id,
-      '2_issues',
+      '2_questions',
       index,
       'topic_id',
       '1_topics',
     );
   });
-  workbookData.parameters.forEach((row, index) => {
+  workbookData.leadingQuestions.forEach((row, index) => {
     assertReference(
-      issueIds,
-      row.issue_id,
-      '3_parameters',
+      questionIds,
+      row.question_id,
+      '3_leadingQuestions',
       index,
-      'issue_id',
-      '2_issues',
+      'question_id',
+      '2_questions',
     );
   });
   workbookData.rules.forEach((row, index) => {
     assertReference(
-      issueIds,
-      row.issue_id,
+      questionIds,
+      row.question_id,
       '4_decision_rules',
       index,
-      'issue_id',
-      '2_issues',
+      'question_id',
+      '2_questions',
     );
     assertReference(
-      recommendationIds,
-      row.recommendation_id,
+      answerIds,
+      row.answer_id,
       '4_decision_rules',
       index,
-      'recommendation_id',
-      '5_recommendations',
+      'answer_id',
+      '5_answers',
     );
     try {
       validateRuleConditions(
         row.conditions,
-        row.issue_id,
-        workbookData.parameters,
+        row.question_id,
+        workbookData.leadingQuestions,
       );
     } catch (error) {
       throw new Error(
@@ -346,19 +346,19 @@ function createCellLocation(sheetName, rowIndex) {
 function getIdColumn(key) {
   return {
     topics: 'topic_id',
-    issues: 'issue_id',
-    parameters: 'parameter_id',
+    questions: 'question_id',
+    leadingQuestions: 'leadingQuestion_id',
     rules: 'rule_id',
-    recommendations: 'recommendation_id',
+    answers: 'answer_id',
   }[key];
 }
 
 function getRequiredValueColumns(key) {
   return {
     topics: ['topic_id', 'topic_name'],
-    issues: ['issue_id', 'topic_id', 'issue_name'],
-    parameters: ['issue_id', 'parameter_id', 'parameter_name'],
-    rules: ['rule_id', 'issue_id', 'conditions', 'recommendation_id'],
-    recommendations: ['recommendation_id', 'final_decision'],
+    questions: ['question_id', 'topic_id', 'question_name'],
+    leadingQuestions: ['question_id', 'leadingQuestion_id', 'leadingQuestion_name'],
+    rules: ['rule_id', 'question_id', 'conditions', 'answer_id'],
+    answers: ['answer_id', 'final_decision'],
   }[key];
 }

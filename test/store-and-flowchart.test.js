@@ -17,21 +17,21 @@ globalThis.localStorage = {
 function setState() {
   Object.assign(appState, {
     topics: [{ topic_id: 'TOPIC', topic_name: 'Topic' }],
-    issues: [{ issue_id: 'ISSUE', topic_id: 'TOPIC', issue_name: 'Issue' }],
-    parameters: [
+    questions: [{ question_id: 'ISSUE', topic_id: 'TOPIC', question_name: 'Question' }],
+    leadingQuestions: [
       {
-        issue_id: 'ISSUE',
-        parameter_id: 'RELEVANT',
-        parameter_name: 'Relevant',
+        question_id: 'ISSUE',
+        leadingQuestion_id: 'RELEVANT',
+        leadingQuestion_name: 'Relevant',
         question_to_ask: 'Relevant question',
         required: 'yes',
         allowed_values: 'Yes; No',
         order: 1,
       },
       {
-        issue_id: 'ISSUE',
-        parameter_id: 'UNUSED',
-        parameter_name: 'Unused',
+        question_id: 'ISSUE',
+        leadingQuestion_id: 'UNUSED',
+        leadingQuestion_name: 'Unused',
         question_to_ask: 'Unused question',
         required: 'yes',
         allowed_values: 'A; B',
@@ -41,29 +41,29 @@ function setState() {
     rules: [
       {
         rule_id: 'RULE_YES',
-        issue_id: 'ISSUE',
+        question_id: 'ISSUE',
         conditions: '{"RELEVANT":"Yes"}',
-        recommendation_id: 'REC_YES',
+        answer_id: 'REC_YES',
         priority: 1,
       },
       {
         rule_id: 'RULE_NO',
-        issue_id: 'ISSUE',
+        question_id: 'ISSUE',
         conditions: '{"RELEVANT":"No"}',
-        recommendation_id: 'REC_NO',
+        answer_id: 'REC_NO',
         priority: 1,
       },
     ],
-    recommendations: [
+    answers: [
       {
-        recommendation_id: 'REC_YES',
+        answer_id: 'REC_YES',
         final_decision: 'Approve',
-        recommendation_text: 'Approved',
+        answer_text: 'Approved',
       },
       {
-        recommendation_id: 'REC_NO',
+        answer_id: 'REC_NO',
         final_decision: 'Decline',
-        recommendation_text: 'Declined',
+        answer_text: 'Declined',
       },
     ],
   });
@@ -86,10 +86,10 @@ test('cascade deletion persists one complete state snapshot', () => {
   removeTopic('TOPIC');
 
   assert.deepEqual(appState.topics, []);
-  assert.deepEqual(appState.issues, []);
-  assert.deepEqual(appState.parameters, []);
+  assert.deepEqual(appState.questions, []);
+  assert.deepEqual(appState.leadingQuestions, []);
   assert.deepEqual(appState.rules, []);
-  assert.deepEqual(appState.recommendations, []);
+  assert.deepEqual(appState.answers, []);
   assert.equal(writes.length, 5);
 });
 
@@ -97,16 +97,16 @@ test('loading a workbook replaces every existing state collection', () => {
   setState();
   loadState({
     topics: [{ topic_id: 'NEW_TOPIC', topic_name: 'New topic' }],
-    issues: [
+    questions: [
       {
-        issue_id: 'NEW_ISSUE',
+        question_id: 'NEW_ISSUE',
         topic_id: 'NEW_TOPIC',
-        issue_name: 'New issue',
+        question_name: 'New question',
       },
     ],
-    parameters: [],
+    leadingQuestions: [],
     rules: [],
-    recommendations: [],
+    answers: [],
   });
 
   assert.deepEqual(
@@ -114,23 +114,23 @@ test('loading a workbook replaces every existing state collection', () => {
     ['NEW_TOPIC'],
   );
   assert.deepEqual(
-    appState.issues.map((issue) => issue.issue_id),
+    appState.questions.map((question) => question.question_id),
     ['NEW_ISSUE'],
   );
-  assert.equal(appState.parameters.length, 0);
+  assert.equal(appState.leadingQuestions.length, 0);
   assert.equal(appState.rules.length, 0);
-  assert.equal(appState.recommendations.length, 0);
+  assert.equal(appState.answers.length, 0);
 });
 
 test('flowchart asks only rule-relevant questions', () => {
   setState();
   const graph = buildDecisionGraph({
-    issue: appState.issues[0],
+    question: appState.questions[0],
     topicName: appState.topics[0].topic_name,
-    parameters: appState.parameters,
+    leadingQuestions: appState.leadingQuestions,
     rules: appState.rules,
-    recommendationById: new Map(
-      appState.recommendations.map((item) => [item.recommendation_id, item]),
+    answerById: new Map(
+      appState.answers.map((item) => [item.answer_id, item]),
     ),
   });
 

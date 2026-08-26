@@ -6,17 +6,17 @@ export function validateStateRelationships(state) {
   validateStateShape(state);
 
   const topicIds = new Set(state.topics.map((topic) => str(topic.topic_id)));
-  const issueIds = new Set(state.issues.map((issue) => str(issue.issue_id)));
-  const recommendationIds = new Set(
-    state.recommendations.map((rec) => str(rec.recommendation_id)),
+  const questionIds = new Set(state.questions.map((question) => str(question.question_id)));
+  const answerIds = new Set(
+    state.answers.map((rec) => str(rec.answer_id)),
   );
 
-  assertNoOrphans(state.issues, 'topic_id', topicIds, 'issues');
-  assertNoOrphans(state.parameters, 'issue_id', issueIds, 'parameters');
-  assertNoOrphans(state.rules, 'issue_id', issueIds, 'rules');
-  assertNoOrphans(state.rules, 'recommendation_id', recommendationIds, 'rules');
+  assertNoOrphans(state.questions, 'topic_id', topicIds, 'questions');
+  assertNoOrphans(state.leadingQuestions, 'question_id', questionIds, 'leadingQuestions');
+  assertNoOrphans(state.rules, 'question_id', questionIds, 'rules');
+  assertNoOrphans(state.rules, 'answer_id', answerIds, 'rules');
   state.rules.forEach((rule) =>
-    validateRuleConditions(rule.conditions, rule.issue_id, state.parameters),
+    validateRuleConditions(rule.conditions, rule.question_id, state.leadingQuestions),
   );
   assertUniqueRuleCombinations(state.rules);
 }
@@ -25,11 +25,11 @@ function assertUniqueRuleCombinations(rules) {
   const ruleByCombination = new Map();
 
   rules.forEach((rule) => {
-    const key = `${str(rule.issue_id)}:${serializeConditions(rule.conditions)}`;
+    const key = `${str(rule.question_id)}:${serializeConditions(rule.conditions)}`;
     const existingRule = ruleByCombination.get(key);
     if (existingRule) {
       throw new Error(
-        `Rules ${existingRule.rule_id} and ${rule.rule_id} use the same parameter combination.`,
+        `Rules ${existingRule.rule_id} and ${rule.rule_id} use the same leadingQuestion combination.`,
       );
     }
     ruleByCombination.set(key, rule);
@@ -39,10 +39,10 @@ function assertUniqueRuleCombinations(rules) {
 function validateStateShape(state) {
   const collections = [
     'topics',
-    'issues',
-    'parameters',
+    'questions',
+    'leadingQuestions',
     'rules',
-    'recommendations',
+    'answers',
   ];
 
   collections.forEach((key) => {

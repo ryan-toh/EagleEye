@@ -1,5 +1,5 @@
 /* ============================================================
-   editor.css: editor panel and recommendation editor
+   editor.css: editor panel and answer editor
    Used by: parts/editor-panel.html
    ============================================================ */
 
@@ -249,20 +249,20 @@
   gap: 8px;
 }
 
-.recommendation-assignments-fieldset {
+.answer-assignments-fieldset {
   margin: 16px 0;
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
 }
 
-.recommendation-assignments-fieldset legend {
+.answer-assignments-fieldset legend {
   padding: 0 4px;
   color: var(--accent-dark);
   font-weight: 600;
 }
 
-.recommendation-assignment {
+.answer-assignment {
   margin-bottom: 12px;
   padding: 12px;
   border: 1px solid var(--border);
@@ -270,44 +270,44 @@
   background: var(--panel);
 }
 
-.recommendation-assignment__header,
-.recommendation-assignment__condition {
+.answer-assignment__header,
+.answer-assignment__condition {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.recommendation-assignment__header {
+.answer-assignment__header {
   justify-content: space-between;
   margin-bottom: 10px;
 }
 
-.recommendation-assignment__conditions {
+.answer-assignment__conditions {
   display: grid;
   gap: 8px;
 }
 
-.recommendation-assignment__condition select {
+.answer-assignment__condition select {
   min-width: 0;
   flex: 1;
 }
 
-.recommendation-assignment__condition-label {
+.answer-assignment__condition-label {
   width: 76px;
   color: var(--muted);
   font-size: 12px;
   font-weight: 600;
 }
 
-.recommendation-assignment__remove,
-.recommendation-assignment__remove-condition {
+.answer-assignment__remove,
+.answer-assignment__remove-condition {
   padding: 4px 8px;
   color: var(--danger);
   background: transparent;
   border-color: transparent;
 }
 
-.recommendation-assignment__footer {
+.answer-assignment__footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -315,23 +315,23 @@
   margin-top: 12px;
 }
 
-.recommendation-assignment__footer button {
+.answer-assignment__footer button {
   padding: 6px 8px;
 }
 
-.recommendation-assignment details {
+.answer-assignment details {
   color: var(--muted);
   font-size: 12px;
 }
 
-.recommendation-assignment details label {
+.answer-assignment details label {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   margin: 8px 0 0;
 }
 
-.recommendation-assignment__priority {
+.answer-assignment__priority {
   width: 66px;
 }
 

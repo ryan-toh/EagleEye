@@ -23,7 +23,7 @@ export function safeMermaidLabel(value) {
   return safeLabel.length > 180 ? `${safeLabel.slice(0, 177)}...` : safeLabel;
 }
 
-export function recommendationEmoji(finalDecision) {
+export function answerEmoji(finalDecision) {
   const decision = str(finalDecision).toLowerCase();
   if (decision.includes('escalat')) return '🚨';
   if (decision.includes('clarif')) return '❓';
