@@ -139,7 +139,7 @@
 .global-search__result:hover,
 .global-search__result:focus-visible {
   color: var(--text);
-  background: var(--tint);
+  background: #f6f7fd;
   border-color: var(--accent);
 }
 
@@ -293,7 +293,7 @@
 }
 
 .answer-assignment__condition-label {
-  width: 76px;
+  width: 8px;
   color: var(--muted);
   font-size: 12px;
   font-weight: 600;

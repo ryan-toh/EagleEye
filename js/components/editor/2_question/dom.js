@@ -36,6 +36,7 @@ export function setQuestionSelectedState(questionId) {
 
 export function renderQuestionOptions(topicId) {
   const questions = topicId ? getQuestionsForTopic(topicId) : [];
+  questionEditorDom.createQuestionBtn.disabled = !topicId;
 
   if (!topicId) {
     questionEditorDom.questionPanelHint.textContent = 'Select a topic first';

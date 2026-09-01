@@ -60,6 +60,7 @@ export function setAnswerSelectedState(answerId) {
 }
 
 export function renderAnswerOptions(questionId) {
+  recomEditorDom.createAnswerBtn.disabled = !questionId;
   recomEditorDom.recommPanelHint.textContent = questionId
     ? 'Create or double click on answer to edit'
     : 'Select an question first';
@@ -319,7 +320,7 @@ function renderAssignmentCard(conditions = {}, priority) {
       <div class="answer-assignment__conditions">${conditionRows}</div>
       <div class="answer-assignment__footer">
         <button type="button" data-add-condition>Add another condition</button>
-        <span class="helper-text">Other leadingQuestions are not needed.</span>
+        <span class="helper-text">Other leading questions are not needed.</span>
         <details>
           <summary>Advanced</summary>
           ${priorityInput}
@@ -368,12 +369,12 @@ function renderCondition(selectedLeadingQuestionId = '', selectedValue = '') {
 
   return `
     <div class="answer-assignment__condition">
-      <span class="answer-assignment__condition-label">LeadingQuestion</span>
+      <span class="answer-assignment__condition-label">Q:</span>
       <select class="answer-assignment__leadingQuestion">
         <option value="">Choose a question</option>
         ${leadingQuestionOptions}
       </select>
-      <span class="answer-assignment__condition-label">Response</span>
+      <span class="answer-assignment__condition-label">R:</span>
       <select class="answer-assignment__value">${valueOptions}</select>
       <button
         class="answer-assignment__remove-condition"

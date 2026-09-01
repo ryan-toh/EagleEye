@@ -25,7 +25,7 @@
     <input
       id="editorGlobalSearch"
       type="search"
-      placeholder="Search topics, questions, leadingQuestions, and answers"
+      placeholder="Search topics, questions, leading questions, and answers"
       aria-describedby="editorGlobalSearchHint"
       autocomplete="off"
       disabled
@@ -72,6 +72,7 @@
           id="createQuestionBtn"
           class="editor-explorer__add-btn"
           type="button"
+          disabled
         >
           +
         </button>
@@ -88,15 +89,16 @@
 
     <section class="decision-explorer__pane decision-explorer__pane--params">
       <div class="decision-explorer__pane-header">
-        <h3>LeadingQuestions</h3>
+        <h3>Leading Questions</h3>
         <p class="helper-text" id="editorParamPanelHint">
-          Select an question first
+          Select a question first
         </p>
         <button
           id="createParamBtn"
           ,
           class="editor-explorer__add-btn"
           type="button"
+          disabled
         >
           +
         </button>
@@ -121,6 +123,7 @@
           id="createAnswerBtn"
           class="editor-explorer__add-btn"
           type="button"
+          disabled
         >
           +
         </button>

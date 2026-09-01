@@ -43,15 +43,16 @@ export function setParamSelectedState(paramId) {
 
 export function renderParamOptions(questionId) {
   const params = questionId ? getQuestionLeadingQuestions(questionId) : [];
+  paramEditorDom.createParamBtn.disabled = !questionId;
 
   if (!questionId) {
-    paramEditorDom.paramPanelHint.textContent = 'Select an question first';
-    renderExplorerEmpty(paramEditorDom.paramList, 'Select an question first');
+    paramEditorDom.paramPanelHint.textContent = 'Select a question first';
+    renderExplorerEmpty(paramEditorDom.paramList, 'Select a question first');
     return;
   }
 
   paramEditorDom.paramPanelHint.textContent =
-    'Create or double click on leadingQuestion to edit';
+    'Create or double click on a leading question to edit';
 
   renderExplorerList({
     container: paramEditorDom.paramList,
@@ -66,8 +67,8 @@ export function renderParamOptions(questionId) {
     icon: '✏️',
     emptyMessage: (allParams) =>
       allParams.length
-        ? 'No leadingQuestions match your search'
-        : 'No leadingQuestions found for this question',
+        ? 'No leading questions match your search'
+        : 'No leading questions found for this question',
   });
 }
 

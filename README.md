@@ -417,15 +417,15 @@ Questions represent specific problems or requests within a Topic.
 
 ---
 
-## Leading questions
+## Leading Questions
 
 Leading questions define the information the chatbot must collect before making a decision.
 
-### Create or Edit a Leading question
+### Create or Edit a Leading Question
 
 1. Select a Topic.
 2. Select an Question.
-3. Create or edit a Leading question.
+3. Create or edit a Leading Question.
 4. Enter:
 
    - **Question to ask**
@@ -434,7 +434,7 @@ Leading questions define the information the chatbot must collect before making 
    - Example values (optional)
    - Question order
 
-5. Save the Leading question.
+5. Save the Leading Question.
 
 Example allowed values:
 
@@ -444,7 +444,7 @@ low, medium, high
 
 > **Required Leading questions**
 >
-> Leading questions marked **required = yes** should be collected unless a fully matching decision rule can already provide a answer without them.
+> Leading Questions marked **required = yes** should be collected unless a fully matching decision rule can already provide a answer without them.
 
 ---
 
@@ -474,7 +474,7 @@ Allowed values provide the selectable responses used when defining assignments.
    - One or more assignments, each containing only the relevant leadingQuestions responses
    - Optional advanced priority
 
-> **No Leading question Answers**
+> **No Leading Questions?**
 >
 > You may assign a answer directly to an question if you do not have any leadingQuestionss.
 
@@ -513,7 +513,7 @@ Example:
 | Priority | Behaviour                          |
 | -------- | ---------------------------------- |
 | 1        | Escalate urgent or sensitive cases |
-| 2        | Return the standard answer |
+| 2        | Return the standard answer         |
 | 3        | Ask the user for clarification     |
 
 ---

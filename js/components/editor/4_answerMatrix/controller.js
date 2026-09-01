@@ -70,6 +70,11 @@ export function refreshAnswers(questionId) {
 /** Event Listener Functions */
 
 function onCreateAnswer() {
+  if (!getSelectedQuestion()) {
+    notify('Select an question before creating an answer.', 'error');
+    return;
+  }
+
   clearDialogError(recomEditorDom.recommDialog);
   renderAnswerFormFor('__new__', getSelectedQuestion());
   recomEditorDom.recommDialog.showModal();
