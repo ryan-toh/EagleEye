@@ -136,8 +136,8 @@
   text-align: left;
 }
 
-.global-search__result:hover,
-.global-search__result:focus-visible {
+button.global-search__result:hover:not(:disabled),
+button.global-search__result:focus-visible {
   color: var(--text);
   background: #f6f7fd;
   border-color: var(--accent);
