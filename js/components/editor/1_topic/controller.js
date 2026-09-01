@@ -55,7 +55,7 @@ export function onTopicClick(event) {
     if (
       !confirmDeletion(
         'topic',
-        'This also removes its questions, leadingQuestions, rules, and answers.',
+        'This also removes its questions, leading questions, rules, and answers.',
       )
     ) {
       return;

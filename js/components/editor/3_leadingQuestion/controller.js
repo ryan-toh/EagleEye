@@ -143,7 +143,7 @@ function onSaveLeadingQuestion() {
 
     closeDialog(paramEditorDom.paramDialog);
 
-    notify('Saved leadingQuestion. Download to see changes.', 'success');
+    notify('Saved leading question. Download to see changes.', 'success');
   } catch (error) {
     showDialogError(paramEditorDom.paramDialog, error.message);
   }
@@ -151,7 +151,7 @@ function onSaveLeadingQuestion() {
 
 function onCreateParam() {
   if (!getSelectedQuestion()) {
-    notify('Select an question before creating a leadingQuestion.', 'error');
+    notify('Select an question before creating a leading question.', 'error');
     return;
   }
 

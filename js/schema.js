@@ -102,7 +102,7 @@ export function getSampleWorkbookData() {
       {
         question_id: 'ISSUE_001',
         leadingQuestion_id: 'PARAM_001',
-        leadingQuestion_name: 'Sample LeadingQuestion',
+        leadingQuestion_name: 'Sample Leading Question',
         question_to_ask: 'Sample question to ask the user?',
         required: true,
         allowed_values: 'Yes; No',

@@ -65,7 +65,7 @@ function onQuestionClick(event) {
     if (
       !confirmDeletion(
         'question',
-        'This also removes its leadingQuestions, rules, and answers.',
+        'This also removes its leading questions, rules, and answers.',
       )
     ) {
       return;

@@ -295,7 +295,7 @@ function renderAssignmentForRule(rule) {
 }
 
 function renderMissingAllowedValuesMessage() {
-  return '<p class="helper-text">Add allowed values to leadingQuestions before adding an assignment.</p>';
+  return '<p class="helper-text">Add allowed values to leading questions before adding an assignment.</p>';
 }
 
 function renderNoAssignmentsMessage() {
