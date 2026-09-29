@@ -262,7 +262,9 @@ function validateRowFormats(key, row, location) {
 
 function validateWorkbookRelationships(workbookData) {
   const topicIds = new Set(workbookData.topics.map((row) => str(row.topic_id)));
-  const questionIds = new Set(workbookData.questions.map((row) => str(row.question_id)));
+  const questionIds = new Set(
+    workbookData.questions.map((row) => str(row.question_id)),
+  );
   const answerIds = new Set(
     workbookData.answers.map((row) => str(row.answer_id)),
   );
@@ -357,7 +359,11 @@ function getRequiredValueColumns(key) {
   return {
     topics: ['topic_id', 'topic_name'],
     questions: ['question_id', 'topic_id', 'question_name'],
-    leadingQuestions: ['question_id', 'leadingQuestion_id', 'leadingQuestion_name'],
+    leadingQuestions: [
+      'question_id',
+      'leadingQuestion_id',
+      'leadingQuestion_name',
+    ],
     rules: ['rule_id', 'question_id', 'conditions', 'answer_id'],
     answers: ['answer_id', 'final_decision'],
   }[key];

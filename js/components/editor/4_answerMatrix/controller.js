@@ -3,6 +3,8 @@ import {
   clearDialogError,
   closeDialog,
   confirmDeletion,
+  openDialog,
+  preserveDialogScrollPosition,
   showDialogError,
 } from '../../../ui/dialog.js';
 import { notify } from '../../../ui/notifications.js';
@@ -31,19 +33,11 @@ import {
 
 export function initRecomEditor() {
   initRecomEditorDom();
-  recomEditorDom.createAnswerBtn.addEventListener(
-    'click',
-    onCreateAnswer,
-  );
+  preserveDialogScrollPosition(recomEditorDom.recommDialog);
+  recomEditorDom.createAnswerBtn.addEventListener('click', onCreateAnswer);
   recomEditorDom.recommList.addEventListener('click', onAnswerClick);
-  recomEditorDom.recommList.addEventListener(
-    'dblclick',
-    onAnswerDoubleClick,
-  );
-  recomEditorDom.saveAnswerBtn.addEventListener(
-    'click',
-    onSaveAnswer,
-  );
+  recomEditorDom.recommList.addEventListener('dblclick', onAnswerDoubleClick);
+  recomEditorDom.saveAnswerBtn.addEventListener('click', onSaveAnswer);
   recomEditorDom.addAnswerAssignmentBtn.addEventListener(
     'click',
     addAnswerAssignment,
@@ -77,7 +71,7 @@ function onCreateAnswer() {
 
   clearDialogError(recomEditorDom.recommDialog);
   renderAnswerFormFor('__new__', getSelectedQuestion());
-  recomEditorDom.recommDialog.showModal();
+  openDialog(recomEditorDom.recommDialog);
 }
 
 function onAnswerClick(event) {
@@ -86,12 +80,7 @@ function onAnswerClick(event) {
 
   // deletion
   if (event.target.closest('.decision-explorer__delete')) {
-    if (
-      !confirmDeletion(
-        'answer',
-        'This also removes its matching rules.',
-      )
-    ) {
+    if (!confirmDeletion('answer', 'This also removes its matching rules.')) {
       return;
     }
     deleteAnswer(answerId);
@@ -117,7 +106,7 @@ function onAnswerDoubleClick(event) {
   setAnswerSelectedState(answerId);
   clearDialogError(recomEditorDom.recommDialog);
   renderAnswerFormFor(answerId, getSelectedQuestion());
-  recomEditorDom.recommDialog.showModal();
+  openDialog(recomEditorDom.recommDialog);
 }
 
 /** Internal Functions */
@@ -155,11 +144,7 @@ function onSaveAnswer() {
   }
 }
 
-function saveAssignmentsForSelectedQuestion(
-  questionId,
-  answerId,
-  assignments,
-) {
+function saveAssignmentsForSelectedQuestion(questionId, answerId, assignments) {
   if (!questionId) return 0;
   return saveAnswerAssignments(questionId, answerId, assignments);
 }

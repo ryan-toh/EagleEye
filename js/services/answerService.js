@@ -63,19 +63,13 @@ export function saveAnswer({
   return upsertAnswer({
     answer_id: id,
     final_decision: str(finalDecision) || 'Clarify',
-    answer_text:
-      str(answerText) ||
-      'Clarify before giving a final answer.',
+    answer_text: str(answerText) || 'Clarify before giving a final answer.',
     next_steps: nextSteps,
     escalation_note: escalationNote,
   });
 }
 
-export function saveAnswerAssignments(
-  questionId,
-  answerId,
-  assignments,
-) {
+export function saveAnswerAssignments(questionId, answerId, assignments) {
   if (!Array.isArray(assignments)) {
     return getAnswerAssignments(questionId, answerId).length;
   }
@@ -91,31 +85,18 @@ export function saveAnswerAssignments(
     let savedCount = 0;
 
     normalizedAssignments.forEach((assignment, index) => {
-      saveAnswerAssignment(
-        questionId,
-        answerId,
-        assignment,
-        index,
-      );
+      saveAnswerAssignment(questionId, answerId, assignment, index);
       savedCount = index + 1;
     });
 
-    removeUnselectedAnswerAssignments(
-      questionId,
-      answerId,
-      selectedKeys,
-    );
+    removeUnselectedAnswerAssignments(questionId, answerId, selectedKeys);
 
     return savedCount;
   });
 }
 
 /** Ensures one answer owns each condition combination within an question. */
-export function validateAnswerAssignments(
-  questionId,
-  answerId,
-  assignments,
-) {
+export function validateAnswerAssignments(questionId, answerId, assignments) {
   const normalizedAssignments = normalizeAnswerAssignments(assignments);
   const combinationKeys = new Set();
 
@@ -128,11 +109,11 @@ export function validateAnswerAssignments(
     }
     combinationKeys.add(combinationKey);
 
-    const existingRule = getRuleForCombination(questionId, assignment.conditions);
-    if (
-      existingRule &&
-      str(existingRule.answer_id) !== str(answerId)
-    ) {
+    const existingRule = getRuleForCombination(
+      questionId,
+      assignment.conditions,
+    );
+    if (existingRule && str(existingRule.answer_id) !== str(answerId)) {
       throw new Error(
         'This leadingQuestion combination is already assigned to another answer.',
       );
@@ -157,17 +138,9 @@ function getAssignmentConditionKeys(assignments) {
   return new Set(conditionKeys);
 }
 
-function saveAnswerAssignment(
-  questionId,
-  answerId,
-  assignment,
-  index,
-) {
+function saveAnswerAssignment(questionId, answerId, assignment, index) {
   const existingRule = getRuleForCombination(questionId, assignment.conditions);
-  if (
-    existingRule &&
-    str(existingRule.answer_id) !== str(answerId)
-  ) {
+  if (existingRule && str(existingRule.answer_id) !== str(answerId)) {
     throw new Error(
       'This leadingQuestion combination is already assigned to another answer.',
     );
@@ -189,11 +162,7 @@ function createRuleId() {
   return makeUniqueId('RULE', appState.rules, 'rule_id');
 }
 
-function removeUnselectedAnswerAssignments(
-  questionId,
-  answerId,
-  selectedKeys,
-) {
+function removeUnselectedAnswerAssignments(questionId, answerId, selectedKeys) {
   const savedRules = getAnswerAssignments(questionId, answerId);
 
   savedRules.forEach((rule) => {

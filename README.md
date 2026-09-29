@@ -321,7 +321,6 @@ Alternatively, you may restore the file you were editing previously.
 >
 > EagleEye saves all data up to the last time you clicked **Save** on each topic, question, leadingQuestions or answer.
 
-
 ---
 
 ## Viewing a Decision Tree
@@ -366,12 +365,12 @@ answers
 
 Different items require different selections before they can be created or edited.
 
-| Item           | Required Selection |
-| -------------- | ------------------ |
-| Topic          | None               |
-| Question          | Topic              |
-| Leading question      | Topic + Question      |
-| Answer | Topic + Question      |
+| Item             | Required Selection |
+| ---------------- | ------------------ |
+| Topic            | None               |
+| Question         | Topic              |
+| Leading question | Topic + Question   |
+| Answer           | Topic + Question   |
 
 You can either:
 
@@ -430,7 +429,7 @@ Leading questions define the information the chatbot must collect before making 
 
    - **Question to ask**
    - Required (Yes/No)
-   - Allowed values 
+   - Allowed values
    - Example values (optional)
    - Question order
 
@@ -670,9 +669,9 @@ example_phrases
 
 Example
 
-| question_id | topic_id | question_name        | question_description                      | example_phrases |
-| -------- | -------- | ----------------- | -------------------------------------- | --------------- |
-| I001     | T001     | Claim eligibility | Determines whether a claim may proceed | can I claim     |
+| question_id | topic_id | question_name     | question_description                   | example_phrases |
+| ----------- | -------- | ----------------- | -------------------------------------- | --------------- |
+| I001        | T001     | Claim eligibility | Determines whether a claim may proceed | can I claim     |
 
 > Every Question must reference an existing `topic_id`.
 
@@ -697,8 +696,8 @@ order
 Example
 
 | question_id | leadingQuestions_id | question_to_ask       | required | allowed_values    | example_values | order |
-| -------- | ------------ | --------------------- | -------- | ----------------- | -------------- | ----: |
-| I001     | severity     | What is the severity? | yes      | low, medium, high | urgent         |     1 |
+| ----------- | ------------------- | --------------------- | -------- | ----------------- | -------------- | ----: |
+| I001        | severity            | What is the severity? | yes      | low, medium, high | urgent         |     1 |
 
 ### Notes
 
@@ -726,8 +725,8 @@ priority
 Example
 
 | rule_id | question_id | conditions          | answer_id | priority |
-| ------- | -------- | ------------------- | ----------------- | -------: |
-| R001    | I001     | {"severity":"high"} | REC001            |        1 |
+| ------- | ----------- | ------------------- | --------- | -------: |
+| R001    | I001        | {"severity":"high"} | REC001    |        1 |
 
 ### Notes
 
@@ -754,9 +753,9 @@ escalation_note
 
 Example
 
-| answer_id | final_decision | answer_text                 | next_steps                    | escalation_note                |
-| ----------------- | -------------- | ----------------------------------- | ----------------------------- | ------------------------------ |
-| REC001            | Escalate       | Refer this case to a human officer. | Collect supporting documents. | Escalate to the relevant team. |
+| answer_id | final_decision | answer_text                         | next_steps                    | escalation_note                |
+| --------- | -------------- | ----------------------------------- | ----------------------------- | ------------------------------ |
+| REC001    | Escalate       | Refer this case to a human officer. | Collect supporting documents. | Escalate to the relevant team. |
 
 Recommended values for `final_decision`:
 
@@ -804,7 +803,6 @@ When modifying a knowledge base, follow these rules.
 ## `mermaid is not defined`
 
 Mermaid must be loaded before the application script.
-
 
 ### npm
 
@@ -879,18 +877,41 @@ The export service should always write workbook data from `appState`, not direct
 
 ---
 
+# AI providers
+
+The AI assistant depends on the generic `AiClient` contract in
+`js/services/aiAssistantClient.js`. An implementation exposes one method:
+
+```javascript
+await client.answer(question, options);
+```
+
+It returns the assistant answer as text. The built-in provider calls EagleEye's
+backend endpoint; backend credentials and upstream provider details never reach
+the browser. Additional providers can be registered without changing the
+assistant controller:
+
+```javascript
+registerAiProvider('my-provider', () => new MyAiClient());
+```
+
+The frontend uses the `backend` provider by default. Configure the upstream
+provider and credentials in `eagleEye-backend`, keeping them off the browser.
+
+---
+
 # Glossary
 
-| Term               | Description                                                       |
-| ------------------ | ----------------------------------------------------------------- |
-| Topic              | A broad category of user enquiries                                |
-| Question              | A specific problem within a Topic                                 |
+| Term                      | Description                                                       |
+| ------------------------- | ----------------------------------------------------------------- |
+| Topic                     | A broad category of user enquiries                                |
+| Question                  | A specific problem within a Topic                                 |
 | Leading question          | Information required before making a decision                     |
 | Required Leading question | Information that must be collected before recommending an outcome |
-| Allowed Values     | Valid responses for a Leading question                                   |
-| Decision Rule      | Conditions that determine which Answer is selected        |
-| Answer     | The chatbot's approved response                                   |
-| Escalation         | Referral to a human or higher-level process                       |
+| Allowed Values            | Valid responses for a Leading question                            |
+| Decision Rule             | Conditions that determine which Answer is selected                |
+| Answer                    | The chatbot's approved response                                   |
+| Escalation                | Referral to a human or higher-level process                       |
 
 ---
 

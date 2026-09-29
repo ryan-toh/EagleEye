@@ -30,8 +30,7 @@ test('answer assignments cannot reuse another answer combination', () => {
   ];
 
   assert.throws(
-    () =>
-      validateAnswerAssignments('ISSUE_ONE', 'REC_TWO', assignments),
+    () => validateAnswerAssignments('ISSUE_ONE', 'REC_TWO', assignments),
     /already assigned to another answer/,
   );
   assert.doesNotThrow(() =>
@@ -54,11 +53,7 @@ test('answer assignments reject duplicate combinations in one save', () => {
 
   assert.throws(
     () =>
-      validateAnswerAssignments(
-        'ISSUE_ONE',
-        'REC_TWO',
-        duplicateAssignments,
-      ),
+      validateAnswerAssignments('ISSUE_ONE', 'REC_TWO', duplicateAssignments),
     /only be assigned to one answer/,
   );
 });

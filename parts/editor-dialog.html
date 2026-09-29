@@ -47,7 +47,8 @@
       <textarea id="editorQuestionDescription" rows="3"></textarea>
     </label>
     <label
-      >Example phrases <textarea id="editorQuestionExamples" rows="3"></textarea>
+      >Example phrases
+      <textarea id="editorQuestionExamples" rows="3"></textarea>
     </label>
     <button id="saveQuestionBtn" type="button">Save question</button>
   </dialog>
@@ -68,7 +69,9 @@
     <label class="hidden"
       >LeadingQuestion ID <input id="editorLeadingQuestionId" type="text"
     /></label>
-    <label>LeadingQuestion name <input id="editorLeadingQuestionName" type="text" /></label>
+    <label
+      >LeadingQuestion name <input id="editorLeadingQuestionName" type="text"
+    /></label>
     <label
       >Question to ask
       <textarea id="editorLeadingQuestionQuestion" rows="3"></textarea>
@@ -98,7 +101,9 @@
     <label
       >Order <input id="editorLeadingQuestionOrder" type="number" min="1"
     /></label>
-    <button id="saveLeadingQuestionBtn" type="button">Save leadingQuestion</button>
+    <button id="saveLeadingQuestionBtn" type="button">
+      Save leadingQuestion
+    </button>
   </dialog>
 
   <dialog id="editorAnswerDialog" class="editor-card">
@@ -135,16 +140,12 @@
     <fieldset class="answer-assignments-fieldset">
       <legend>Assign when</legend>
       <p class="helper-text">
-        Add only the answers needed to give this answer. Any leadingQuestion
-        not included here is not needed for this answer.
+        Add only the answers needed to give this answer. Any leadingQuestion not
+        included here is not needed for this answer.
       </p>
       <div id="editorAnswerAssignments"></div>
-      <button id="addAnswerAssignmentBtn" type="button">
-        Add assignment
-      </button>
+      <button id="addAnswerAssignmentBtn" type="button">Add assignment</button>
     </fieldset>
-    <button id="saveAnswerBtn" type="button">
-      Save answer
-    </button>
+    <button id="saveAnswerBtn" type="button">Save answer</button>
   </dialog>
 </section>

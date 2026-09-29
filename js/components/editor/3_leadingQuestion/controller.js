@@ -17,6 +17,8 @@ import {
   clearDialogError,
   closeDialog,
   confirmDeletion,
+  openDialog,
+  preserveDialogScrollPosition,
   showDialogError,
 } from '../../../ui/dialog.js';
 import { notify } from '../../../ui/notifications.js';
@@ -37,16 +39,26 @@ const PARAMETER_DRAG_TYPE = 'application/x-eagle-eye-leadingQuestion';
 
 export function initParamEditor() {
   initParamEditorDom();
+  preserveDialogScrollPosition(paramEditorDom.paramDialog);
 
-  paramEditorDom.saveLeadingQuestionBtn.addEventListener('click', onSaveLeadingQuestion);
+  paramEditorDom.saveLeadingQuestionBtn.addEventListener(
+    'click',
+    onSaveLeadingQuestion,
+  );
   paramEditorDom.createParamBtn.addEventListener('click', onCreateParam);
   paramEditorDom.paramList.addEventListener('click', onParamClick);
   paramEditorDom.paramList.addEventListener('dblclick', onParamDblClick);
   paramEditorDom.paramList.addEventListener('dragstart', onParamDragStart);
   paramEditorDom.paramList.addEventListener('dragend', clearExplorerDragState);
 
-  questionEditorDom.questionList.addEventListener('dragover', onQuestionDragOver);
-  questionEditorDom.questionList.addEventListener('dragleave', onQuestionDragLeave);
+  questionEditorDom.questionList.addEventListener(
+    'dragover',
+    onQuestionDragOver,
+  );
+  questionEditorDom.questionList.addEventListener(
+    'dragleave',
+    onQuestionDragLeave,
+  );
   questionEditorDom.questionList.addEventListener('drop', onQuestionDrop);
   subscribeToQuestionSelection(handleQuestionSelection);
 }
@@ -100,7 +112,7 @@ function onParamDblClick(event) {
   }
 
   selectLeadingQuestionForEditing(paramId);
-  paramEditorDom.paramDialog.showModal();
+  openDialog(paramEditorDom.paramDialog);
 }
 
 /** Question related functions */
@@ -156,7 +168,7 @@ function onCreateParam() {
   }
 
   selectLeadingQuestionForEditing('__new__');
-  paramEditorDom.paramDialog.showModal();
+  openDialog(paramEditorDom.paramDialog);
 }
 
 function selectLeadingQuestionForEditing(paramId) {
@@ -187,7 +199,10 @@ function onQuestionDragLeave(event) {
 
 function onQuestionDrop(event) {
   const target = event.target.closest('[data-question-id]');
-  const draggedLeadingQuestionId = getExplorerDragId(event, PARAMETER_DRAG_TYPE);
+  const draggedLeadingQuestionId = getExplorerDragId(
+    event,
+    PARAMETER_DRAG_TYPE,
+  );
   clearExplorerDragState();
   if (!target || !draggedLeadingQuestionId) return;
 

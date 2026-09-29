@@ -1,0 +1,112 @@
+/* AI-assisted decision tree generation dialog. */
+.ai-assistant-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ai-assistant-dialog {
+  width: min(96vw, 1100px);
+  max-width: 1100px;
+  padding: 20px;
+}
+
+.ai-assistant-dialog:not([open]) {
+  display: none;
+}
+
+.ai-assistant-dialog[open] {
+  display: flex;
+}
+
+.ai-assistant-panel__header h2,
+.ai-assistant-panel__header .helper-text {
+  margin-bottom: 0;
+}
+
+.ai-assistant-panel__grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(360px, 1.2fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.ai-assistant-panel__form,
+.ai-assistant-panel__preview {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ai-assistant-panel__form textarea {
+  min-height: 0;
+}
+
+.ai-assistant-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-assistant-panel__actions #acceptAiTreeBtn {
+  background: var(--ok);
+}
+
+.ai-assistant-panel__actions #acceptAiTreeBtn:hover:not(:disabled) {
+  background: #195d38;
+}
+
+.ai-assistant-panel #aiFlowchart {
+  width: 100%;
+  height: clamp(250px, 45vh, 520px);
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+  background: #fafafa;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  contain: layout paint;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: pan-x pan-y;
+}
+
+.ai-assistant-panel .flowchart .mermaid {
+  display: flex;
+  justify-content: center;
+  width: max-content;
+  min-width: 100%;
+}
+
+.ai-assistant-panel .flowchart .mermaid svg {
+  display: block;
+  max-width: none !important;
+}
+
+.ai-assistant-panel #aiFlowchart:active {
+  cursor: grabbing;
+}
+
+@media (max-width: 900px) {
+  .ai-assistant-panel__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-assistant-panel #aiFlowchart {
+    height: clamp(220px, 40vh, 420px);
+  }
+}
+
+@media (max-width: 520px) {
+  .ai-assistant-panel {
+    padding: 16px;
+  }
+
+  .ai-assistant-panel__actions button {
+    flex: 1 1 100%;
+  }
+}

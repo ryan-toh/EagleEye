@@ -1,0 +1,80 @@
+<section class="dialog-panel">
+  <dialog
+    class="ai-assistant-panel ai-assistant-dialog"
+    id="ai-assistant-dialog"
+  >
+    <form method="dialog" class="editor-dialog__close-form">
+      <button
+        class="editor-dialog__close"
+        type="submit"
+        aria-label="Close AI decision-tree assistant"
+        title="Close"
+      >
+        ×
+      </button>
+    </form>
+    <header class="ai-assistant-panel__header">
+      <div>
+        <h2>AI decision-tree assistant</h2>
+        <p class="helper-text">
+          Describe a user question and the answer you want to provide. Review
+          the generated draft before adding it to your knowledge base.
+        </p>
+      </div>
+    </header>
+    <div class="ai-assistant-panel__grid">
+      <form id="aiDecisionTreeForm" class="ai-assistant-panel__form">
+        <label for="aiTopicSelect"
+          >Topic
+          <select id="aiTopicSelect">
+            <option value="">Let AI decide</option>
+          </select>
+          <span class="helper-text"
+            >Choose an existing topic, or let AI create a new one.</span
+          >
+        </label>
+        <label for="aiQuestionInput"
+          >User question
+          <textarea
+            id="aiQuestionInput"
+            rows="4"
+            required
+            placeholder="e.g. Can I claim medical expenses incurred overseas?"
+          ></textarea>
+        </label>
+        <label for="aiAnswerInput"
+          >Answer or policy guidance
+          <textarea
+            id="aiAnswerInput"
+            rows="7"
+            required
+            placeholder="e.g. Explain eligibility, exclusions, documents required, and when to escalate."
+          ></textarea>
+        </label>
+        <div class="ai-assistant-panel__actions">
+          <button id="generateAiTreeBtn" type="submit">
+            Generate decision tree
+          </button>
+          <button id="acceptAiTreeBtn" type="button" disabled>
+            Add approved tree
+          </button>
+        </div>
+        <p id="aiAssistantStatus" class="status" aria-live="polite"></p>
+      </form>
+      <section
+        class="ai-assistant-panel__preview"
+        aria-label="Generated decision tree preview"
+      >
+        <div class="flowchart-header">
+          <h3>Draft preview</h3>
+          <button id="copyAiMermaidBtn" type="button" disabled>
+            Copy Mermaid
+          </button>
+        </div>
+        <div id="aiFlowchart" class="flowchart empty">
+          Generate a draft to preview its decision tree.
+        </div>
+      </section>
+    </div>
+  </dialog>
+</section>

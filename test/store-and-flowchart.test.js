@@ -4,6 +4,7 @@ import {
   appState,
   loadState,
   makeUniqueId,
+  removeQuestion,
   removeTopic,
 } from '../js/appState.js';
 import { buildDecisionGraph } from '../js/components/preview/decisionGraph.js';
@@ -17,7 +18,9 @@ globalThis.localStorage = {
 function setState() {
   Object.assign(appState, {
     topics: [{ topic_id: 'TOPIC', topic_name: 'Topic' }],
-    questions: [{ question_id: 'ISSUE', topic_id: 'TOPIC', question_name: 'Question' }],
+    questions: [
+      { question_id: 'ISSUE', topic_id: 'TOPIC', question_name: 'Question' },
+    ],
     leadingQuestions: [
       {
         question_id: 'ISSUE',
@@ -93,6 +96,28 @@ test('cascade deletion persists one complete state snapshot', () => {
   assert.equal(writes.length, 5);
 });
 
+test('question deletion removes unconditional fallback rules', () => {
+  setState();
+  appState.rules.push({
+    rule_id: 'RULE_FALLBACK',
+    question_id: 'ISSUE',
+    conditions: '{}',
+    answer_id: 'REC_FALLBACK',
+    priority: 99,
+  });
+  appState.answers.push({
+    answer_id: 'REC_FALLBACK',
+    final_decision: 'Escalate',
+    answer_text: 'Review manually',
+  });
+
+  assert.doesNotThrow(() => removeQuestion('ISSUE'));
+  assert.deepEqual(appState.questions, []);
+  assert.deepEqual(appState.leadingQuestions, []);
+  assert.deepEqual(appState.rules, []);
+  assert.deepEqual(appState.answers, []);
+});
+
 test('loading a workbook replaces every existing state collection', () => {
   setState();
   loadState({
@@ -129,9 +154,7 @@ test('flowchart asks only rule-relevant questions', () => {
     topicName: appState.topics[0].topic_name,
     leadingQuestions: appState.leadingQuestions,
     rules: appState.rules,
-    answerById: new Map(
-      appState.answers.map((item) => [item.answer_id, item]),
-    ),
+    answerById: new Map(appState.answers.map((item) => [item.answer_id, item])),
   });
 
   assert.match(graph, /Relevant question/);

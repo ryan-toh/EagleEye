@@ -6,17 +6,26 @@ export function validateStateRelationships(state) {
   validateStateShape(state);
 
   const topicIds = new Set(state.topics.map((topic) => str(topic.topic_id)));
-  const questionIds = new Set(state.questions.map((question) => str(question.question_id)));
-  const answerIds = new Set(
-    state.answers.map((rec) => str(rec.answer_id)),
+  const questionIds = new Set(
+    state.questions.map((question) => str(question.question_id)),
   );
+  const answerIds = new Set(state.answers.map((rec) => str(rec.answer_id)));
 
   assertNoOrphans(state.questions, 'topic_id', topicIds, 'questions');
-  assertNoOrphans(state.leadingQuestions, 'question_id', questionIds, 'leadingQuestions');
+  assertNoOrphans(
+    state.leadingQuestions,
+    'question_id',
+    questionIds,
+    'leadingQuestions',
+  );
   assertNoOrphans(state.rules, 'question_id', questionIds, 'rules');
   assertNoOrphans(state.rules, 'answer_id', answerIds, 'rules');
   state.rules.forEach((rule) =>
-    validateRuleConditions(rule.conditions, rule.question_id, state.leadingQuestions),
+    validateRuleConditions(
+      rule.conditions,
+      rule.question_id,
+      state.leadingQuestions,
+    ),
   );
   assertUniqueRuleCombinations(state.rules);
 }

@@ -52,12 +52,22 @@ export function referencesLeadingQuestion(conditions, leadingQuestionId) {
   return parsed ? Object.hasOwn(parsed, str(leadingQuestionId)) : false;
 }
 
-export function validateRuleConditions(conditions, questionId, leadingQuestions) {
+export function validateRuleConditions(
+  conditions,
+  questionId,
+  leadingQuestions,
+) {
   const parsed = parseConditions(conditions);
   const leadingQuestionsById = new Map(
     leadingQuestions
-      .filter((leadingQuestion) => str(leadingQuestion.question_id) === str(questionId))
-      .map((leadingQuestion) => [str(leadingQuestion.leadingQuestion_id), leadingQuestion]),
+      .filter(
+        (leadingQuestion) =>
+          str(leadingQuestion.question_id) === str(questionId),
+      )
+      .map((leadingQuestion) => [
+        str(leadingQuestion.leadingQuestion_id),
+        leadingQuestion,
+      ]),
   );
 
   Object.entries(parsed).forEach(([leadingQuestionId, response]) => {

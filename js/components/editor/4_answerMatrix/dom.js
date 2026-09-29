@@ -29,22 +29,12 @@ export function initRecomEditorDom() {
     recommPanelHint: document.getElementById('editorAnswerPanelHint'),
     recommDialog: document.getElementById('editorAnswerDialog'),
     answerId: document.getElementById('editorAnswerId'),
-    answerDecision: document.getElementById(
-      'editorAnswerDecision',
-    ),
+    answerDecision: document.getElementById('editorAnswerDecision'),
     answerText: document.getElementById('editorAnswerText'),
-    answerNextSteps: document.getElementById(
-      'editorAnswerNextSteps',
-    ),
-    answerEscalationNote: document.getElementById(
-      'editorAnswerEscalationNote',
-    ),
-    answerAssignments: document.getElementById(
-      'editorAnswerAssignments',
-    ),
-    addAnswerAssignmentBtn: document.getElementById(
-      'addAnswerAssignmentBtn',
-    ),
+    answerNextSteps: document.getElementById('editorAnswerNextSteps'),
+    answerEscalationNote: document.getElementById('editorAnswerEscalationNote'),
+    answerAssignments: document.getElementById('editorAnswerAssignments'),
+    addAnswerAssignmentBtn: document.getElementById('addAnswerAssignmentBtn'),
     saveAnswerBtn: document.getElementById('saveAnswerBtn'),
   });
 }
@@ -52,11 +42,7 @@ export function initRecomEditorDom() {
 /** Controller Functions */
 
 export function setAnswerSelectedState(answerId) {
-  setExplorerSelectedState(
-    recomEditorDom.recommList,
-    'answerId',
-    answerId,
-  );
+  setExplorerSelectedState(recomEditorDom.recommList, 'answerId', answerId);
 }
 
 export function renderAnswerOptions(questionId) {
@@ -98,24 +84,18 @@ export function renderAnswerFormFor(answerId, questionId) {
     (item) => str(item.answer_id) === str(answerId),
   );
   recomEditorDom.answerId.value =
-    answer?.answer_id ||
-    makeUniqueId('REC', appState.answers, 'answer_id');
-  recomEditorDom.answerDecision.value =
-    answer?.final_decision || 'Answered';
-  recomEditorDom.answerText.value =
-    answer?.answer_text || '';
-  recomEditorDom.answerNextSteps.value =
-    answer?.next_steps || '';
-  recomEditorDom.answerEscalationNote.value =
-    answer?.escalation_note || '';
+    answer?.answer_id || makeUniqueId('REC', appState.answers, 'answer_id');
+  recomEditorDom.answerDecision.value = answer?.final_decision || 'Answered';
+  recomEditorDom.answerText.value = answer?.answer_text || '';
+  recomEditorDom.answerNextSteps.value = answer?.next_steps || '';
+  recomEditorDom.answerEscalationNote.value = answer?.escalation_note || '';
   renderAssignmentChoices(questionId, answer?.answer_id);
 }
 
 export function collectAnswerAssignments() {
-  const assignmentElements =
-    recomEditorDom.answerAssignments.querySelectorAll(
-      '[data-answer-assignment]',
-    );
+  const assignmentElements = recomEditorDom.answerAssignments.querySelectorAll(
+    '[data-answer-assignment]',
+  );
 
   return [...assignmentElements].map(readAnswerAssignment);
 }
@@ -142,8 +122,7 @@ export function handleAnswerAssignmentClick(event) {
       .querySelector('.answer-assignment__conditions')
       .insertAdjacentHTML('beforeend', renderCondition());
     if (assignment.dataset.autoPriority === 'true') {
-      assignment.querySelector('.answer-assignment__priority').value =
-        1;
+      assignment.querySelector('.answer-assignment__priority').value = 1;
     }
     return;
   }
@@ -162,9 +141,8 @@ export function handleAnswerAssignmentClick(event) {
 
 export function handleAnswerAssignmentChange(event) {
   if (event.target.matches('.answer-assignment__priority')) {
-    event.target.closest(
-      '[data-answer-assignment]',
-    ).dataset.autoPriority = 'false';
+    event.target.closest('[data-answer-assignment]').dataset.autoPriority =
+      'false';
     return;
   }
 
@@ -193,10 +171,7 @@ function renderAssignmentChoices(questionId, answerId) {
   recomEditorDom.addAnswerAssignmentBtn.disabled =
     !hasAssignmentLeadingQuestions;
 
-  const assignments = getAssignmentsForAnswer(
-    questionId,
-    answerId,
-  );
+  const assignments = getAssignmentsForAnswer(questionId, answerId);
 
   if (!hasAssignmentLeadingQuestions) {
     renderAssignmentsWithoutAllowedValues(questionId, assignments);
@@ -207,10 +182,7 @@ function renderAssignmentChoices(questionId, answerId) {
 }
 
 function getAnswerMeta(questionId, answer) {
-  const assignments = getAnswerAssignments(
-    questionId,
-    answer.answer_id,
-  );
+  const assignments = getAnswerAssignments(questionId, answer.answer_id);
   const assignmentCount = assignments.length;
   const assignmentLabel = assignmentCount === 1 ? 'assignment' : 'assignments';
   const responseText = answer.answer_text || 'No response text';
@@ -261,7 +233,8 @@ function renderAssignmentsWithoutAllowedValues(questionId, assignments) {
     return;
   }
 
-  const hasLeadingQuestions = getQuestionLeadingQuestions(questionId).length > 0;
+  const hasLeadingQuestions =
+    getQuestionLeadingQuestions(questionId).length > 0;
   recomEditorDom.answerAssignments.innerHTML = hasLeadingQuestions
     ? renderMissingAllowedValuesMessage()
     : renderDirectAssignmentCard();
@@ -269,8 +242,7 @@ function renderAssignmentsWithoutAllowedValues(questionId, assignments) {
 
 function renderAssignmentsWithAllowedValues(assignments) {
   if (!assignments.length) {
-    recomEditorDom.answerAssignments.innerHTML =
-      renderNoAssignmentsMessage();
+    recomEditorDom.answerAssignments.innerHTML = renderNoAssignmentsMessage();
     return;
   }
 
@@ -305,7 +277,9 @@ function renderNoAssignmentsMessage() {
 function renderAssignmentCard(conditions = {}, priority) {
   const entries = Object.entries(conditions);
   const conditionRows = (entries.length ? entries : [['', '']])
-    .map(([leadingQuestionId, value]) => renderCondition(leadingQuestionId, value))
+    .map(([leadingQuestionId, value]) =>
+      renderCondition(leadingQuestionId, value),
+    )
     .join('');
   const defaultPriority = 1;
   const autoPriority = priority ? 'false' : 'true';
@@ -364,8 +338,13 @@ function renderPriorityInput(priority) {
 }
 
 function renderCondition(selectedLeadingQuestionId = '', selectedValue = '') {
-  const leadingQuestionOptions = renderLeadingQuestionOptions(selectedLeadingQuestionId);
-  const valueOptions = renderValueOptions(selectedLeadingQuestionId, selectedValue);
+  const leadingQuestionOptions = renderLeadingQuestionOptions(
+    selectedLeadingQuestionId,
+  );
+  const valueOptions = renderValueOptions(
+    selectedLeadingQuestionId,
+    selectedValue,
+  );
 
   return `
     <div class="answer-assignment__condition">
@@ -389,15 +368,21 @@ function renderCondition(selectedLeadingQuestionId = '', selectedValue = '') {
 
 function renderLeadingQuestionOptions(selectedLeadingQuestionId) {
   return assignmentLeadingQuestions
-    .map((leadingQuestion) => renderLeadingQuestionOption(leadingQuestion, selectedLeadingQuestionId))
+    .map((leadingQuestion) =>
+      renderLeadingQuestionOption(leadingQuestion, selectedLeadingQuestionId),
+    )
     .join('');
 }
 
-function renderLeadingQuestionOption(leadingQuestion, selectedLeadingQuestionId) {
+function renderLeadingQuestionOption(
+  leadingQuestion,
+  selectedLeadingQuestionId,
+) {
   const leadingQuestionId = str(leadingQuestion.leadingQuestion_id);
   const isSelected = leadingQuestionId === str(selectedLeadingQuestionId);
   const selectedAttribute = isSelected ? 'selected' : '';
-  const label = leadingQuestion.question_to_ask || leadingQuestion.leadingQuestion_name;
+  const label =
+    leadingQuestion.question_to_ask || leadingQuestion.leadingQuestion_name;
 
   return `<option value="${escapeHtml(leadingQuestionId)}" ${selectedAttribute}>${escapeHtml(label)}</option>`;
 }
@@ -406,7 +391,9 @@ function renderValueOptions(leadingQuestionId, selectedValue = '') {
   const leadingQuestion = assignmentLeadingQuestions.find(
     (item) => str(item.leadingQuestion_id) === str(leadingQuestionId),
   );
-  const values = leadingQuestion ? parseAllowedValues(leadingQuestion.allowed_values) : [];
+  const values = leadingQuestion
+    ? parseAllowedValues(leadingQuestion.allowed_values)
+    : [];
   const responseOptions = values
     .map((value) => renderValueOption(value, selectedValue))
     .join('');

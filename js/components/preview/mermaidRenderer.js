@@ -7,7 +7,7 @@ export async function renderMermaid(
   isCurrentRequest = () => true,
 ) {
   if (!isCurrentRequest()) return { ok: false, stale: true };
-  
+
   targetElement.classList.remove('empty');
   targetElement.innerHTML = '<div class="mermaid"></div>';
 

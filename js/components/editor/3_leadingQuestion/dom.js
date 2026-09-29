@@ -17,8 +17,12 @@ export function initParamEditorDom() {
   Object.assign(paramEditorDom, {
     leadingQuestionId: document.getElementById('editorLeadingQuestionId'),
     leadingQuestionName: document.getElementById('editorLeadingQuestionName'),
-    leadingQuestionQuestion: document.getElementById('editorLeadingQuestionQuestion'),
-    leadingQuestionRequired: document.getElementById('editorLeadingQuestionRequired'),
+    leadingQuestionQuestion: document.getElementById(
+      'editorLeadingQuestionQuestion',
+    ),
+    leadingQuestionRequired: document.getElementById(
+      'editorLeadingQuestionRequired',
+    ),
     leadingQuestionAllowedValues: document.getElementById(
       'editorLeadingQuestionAllowedValues',
     ),
@@ -77,7 +81,9 @@ export function getClickedParamId(event) {
 }
 
 export function renderParamFormFor(leadingQuestionId, questionId) {
-  const leadingQuestions = questionId ? getQuestionLeadingQuestions(questionId) : [];
+  const leadingQuestions = questionId
+    ? getQuestionLeadingQuestions(questionId)
+    : [];
   const leadingQuestion = leadingQuestions.find(
     (item) => str(item.leadingQuestion_id) === str(leadingQuestionId),
   );
@@ -85,12 +91,18 @@ export function renderParamFormFor(leadingQuestionId, questionId) {
   paramEditorDom.leadingQuestionId.value =
     leadingQuestion?.leadingQuestion_id ||
     makeUniqueId('PARAM', appState.leadingQuestions, 'leadingQuestion_id');
-  paramEditorDom.leadingQuestionName.value = leadingQuestion?.leadingQuestion_name || '';
-  paramEditorDom.leadingQuestionQuestion.value = leadingQuestion?.question_to_ask || '';
+  paramEditorDom.leadingQuestionName.value =
+    leadingQuestion?.leadingQuestion_name || '';
+  paramEditorDom.leadingQuestionQuestion.value =
+    leadingQuestion?.question_to_ask || '';
   paramEditorDom.leadingQuestionRequired.value =
-    leadingQuestion == null || isRequired(leadingQuestion.required) ? 'yes' : 'no';
-  paramEditorDom.leadingQuestionAllowedValues.value = leadingQuestion?.allowed_values || '';
-  paramEditorDom.leadingQuestionExampleValues.value = leadingQuestion?.example_values || '';
+    leadingQuestion == null || isRequired(leadingQuestion.required)
+      ? 'yes'
+      : 'no';
+  paramEditorDom.leadingQuestionAllowedValues.value =
+    leadingQuestion?.allowed_values || '';
+  paramEditorDom.leadingQuestionExampleValues.value =
+    leadingQuestion?.example_values || '';
   paramEditorDom.leadingQuestionOrder.value =
     leadingQuestion?.order || leadingQuestions.length + 1;
 }

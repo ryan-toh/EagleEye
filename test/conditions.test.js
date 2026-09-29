@@ -30,7 +30,11 @@ test('condition helpers handle malformed input safely', () => {
 
 test('rule conditions must reference an question leadingQuestion and allowed value', () => {
   const leadingQuestions = [
-    { question_id: 'ISSUE_A', leadingQuestion_id: 'P', allowed_values: 'Yes; No' },
+    {
+      question_id: 'ISSUE_A',
+      leadingQuestion_id: 'P',
+      allowed_values: 'Yes; No',
+    },
   ];
 
   assert.deepEqual(
@@ -42,7 +46,8 @@ test('rule conditions must reference an question leadingQuestion and allowed val
     /not allowed/,
   );
   assert.throws(
-    () => validateRuleConditions('{"OTHER":"Yes"}', 'ISSUE_A', leadingQuestions),
+    () =>
+      validateRuleConditions('{"OTHER":"Yes"}', 'ISSUE_A', leadingQuestions),
     /does not belong/,
   );
 });

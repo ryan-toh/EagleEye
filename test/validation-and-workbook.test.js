@@ -9,7 +9,11 @@ function createValidState() {
     topics: [{ topic_id: 'TOPIC' }],
     questions: [{ question_id: 'ISSUE', topic_id: 'TOPIC' }],
     leadingQuestions: [
-      { question_id: 'ISSUE', leadingQuestion_id: 'PARAM', allowed_values: 'Yes; No' },
+      {
+        question_id: 'ISSUE',
+        leadingQuestion_id: 'PARAM',
+        allowed_values: 'Yes; No',
+      },
     ],
     rules: [
       {

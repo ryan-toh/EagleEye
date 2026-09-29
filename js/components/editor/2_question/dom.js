@@ -31,7 +31,11 @@ export function initQuestionEditorDom() {
 /** Controller Functions */
 
 export function setQuestionSelectedState(questionId) {
-  setExplorerSelectedState(questionEditorDom.questionList, 'questionId', questionId);
+  setExplorerSelectedState(
+    questionEditorDom.questionList,
+    'questionId',
+    questionId,
+  );
 }
 
 export function renderQuestionOptions(topicId) {
@@ -73,8 +77,10 @@ export function renderQuestionFormFor(questionId) {
   const question = questionId === '__new__' ? null : getQuestion(questionId);
 
   questionEditorDom.questionId.value =
-    question?.question_id || makeUniqueId('ISSUE', appState.questions, 'question_id');
+    question?.question_id ||
+    makeUniqueId('ISSUE', appState.questions, 'question_id');
   questionEditorDom.questionName.value = question?.question_name || '';
-  questionEditorDom.questionDescription.value = question?.question_description || '';
+  questionEditorDom.questionDescription.value =
+    question?.question_description || '';
   questionEditorDom.questionExamples.value = question?.example_phrases || '';
 }

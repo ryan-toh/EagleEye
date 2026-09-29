@@ -1,7 +1,11 @@
 import { readUiState, saveUiState } from '../persistence/localState.js';
 import { str } from '../utils.js';
 
-export const uiState = { step: 1, lastMermaid: '' };
+export const uiState = {
+  step: 1,
+  lastMermaid: '',
+  aiAssistantAvailable: false,
+};
 
 export function loadUiState() {
   Object.assign(uiState, readUiState());

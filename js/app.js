@@ -2,6 +2,7 @@ import { validateLibraries } from './utils.js';
 import { initEditor } from './components/editor/shared/controller.js';
 import { initUpload } from './components/upload/controller.js';
 import { initPreview } from './components/preview/controller.js';
+import { initAiAssistant } from './components/ai-assistant/controller.js';
 
 /**
  * Main js entry point.
@@ -47,4 +48,5 @@ function initApp() {
   initUpload();
   initEditor();
   initPreview();
+  initAiAssistant();
 }

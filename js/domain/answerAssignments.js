@@ -7,7 +7,9 @@ export function normalizeAnswerAssignments(assignments) {
       const normalizedLeadingQuestionId = str(leadingQuestionId);
       const normalizedValue = str(value);
       if (!normalizedLeadingQuestionId || !normalizedValue) {
-        throw new Error('Choose a leadingQuestion and response for every condition.');
+        throw new Error(
+          'Choose a leadingQuestion and response for every condition.',
+        );
       }
       if (Object.hasOwn(conditions, normalizedLeadingQuestionId)) {
         throw new Error(

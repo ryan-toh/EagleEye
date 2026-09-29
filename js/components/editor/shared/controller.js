@@ -3,7 +3,10 @@ import {
   initTopicEditor,
   setTopicOptions,
 } from '../1_topic/controller.js';
-import { getSelectedQuestion, initQuestionEditor } from '../2_question/controller.js';
+import {
+  getSelectedQuestion,
+  initQuestionEditor,
+} from '../2_question/controller.js';
 import {
   selectTopic,
   subscribeToQuestionPreviewRefresh,

@@ -3,6 +3,8 @@ import {
   clearDialogError,
   closeDialog,
   confirmDeletion,
+  openDialog,
+  preserveDialogScrollPosition,
   showDialogError,
 } from '../../../ui/dialog.js';
 import { notify } from '../../../ui/notifications.js';
@@ -18,6 +20,7 @@ import { removeTopic, upsertTopic } from '../../../appState.js';
 
 export function initTopicEditor() {
   initTopicEditorDom();
+  preserveDialogScrollPosition(topicEditorDom.topicDialog);
 
   topicEditorDom.saveTopicBtn.addEventListener('click', onSaveTopic);
   topicEditorDom.createTopicBtn.addEventListener('click', onCreateTopic);
@@ -84,7 +87,7 @@ function onTopicDblClick(event) {
   }
 
   selectTopicForEditing(topicId);
-  topicEditorDom.topicDialog.showModal();
+  openDialog(topicEditorDom.topicDialog);
 }
 
 function onSaveTopic() {
@@ -119,7 +122,7 @@ export function setDomTopicValue(value) {
 
 function onCreateTopic() {
   selectTopicForEditing('__new__');
-  topicEditorDom.topicDialog.showModal();
+  openDialog(topicEditorDom.topicDialog);
 }
 
 function selectTopicForEditing(topicId) {

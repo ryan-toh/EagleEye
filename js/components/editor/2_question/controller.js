@@ -14,6 +14,8 @@ import {
   clearDialogError,
   closeDialog,
   confirmDeletion,
+  openDialog,
+  preserveDialogScrollPosition,
   showDialogError,
 } from '../../../ui/dialog.js';
 import { notify } from '../../../ui/notifications.js';
@@ -37,13 +39,26 @@ const ISSUE_DRAG_TYPE = 'application/x-eagle-eye-question';
 
 export function initQuestionEditor() {
   initQuestionEditorDom();
+  preserveDialogScrollPosition(questionEditorDom.questionDialog);
 
   questionEditorDom.saveQuestionBtn.addEventListener('click', onSaveQuestion);
-  questionEditorDom.createQuestionBtn.addEventListener('click', onCreateQuestion);
+  questionEditorDom.createQuestionBtn.addEventListener(
+    'click',
+    onCreateQuestion,
+  );
   questionEditorDom.questionList.addEventListener('click', onQuestionClick);
-  questionEditorDom.questionList.addEventListener('dblclick', onQuestionDblClick);
-  questionEditorDom.questionList.addEventListener('dragstart', onQuestionDragStart);
-  questionEditorDom.questionList.addEventListener('dragend', clearExplorerDragState);
+  questionEditorDom.questionList.addEventListener(
+    'dblclick',
+    onQuestionDblClick,
+  );
+  questionEditorDom.questionList.addEventListener(
+    'dragstart',
+    onQuestionDragStart,
+  );
+  questionEditorDom.questionList.addEventListener(
+    'dragend',
+    clearExplorerDragState,
+  );
 
   topicEditorDom.topicList.addEventListener('dragover', onTopicDragOver);
   topicEditorDom.topicList.addEventListener('dragleave', onTopicDragLeave);
@@ -96,7 +111,7 @@ function onQuestionDblClick(event) {
   }
 
   selectQuestionForEditing(questionId);
-  questionEditorDom.questionDialog.showModal();
+  openDialog(questionEditorDom.questionDialog);
 }
 
 /** Shared Functions */
@@ -163,7 +178,7 @@ function onCreateQuestion() {
   }
 
   selectQuestionForEditing('__new__');
-  questionEditorDom.questionDialog.showModal();
+  openDialog(questionEditorDom.questionDialog);
 }
 
 function selectQuestionForEditing(questionId) {
@@ -200,7 +215,10 @@ function onTopicDrop(event) {
 
   event.preventDefault();
   try {
-    const movedQuestion = moveQuestionToTopic(draggedQuestionId, target.dataset.topicId);
+    const movedQuestion = moveQuestionToTopic(
+      draggedQuestionId,
+      target.dataset.topicId,
+    );
     handleTopicSelection(getSelectedTopic());
     notify(
       `Moved ${movedQuestion.question_name}. Download to save changes.`,

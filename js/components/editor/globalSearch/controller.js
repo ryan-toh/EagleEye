@@ -49,21 +49,26 @@ function createSearchSources() {
       getTitle: (question) => question.question_name,
       getContext: (question) => getTopicName(question.topic_id),
       fields: [{ name: 'question_name', weight: 8 }],
-      onSelect: (question) => navigateToQuestion(question.topic_id, question.question_id),
+      onSelect: (question) =>
+        navigateToQuestion(question.topic_id, question.question_id),
     },
     {
       type: 'leadingQuestion',
       getItems: () => appState.leadingQuestions,
       getId: (leadingQuestion) => leadingQuestion.leadingQuestion_id,
       getTitle: (leadingQuestion) => leadingQuestion.leadingQuestion_name,
-      getContext: (leadingQuestion) => getQuestionContext(leadingQuestion.question_id),
+      getContext: (leadingQuestion) =>
+        getQuestionContext(leadingQuestion.question_id),
       fields: [
         { name: 'leadingQuestion_name', weight: 8 },
         { name: 'question_to_ask', weight: 4 },
         { name: 'allowed_values', weight: 2 },
       ],
       onSelect: (leadingQuestion) =>
-        navigateToLeadingQuestion(leadingQuestion.question_id, leadingQuestion.leadingQuestion_id),
+        navigateToLeadingQuestion(
+          leadingQuestion.question_id,
+          leadingQuestion.leadingQuestion_id,
+        ),
     },
     {
       type: 'answer',
@@ -185,9 +190,7 @@ function getQuestionContext(questionId) {
 
 function getAnswerContext(answer) {
   const rules = appState.rules.filter(
-    (rule) =>
-      String(rule.answer_id) ===
-      String(answer.answer_id),
+    (rule) => String(rule.answer_id) === String(answer.answer_id),
   );
   if (!rules.length) return 'Not assigned to an question';
   const context = getQuestionContext(rules[0].question_id);
@@ -217,9 +220,7 @@ function navigateToLeadingQuestion(questionId, leadingQuestionId) {
 
 function navigateToAnswer(answer) {
   const rule = appState.rules.find(
-    (item) =>
-      String(item.answer_id) ===
-      String(answer.answer_id),
+    (item) => String(item.answer_id) === String(answer.answer_id),
   );
   if (!rule) return;
   const question = appState.questions.find(

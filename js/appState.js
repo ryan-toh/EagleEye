@@ -78,7 +78,9 @@ export function getQuestionsForTopic(topicId) {
 }
 
 export function getQuestion(questionId) {
-  return appState.questions.find((question) => str(question.question_id) === str(questionId));
+  return appState.questions.find(
+    (question) => str(question.question_id) === str(questionId),
+  );
 }
 
 export function getTopic(topicId) {
@@ -107,22 +109,16 @@ export function getQuestionRules(questionId) {
 }
 
 function getAnswer(answerId) {
-  return appState.answers.find(
-    (rec) => str(rec.answer_id) === str(answerId),
-  );
+  return appState.answers.find((rec) => str(rec.answer_id) === str(answerId));
 }
 
 export function getAnswersForRules(rules) {
   const ids = new Set(rules.map((rule) => str(rule.answer_id)));
-  return appState.answers.filter((rec) =>
-    ids.has(str(rec.answer_id)),
-  );
+  return appState.answers.filter((rec) => ids.has(str(rec.answer_id)));
 }
 
 export function getAnswerMap() {
-  return new Map(
-    appState.answers.map((rec) => [str(rec.answer_id), rec]),
-  );
+  return new Map(appState.answers.map((rec) => [str(rec.answer_id), rec]));
 }
 
 export function upsertTopic(topic) {
@@ -149,7 +145,11 @@ export function upsertQuestion(question) {
     example_phrases: str(question.example_phrases),
   };
 
-  requireFields(normalized, ['question_id', 'topic_id', 'question_name'], 'question');
+  requireFields(
+    normalized,
+    ['question_id', 'topic_id', 'question_name'],
+    'question',
+  );
 
   if (!getTopic(normalized.topic_id)) {
     throw new Error(
@@ -171,7 +171,10 @@ export function upsertLeadingQuestion(leadingQuestion) {
     required: str(leadingQuestion.required || 'yes'),
     allowed_values: str(leadingQuestion.allowed_values),
     example_values: str(leadingQuestion.example_values),
-    order: str(leadingQuestion.order || nextLeadingQuestionOrder(leadingQuestion.question_id)),
+    order: str(
+      leadingQuestion.order ||
+        nextLeadingQuestionOrder(leadingQuestion.question_id),
+    ),
   };
 
   requireFields(
@@ -217,9 +220,13 @@ export function moveQuestionToTopic(questionId, topicId) {
   const targetTopic = getTopic(topicId);
 
   if (!question)
-    throw new Error(`Cannot move question: question_id ${questionId} does not exist.`);
+    throw new Error(
+      `Cannot move question: question_id ${questionId} does not exist.`,
+    );
   if (!targetTopic)
-    throw new Error(`Cannot move question: topic_id ${topicId} does not exist.`);
+    throw new Error(
+      `Cannot move question: topic_id ${topicId} does not exist.`,
+    );
   if (str(question.topic_id) === str(topicId)) return question;
 
   question.topic_id = str(topicId);
@@ -243,10 +250,13 @@ export function moveLeadingQuestionToQuestion(leadingQuestionId, questionId) {
       throw new Error(
         `Cannot move leadingQuestion: question_id ${questionId} does not exist.`,
       );
-    if (str(leadingQuestion.question_id) === str(questionId)) return leadingQuestion;
+    if (str(leadingQuestion.question_id) === str(questionId))
+      return leadingQuestion;
 
     appState.rules
-      .filter((rule) => referencesLeadingQuestion(rule.conditions, leadingQuestionId))
+      .filter((rule) =>
+        referencesLeadingQuestion(rule.conditions, leadingQuestionId),
+      )
       .map((rule) => rule.rule_id)
       .forEach(removeRule);
     leadingQuestion.question_id = str(questionId);
@@ -336,6 +346,13 @@ Deletes all leadingQuestions, rules & answers associated with the questionId
 */
 export function removeQuestion(questionId) {
   transaction(() => {
+    // Remove every rule owned by the question first. This includes
+    // unconditional fallback rules, which do not reference a leading question
+    // and therefore cannot be removed by removeLeadingQuestion().
+    appState.rules
+      .filter((rule) => str(rule.question_id) === str(questionId))
+      .map((rule) => rule.rule_id)
+      .forEach(removeRule);
     appState.leadingQuestions
       .filter((param) => str(param.question_id) === str(questionId))
       .map((param) => param.leadingQuestion_id)

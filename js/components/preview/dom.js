@@ -9,11 +9,15 @@ export function initPreviewDomElements() {
     rulesList: document.getElementById('rulesList'),
     answersList: document.getElementById('answersList'),
     questionSummaryName: document.getElementById('questionSummaryName'),
-    questionSummaryDescription: document.getElementById('questionSummaryDescription'),
+    questionSummaryDescription: document.getElementById(
+      'questionSummaryDescription',
+    ),
     leadingQuestionCount: document.getElementById('leadingQuestionCount'),
     ruleCount: document.getElementById('ruleCount'),
     answerCount: document.getElementById('answerCount'),
-    leadingQuestionCardCount: document.getElementById('leadingQuestionCardCount'),
+    leadingQuestionCardCount: document.getElementById(
+      'leadingQuestionCardCount',
+    ),
     ruleCardCount: document.getElementById('ruleCardCount'),
     answerCardCount: document.getElementById('answerCardCount'),
     flowchartPanel: document.getElementById('flowchartPanel'),
@@ -138,17 +142,12 @@ function setSummaryCounts(leadingQuestionCount, ruleCount, answerCount) {
   const counts = [
     [
       leadingQuestionCount,
-      'leadingQuestion',
+      'leading question',
       previewDom.leadingQuestionCount,
       previewDom.leadingQuestionCardCount,
     ],
     [ruleCount, 'rule', previewDom.ruleCount, previewDom.ruleCardCount],
-    [
-      answerCount,
-      'answer',
-      previewDom.answerCount,
-      previewDom.answerCardCount,
-    ],
+    [answerCount, 'answer', previewDom.answerCount, previewDom.answerCardCount],
   ];
 
   counts.forEach(([count, label, summaryElement, cardElement]) => {
@@ -162,7 +161,8 @@ function setSummaryCounts(leadingQuestionCount, ruleCount, answerCount) {
 }
 
 function renderSummaryList(items, renderer) {
-  if (!items.length) return '<p class="empty">None found for this question.</p>';
+  if (!items.length)
+    return '<p class="empty">None found for this question.</p>';
   return `<div class="summary-list">${items
     .map((item) => `<article class="summary-row">${renderer(item)}</article>`)
     .join('')}</div>`;

@@ -53,7 +53,10 @@ function appendDecisionBranch({
   nodeIds,
   lines,
 }) {
-  const leadingQuestion = chooseDecisionLeadingQuestion(candidates, remainingParams);
+  const leadingQuestion = chooseDecisionLeadingQuestion(
+    candidates,
+    remainingParams,
+  );
   if (!leadingQuestion) {
     appendRuleLeaves({
       parentNodeId,
@@ -102,7 +105,10 @@ function chooseDecisionLeadingQuestion(candidates, remainingParams) {
     .map((leadingQuestion, index) => ({
       leadingQuestion,
       index,
-      score: getLeadingQuestionSplitScore(candidates, leadingQuestion.leadingQuestion_id),
+      score: getLeadingQuestionSplitScore(
+        candidates,
+        leadingQuestion.leadingQuestion_id,
+      ),
     }))
     .filter(({ score }) => score > 0);
 
@@ -135,9 +141,11 @@ function createDecisionBranches(candidates, leadingQuestionId) {
   const candidatesWithLeadingQuestion = candidates.filter((candidate) =>
     Object.hasOwn(candidate.conditions, id),
   );
-  const leadingQuestionValues = candidatesWithLeadingQuestion.map((candidate) => {
-    return getCandidateValue(candidate, id);
-  });
+  const leadingQuestionValues = candidatesWithLeadingQuestion.map(
+    (candidate) => {
+      return getCandidateValue(candidate, id);
+    },
+  );
   const uniqueValues = new Set(leadingQuestionValues);
   const values = [...uniqueValues];
   const wildcardCandidates = getWildcardCandidates(candidates, id);
@@ -187,9 +195,7 @@ function appendRuleLeaves({
   candidates.forEach((candidate, index) => {
     const { rule } = candidate;
     const answer = answerById.get(str(rule.answer_id));
-    const decision = answer
-      ? answer.final_decision
-      : 'Unknown answer';
+    const decision = answer ? answer.final_decision : 'Unknown answer';
     const response = answer
       ? answer.answer_text
       : `Missing answer ${rule.answer_id}`;

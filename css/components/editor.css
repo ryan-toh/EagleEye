@@ -59,6 +59,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
+  min-height: 126px;
+  box-sizing: border-box;
 }
 
 .editor-panel .decision-explorer__pane-header h3 {
@@ -77,6 +79,11 @@
   grid-row: 1;
   float: none;
   margin-left: 0;
+}
+
+.editor-panel .decision-explorer__list {
+  max-height: 280px;
+  padding: 4px;
 }
 
 .global-search {
@@ -190,7 +197,12 @@ button.global-search__result:focus-visible {
 }
 
 .dialog-panel .editor-card {
-  position: relative;
+  position: fixed;
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  translate: -50% -50%;
   padding: 16px;
   background: #fafafa;
   border: 1px solid var(--border);
